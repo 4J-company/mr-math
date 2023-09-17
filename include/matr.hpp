@@ -1,6 +1,8 @@
 #ifndef __matr_hpp_
 #define __matr_hpp_
 
+#include "def.hpp"
+
 namespace mr {
   class matr {
   };

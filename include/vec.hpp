@@ -2,6 +2,7 @@
 #define __Vec_hpp_
 
 #include "def.hpp"
+#include <pstl/glue_execution_defs.h>
 
 namespace mr {
   template<typename T, std::size_t N>
@@ -94,9 +95,7 @@ namespace mr {
         }
 
         [[nodiscard]] constexpr T length2() const noexcept {
-          std::array<T, N> arr;
-          (_data * _data).copy_to(&arr[0], stdx::vector_aligned);
-          return std::accumulate(arr.begin(), arr.end(), 0);
+          return stdx::reduce(_data * _data); // sum by default
         }
 
         [[nodiscard]] constexpr T length() const noexcept {
@@ -106,6 +105,17 @@ namespace mr {
         [[nodiscard]] constexpr T operator[](std::size_t i) const {
           return _data[i];
         }
+
+        template<typename... Args>
+          constexpr void shuffle(Args... args) {
+            static_assert(1 <= sizeof...(args) && sizeof...(args) <= N, "Wrong number of parameters");
+            std::array<int, N> tmp {static_cast<int>(args)...};
+            std::array<T, N> arr;
+            std::for_each(std::execution::unseq, tmp.begin(), tmp.end(), [&](auto i) {
+                arr[i] = _data[i];
+                });
+            _data.copy_from(&arr[0], stdx::element_aligned);
+          }
 
         [[nodiscard]] constexpr Vec & normalize() noexcept{
           _data /= length();

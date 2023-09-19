@@ -2,6 +2,8 @@
 #define __def_hpp_
 
 #include <experimental/simd>
+#include <type_traits>
+#include <execution>
 #include <algorithm>
 #include <numeric>
 #include <ranges>

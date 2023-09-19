@@ -109,10 +109,15 @@ namespace mr {
         template<typename... Args>
           constexpr void shuffle(Args... args) {
             static_assert(1 <= sizeof...(args) && sizeof...(args) <= N, "Wrong number of parameters");
-            std::array<int, N> tmp {static_cast<int>(args)...};
-            std::array<T, N> arr;
-            std::for_each(std::execution::unseq, tmp.begin(), tmp.end(), [&](auto i) {
-                arr[i] = _data[i];
+
+            std::array<int, N> arr {};
+            std::ranges::for_each(
+                std::execution::par_unseq, 
+                std::views::zip(
+                  std::views::iota(0, static_cast<int>(size)),
+                  std::array<T, N>(static_cast<int>(args)...)), 
+                [&](auto e) {
+                arr[std::get<0>(e)] = _data[std::get<1>(e)];
                 });
             _data.copy_from(&arr[0], stdx::element_aligned);
           }

@@ -118,19 +118,26 @@ namespace mr {
           }
 
         template<typename... Args>
-          constexpr Vec shuffled(Args... args) {
+          [[nodiscard]] constexpr Vec shuffled(Args... args) const noexcept {
             static_assert(1 <= sizeof...(args) && sizeof...(args) <= N, "Wrong number of parameters");
-            std::array<int, N> tmp {static_cast<int>(args)...};
-            std::array<T, N> arr;
-            std::for_each(std::execution::unseq, tmp.begin(), tmp.end(), [&](auto i) {
-                arr[i] = _data[i];
+
+            std::array<int, N> arr {};
+            std::ranges::for_each(
+                std::execution::par_unseq, 
+                std::views::zip(
+                  std::views::iota(0, static_cast<int>(size)),
+                  std::array<T, N>(static_cast<int>(args)...)), 
+                [&](auto e) {
+                arr[std::get<0>(e)] = _data[std::get<1>(e)];
                 });
+
             stdx::fixed_size_simd<T, N> ans;
             ans.copy_from(&arr[0], stdx::element_aligned);
+
             return ans;
           }
 
-        [[nodiscard]] constexpr Vec & normalize() noexcept{
+        [[nodiscard]] constexpr Vec & normalize() noexcept {
           _data /= length();
           return *this;
         };
@@ -154,11 +161,12 @@ namespace mr {
 
         // cross product
         [[nodiscard]] constexpr Vec operator%(const Vec<T, N> other) const noexcept {
-          Vec tmp0 = shuffled(3, 0, 2, 1);
-          Vec tmp1 = other.shuffled(3, 1, 0, 2);
-          Vec tmp2 = tmp0 * other._data;
-          Vec tmp3 = tmp0 * tmp1;
-          Vec tmp4 = tmp2.shuffled(3, 0, 2, 1);
+          Vec<T, N> tmp0 = this->shuffled(3, 0, 2, 1);
+          Vec<T, N> tmp1 = other.shuffled(3, 1, 0, 2);
+          Vec<T, N> tmp2 = tmp0 * other._data;
+          Vec<T, N> tmp3 = tmp0 * tmp1;
+          Vec<T, N> tmp4 = tmp2.shuffled(3, 0, 2, 1);
+
           return tmp3 - tmp4;
         }
 

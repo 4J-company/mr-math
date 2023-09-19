@@ -1,3 +1,4 @@
+#include <chrono>
 #include <iostream>
 
 #include "math.hpp"
@@ -19,7 +20,7 @@ int main() {
   mr::Vec4f v2 {0.f, 1.f, 0.f, 0.f};
   std::string s = "0123";
 
-  std::cout << v1 % v2;
+  std::cout << v2.shuffled(4, 3, 2, 1) << std::endl;
 
   auto f = [&]() {
   };

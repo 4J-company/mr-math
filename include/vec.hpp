@@ -2,7 +2,6 @@
 #define __Vec_hpp_
 
 #include "def.hpp"
-#include <pstl/glue_execution_defs.h>
 
 namespace mr {
   template<typename T, std::size_t N>
@@ -53,6 +52,10 @@ namespace mr {
             std::array<T, N> arr {args...};
             _data.copy_from(&arr[0], stdx::element_aligned);
           }
+
+        // move semantics
+        Vec(Vec &&) noexcept = delete;
+        Vec &operator=(Vec &&) noexcept = delete;
 
         // copy semantics
         Vec(const Vec &other) noexcept = default;
@@ -108,30 +111,31 @@ namespace mr {
 
         template<typename... Args>
           constexpr void shuffle(Args... args) {
-            static_assert(1 <= sizeof...(args) && sizeof...(args) <= N, "Wrong number of parameters");
+            static_assert(sizeof...(args) == N, "Wrong number of parameters");
 
-            std::array<int, N> arr {};
-            std::ranges::for_each(
+            std::array<int, N> tmp1 {args...};
+            auto tmp2 = std::views::zip(std::views::iota(0, static_cast<int>(size)), tmp1);
+            std::array<T, N> arr {};
+            std::for_each(
                 std::execution::par_unseq, 
-                std::views::zip(
-                  std::views::iota(0, static_cast<int>(size)),
-                  std::array<T, N>(static_cast<int>(args)...)), 
+                tmp2.begin(),
+                tmp2.end(),
                 [&](auto e) {
-                arr[std::get<0>(e)] = _data[std::get<1>(e)];
+                  arr[std::get<0>(e)] = _data[std::get<1>(e)];
                 });
             _data.copy_from(&arr[0], stdx::element_aligned);
           }
 
         template<typename... Args>
           [[nodiscard]] constexpr Vec shuffled(Args... args) const noexcept {
-            static_assert(1 <= sizeof...(args) && sizeof...(args) <= N, "Wrong number of parameters");
+            static_assert(sizeof...(args) == N, "Wrong number of parameters");
 
-            std::array<int, N> arr {};
-            std::ranges::for_each(
+            std::array<int, N> tmp1 {args...};
+            auto tmp2 = std::views::zip(std::views::iota(0, static_cast<int>(size)), tmp1);
+            std::array<T, N> arr {};
+            std::for_each(
                 std::execution::par_unseq, 
-                std::views::zip(
-                  std::views::iota(0, static_cast<int>(size)),
-                  std::array<T, N>(static_cast<int>(args)...)), 
+                tmp2.begin(), tmp2.end(),
                 [&](auto e) {
                 arr[std::get<0>(e)] = _data[std::get<1>(e)];
                 });
@@ -166,20 +170,29 @@ namespace mr {
 
         // cross product
         [[nodiscard]] constexpr Vec operator%(const Vec<T, N> other) const noexcept {
-          Vec<T, N> tmp0 = this->shuffled(3, 0, 2, 1);
-          Vec<T, N> tmp1 = other.shuffled(3, 1, 0, 2);
-          Vec<T, N> tmp2 = tmp0 * other._data;
-          Vec<T, N> tmp3 = tmp0 * tmp1;
-          Vec<T, N> tmp4 = tmp2.shuffled(3, 0, 2, 1);
+          static_assert(N == 3, "Wrong number of elements");
 
-          return tmp3 - tmp4;
+          std::array<T, 3> arr {
+            _data[1] * other._data[2] - _data[2] * other._data[1],
+            _data[2] * other._data[0] - _data[0] * other._data[2],
+            _data[0] * other._data[1] - _data[1] * other._data[0]
+          };
+          stdx::fixed_size_simd<T, N> ans;
+          ans.copy_from(&arr[0], stdx::element_aligned);
+          return {ans};
+
+          // Vec tmp0 = this->shuffled(1, 2, 0);
+          // Vec tmp1 = other.shuffled(2, 0, 1);
+          // Vec tmp2 = this->shuffled(2, 0, 1);
+          // Vec tmp3 = other.shuffled(1, 2, 0);
+
+          // return tmp0 * tmp1 - tmp2 * tmp3;
         }
 
         // dot product
-        [[nodiscard]] constexpr T operator^(const Vec<T, N> other) const noexcept {
+        [[nodiscard]] constexpr T operator&(const Vec<T, N> other) const noexcept {
+          return stdx::reduce(_data * other._data);
         }
-
-        constexpr bool operator<=>(const Vec &other) const noexcept = delete;
 
         friend std::ostream & operator<<(std::ostream &s, const Vec &v) noexcept {
           s << '(';

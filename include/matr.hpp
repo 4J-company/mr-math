@@ -2,7 +2,6 @@
 #define __matr_hpp_
 
 #include "def.hpp"
-#include <iostream>
 
 namespace mr {
   template <typename T, std::size_t N>
@@ -19,12 +18,16 @@ namespace mr {
   using Matr4u = Matr4<uint>;
 
   template <typename T, std::size_t N>
-    class Matr {
+    class [[nodiscard]] Matr {
       public:
         constexpr static inline std::size_t size = N;
 
         class Row : stdx::fixed_size_simd<T, N> {
         public:
+          Row(const T *data) {
+            stdx::fixed_size_simd<T, N>::copy_from(data, stdx::element_aligned);
+          }
+
           template <
             typename... Args,
             typename std::enable_if_t<sizeof...(Args) == 0 || sizeof...(Args) == N, int> = 0,
@@ -52,6 +55,10 @@ namespace mr {
       public:
         Matr() = default;
 
+        Matr(const std::array<Row, N> &arr) {
+          _data = arr;
+        }
+
         template <
           class ... Args,
           typename std::enable_if_t<sizeof...(Args) == N, int> = 0,
@@ -69,28 +76,28 @@ namespace mr {
         Matr(Matr &&other) noexcept = default;
         Matr & operator=(Matr &&other) noexcept = default;
 
-        [[nodiscard]] constexpr Matr operator*=(const Matr &other) noexcept {
+        constexpr Matr operator*=(const Matr &other) noexcept {
           const Matr<T, N> tr = other.transposed();
           for (int i = 0; i < N; i++)
             _data[i] *= tr._data[i];
           return *this;
         }
 
-        [[nodiscard]] constexpr Matr operator+=(const Matr &other) noexcept {
+        constexpr Matr operator+=(const Matr &other) noexcept {
           std::array<Row, N> tmp;
           for (int i = 0; i < N; i++)
             _data[i] += other._data[i];
           return {tmp};
         }
 
-        [[nodiscard]] constexpr Matr operator-=(const Matr &other) noexcept {
+        constexpr Matr operator-=(const Matr &other) noexcept {
           std::array<Row, N> tmp;
           for (int i = 0; i < N; i++)
             _data[i] -= other._data[i];
           return {tmp};
         }
 
-        [[nodiscard]] constexpr Matr operator*(const Matr &other) const noexcept {
+        constexpr Matr operator*(const Matr &other) const noexcept {
           const Matr<T, N> tr = other.transposed();
           std::array<Row, N> tmp;
           for (int i = 0; i < N; i++)
@@ -98,14 +105,14 @@ namespace mr {
           return {tmp};
         }
 
-        [[nodiscard]] constexpr Matr operator+(const Matr &other) const noexcept {
+        constexpr Matr operator+(const Matr &other) const noexcept {
           std::array<Row, N> tmp;
           for (int i = 0; i < N; i++)
             tmp[i] = _data[i] + other._data[i];
           return {tmp};
         }
 
-        [[nodiscard]] constexpr Matr operator-(const Matr &other) const noexcept {
+        constexpr Matr operator-(const Matr &other) const noexcept {
           std::array<Row, N> tmp;
           for (int i = 0; i < N; i++)
             tmp[i] = _data[i] - other._data[i];
@@ -116,7 +123,7 @@ namespace mr {
           return {};
         }
 
-        [[nodiscard]] constexpr Matr transposed() const noexcept {
+        constexpr Matr transposed() const noexcept {
           std::array<Row, N> tmp1;
           std::array<std::array<T, N>, N> tmp2;
           for (int i = 0; i < N; i++)
@@ -127,7 +134,7 @@ namespace mr {
           return {tmp1};
         }
 
-        [[nodiscard]] constexpr Matr & transpose() noexcept {
+        constexpr Matr & transpose() noexcept {
           std::array<std::array<T, N>, N> tmp2;
           for (int i = 0; i < N; i++)
             for (int j = 0; j < N; j++)
@@ -137,8 +144,24 @@ namespace mr {
           return *this;
         }
 
-        constexpr static Matr<T, N> Id() {
-          return {};
+        constexpr static Matr Id() {
+          std::array<Row, N> tmp;
+
+          std::ranges::transform(
+              /// std::execution::par_unseq,
+              std::ranges::iota_view{(size_t)0, N}, tmp.begin(), 
+              [](auto i) -> Row {
+                std::array<T, N> tmp;
+                std::ranges::transform(
+                    /// std::execution::par_unseq,
+                    std::ranges::iota_view{(size_t)0, N}, tmp.begin(),
+                    [i](auto i2) -> T {
+                      return i2 == i ? 1 : 0;
+                    });
+                return {tmp.data()};
+              });
+
+          return tmp;
         }
 
         friend std::ostream & operator<<(std::ostream &s, const Matr &m) noexcept {

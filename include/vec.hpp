@@ -31,10 +31,7 @@ namespace mr {
   using Vec4d = Vec<float, 4>;
 
   template<typename T, std::size_t N>
-    class Vec {
-      public:
-        constexpr inline static std::size_t size = N;
-
+    class [[nodiscard]] Vec {
       private:
         stdx::fixed_size_simd<T, N> _data;
 
@@ -49,7 +46,7 @@ namespace mr {
         template<typename... Args>
           Vec(Args... args) {
             static_assert(1 <= sizeof...(args) && sizeof...(args) <= N, "Wrong number of parameters");
-            std::array<T, N> arr {args...};
+            std::array<T, N> arr {static_cast<T>(args)...};
             _data.copy_from(&arr[0], stdx::element_aligned);
           }
 
@@ -81,19 +78,19 @@ namespace mr {
           return *this;
         }
 
-        [[nodiscard]] constexpr Vec operator+(const Vec &other) const noexcept {
+        constexpr Vec operator+(const Vec &other) const noexcept {
           return _data + other._data;
         }
 
-        [[nodiscard]] constexpr Vec operator-(const Vec &other) const noexcept {
+        constexpr Vec operator-(const Vec &other) const noexcept {
           return _data - other._data;
         }
 
-        [[nodiscard]] constexpr Vec operator*(const Vec &other) const noexcept {
+        constexpr Vec operator*(const Vec &other) const noexcept {
           return _data * other._data;
         }
 
-        [[nodiscard]] constexpr Vec operator/(const Vec &other) const noexcept {
+        constexpr Vec operator/(const Vec &other) const noexcept {
           return _data / other._data;
         }
 
@@ -103,6 +100,23 @@ namespace mr {
 
         [[nodiscard]] constexpr T length() const noexcept {
           return std::sqrt(length2());
+        }
+
+        [[nodiscard]] constexpr T inversed_length() const {
+          float number = length2();
+          long i;
+          float x2, y;
+          const float threehalfs = 1.5F;
+
+          x2 = number * 0.5F;
+          y  = number;
+          i  = * ( long * ) &y;                        // evil floating point bit level hacking
+          i  = 0x5f3759df - ( i >> 1 );                // what the fuck?
+          y  = * ( float * ) &i;
+          y  = y * ( threehalfs - ( x2 * y * y ) );    // 1st iteration
+          // y  = y * ( threehalfs - ( x2 * y * y ) ); // 2nd iteration, this can be removed
+
+          return y;
         }
 
         [[nodiscard]] constexpr T operator[](std::size_t i) const {
@@ -127,7 +141,7 @@ namespace mr {
           }
 
         template<typename... Args>
-          [[nodiscard]] constexpr Vec shuffled(Args... args) const noexcept {
+          constexpr Vec shuffled(Args... args) const noexcept {
             // static_assert(sizeof...(args) == N, "Wrong number of parameters");
 
             // std::array<int, N> tmp1 {args...};
@@ -146,30 +160,32 @@ namespace mr {
             // return ans;
           }
 
-        [[nodiscard]] constexpr Vec & normalize() noexcept {
-          _data /= length();
+        constexpr Vec & normalize() {
+          _data *= inversed_length();
           return *this;
         };
 
-        [[nodiscard]] constexpr Vec normalized() const noexcept {
-          return {_data / length()};
+        constexpr Vec normalized() const {
+          return {_data * inversed_length()};
         };
 
-        [[nodiscard]] constexpr Vec & normalize_safe() noexcept {
+        constexpr Vec & normalize_safe() noexcept {
           auto l = length();
-          if (l == 0) return *this;
+          constexpr double E = 0.001;
+          if (std::abs(l - E) == 0) return *this;
           _data /= l;
           return *this;
         };
 
-        [[nodiscard]] constexpr Vec normalized_safe() const noexcept {
+        constexpr Vec normalized_safe() const noexcept {
           auto l = length();
-          if (l == 0) return {};
+          constexpr double E = 0.001;
+          if (std::abs(l - E) == 0) return {};
           return {_data / l};
         };
 
         // cross product
-        [[nodiscard]] constexpr Vec operator%(const Vec<T, N> other) const noexcept {
+        constexpr Vec operator%(const Vec<T, N> other) const noexcept {
           static_assert(N == 3, "Wrong number of elements");
 
           std::array<T, 3> arr {

@@ -5,9 +5,9 @@
 #include <type_traits>
 #include <execution>
 #include <algorithm>
+#include <iostream>
 #include <numeric>
-// #include <ranges>
-#include <span>
+#include <ranges>
 
 namespace stdx = std::experimental;
 

@@ -3,7 +3,7 @@
 
 #include "math.hpp"
 
-#define C 1000
+#define C 1
 
 template<typename F, typename... Args>
 void timer(F f, Args ...args) {
@@ -16,13 +16,19 @@ void timer(F f, Args ...args) {
 }
 
 int main() {
-  mr::Vec4f v1 {1.f, 0.f, 0.f, 0.f};
-  mr::Vec4f v2 {0.f, 1.f, 0.f, 0.f};
-  std::string s = "0123";
+  using namespace mr;
 
-  std::cout << v2.shuffled(4, 3, 2, 1) << std::endl;
+  mr::Matr4f m;
+  // {
+  //   mr::Matr4f::Row{1.f, 2.f, 3.f, 4.f},
+  //   mr::Matr4f::Row{2.f, 3.f, 4.f, 5.f},
+  //   mr::Matr4f::Row{3.f, 4.f, 5.f, 6.f},
+  //   mr::Matr4f::Row{4.f, 5.f, 6.f, 7.f}
+  // };
+
 
   auto f = [&]() {
+    std::cout << m << std::endl;
   };
 
   auto benchmark = [&]() {

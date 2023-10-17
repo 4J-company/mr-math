@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <iostream>
 #include <numeric>
+#include <cassert>
 #include <ranges>
 
 namespace stdx = std::experimental;

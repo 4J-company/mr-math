@@ -22,7 +22,7 @@ namespace mr {
       public:
         constexpr static inline std::size_t size = N;
 
-        class Row : stdx::fixed_size_simd<T, N> {
+        struct Row : stdx::fixed_size_simd<T, N> {
         public:
           Row(const T *data) {
             stdx::fixed_size_simd<T, N>::copy_from(data, stdx::element_aligned);
@@ -41,8 +41,8 @@ namespace mr {
           friend std::ostream & operator<<(std::ostream &s, const Row &v) noexcept {
             s << '(';
             for (int i = 0; i < N; i++)
-              s << v[i] 
-                << (char)(',' * (i < N - 1)) 
+              s << v[i]
+                << (char)(',' * (i < N - 1))
                 << (char)(' ' * (i < N - 1));
             s << ')';
             return s;
@@ -63,7 +63,7 @@ namespace mr {
           class ... Args,
           typename std::enable_if_t<sizeof...(Args) == N, int> = 0,
           typename std::enable_if_t<(std::is_same_v<Row, Args> && ...), int> = 0
-          > 
+          >
           Matr(Args... args) {
             _data = std::array<Row, N>({static_cast<Row>(args)...});
           }
@@ -119,8 +119,34 @@ namespace mr {
           return {tmp};
         }
 
+        [[nodiscard]] constexpr T determinant() const noexcept {
+          std::array<Row, N> tmp = _data;
+
+          /// impossible because of lack of operator= for std::experemental::simd
+          //
+          // auto io1 = std::ranges::iota_view((size_t)1, N);
+          // std::transform(io1.begin(), io1.end(), tmp.begin(),
+          //     [&tmp](size_t i) {
+          //     return (tmp[i] - (tmp[i][i - 1] == 0 ? 0 : tmp[i - 1][i - 1] /  tmp[i][i - 1]));
+          //
+
+          for (int i = 1; i < N; i++) {
+            tmp[i] -= tmp[i][i - 1] == 0 ? 0 : tmp[i - 1][i - 1] /  tmp[i][i - 1];
+          }
+
+          auto io0 = std::ranges::iota_view((size_t)0, N);
+          return std::transform_reduce(
+              std::execution::par_unseq,
+              io0.begin(), io0.end(), 1,
+              std::multiplies {},
+              [&tmp](auto i) {
+                return tmp[i][i];
+              }
+              );
+        }
+
         [[nodiscard]] constexpr T operator!() const noexcept {
-          return {};
+          return determinant();
         }
 
         constexpr Matr transposed() const noexcept {
@@ -146,15 +172,16 @@ namespace mr {
 
         constexpr static Matr Id() {
           std::array<Row, N> tmp;
+          auto io = std::ranges::iota_view{(size_t)0, N};
 
-          std::ranges::transform(
-              /// std::execution::par_unseq,
-              std::ranges::iota_view{(size_t)0, N}, tmp.begin(), 
-              [](auto i) -> Row {
+          std::transform(
+              std::execution::par_unseq,
+              io.begin(), io.end(), tmp.begin(),
+              [&io](auto i) -> Row {
                 std::array<T, N> tmp;
-                std::ranges::transform(
-                    /// std::execution::par_unseq,
-                    std::ranges::iota_view{(size_t)0, N}, tmp.begin(),
+                std::transform(
+                    std::execution::par_unseq,
+                    io.begin(), io.end(), tmp.begin(),
                     [i](auto i2) -> T {
                       return i2 == i ? 1 : 0;
                     });

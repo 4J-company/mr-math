@@ -2,6 +2,7 @@
 #define __Vec_hpp_
 
 #include "def.hpp"
+#include "row.hpp"
 
 namespace mr {
   template<typename T, std::size_t N>
@@ -33,22 +34,14 @@ namespace mr {
   template<typename T, std::size_t N>
     class [[nodiscard]] Vec {
       private:
-        stdx::fixed_size_simd<T, N> _data;
+        Row<T, N> _data;
 
       public:
         // default constructor
         Vec() = default;
 
         // from simd constructor
-        Vec(stdx::fixed_size_simd<T, N> data) : _data(data) {}
-
-        // variable number of arguments constructor
-        template<typename... Args>
-          Vec(Args... args) {
-            static_assert(1 <= sizeof...(args) && sizeof...(args) <= N, "Wrong number of parameters");
-            std::array<T, N> arr {static_cast<T>(args)...};
-            _data.copy_from(&arr[0], stdx::element_aligned);
-          }
+        Vec(Row<T, N> data) : _data(data) {}
 
         // move semantics
         Vec(Vec &&) noexcept = delete;
@@ -131,7 +124,7 @@ namespace mr {
             // auto tmp2 = std::views::zip(std::views::iota(0, static_cast<int>(size)), tmp1);
             // std::array<T, N> arr {};
             // std::for_each(
-            //     std::execution::par_unseq, 
+            //     std::execution::par_unseq,
             //     tmp2.begin(),
             //     tmp2.end(),
             //     [&](auto e) {
@@ -148,7 +141,7 @@ namespace mr {
             // auto tmp2 = std::views::zip(std::views::iota(0, static_cast<int>(size)), tmp1);
             // std::array<T, N> arr {};
             // std::for_each(
-            //     std::execution::par_unseq, 
+            //     std::execution::par_unseq,
             //     tmp2.begin(), tmp2.end(),
             //     [&](auto e) {
             //     arr[std::get<0>(e)] = _data[std::get<1>(e)];
@@ -211,12 +204,7 @@ namespace mr {
         }
 
         friend std::ostream & operator<<(std::ostream &s, const Vec &v) noexcept {
-          s << '(';
-          for (int i = 0; i < N; i++)
-            s << v[i] 
-              << (char)(',' * (i < N - 1)) 
-              << (char)(' ' * (i < N - 1));
-          s << ')';
+          s << v._data;
           return s;
         }
     };

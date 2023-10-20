@@ -51,33 +51,46 @@ namespace mr {
       Matr(Matr &&other) noexcept = default;
       Matr & operator=(Matr &&other) noexcept = default;
 
-      constexpr Matr operator*=(const Matr &other) noexcept {
+      constexpr Matr & operator*=(const Matr &other) noexcept {
         const Matr<T, N> tr = other.transposed();
+        std::array<std::array<T, N>, N> tmp1;
+        for (int i = 0; i < N; i++) {
+          for (int j = 0; j < N; j++) {
+            tmp1[i][j] = stdx::reduce(_data[i] * tr._data[j]);
+          }
+        }
         for (int i = 0; i < N; i++)
-          _data[i] *= tr._data[i];
+          _data[i].copy_from(tmp1[i].data(), stdx::element_aligned);
+
         return *this;
       }
 
-      constexpr Matr operator+=(const Matr &other) noexcept {
+      constexpr Matr & operator+=(const Matr &other) noexcept {
         std::array<Row<T, N>, N> tmp;
         for (int i = 0; i < N; i++)
           _data[i] += other._data[i];
-        return {tmp};
+        return *this;
       }
 
-      constexpr Matr operator-=(const Matr &other) noexcept {
+      constexpr Matr & operator-=(const Matr &other) noexcept {
         std::array<Row<T, N>, N> tmp;
         for (int i = 0; i < N; i++)
           _data[i] -= other._data[i];
-        return {tmp};
+        return *this;
       }
 
       constexpr Matr operator*(const Matr &other) const noexcept {
         const Matr<T, N> tr = other.transposed();
-        std::array<Row<T, N>, N> tmp;
+        std::array<std::array<T, N>, N> tmp1;
+        for (int i = 0; i < N; i++) {
+          for (int j = 0; j < N; j++) {
+            tmp1[i][j] = stdx::reduce(_data[i] * tr._data[j]);
+          }
+        }
+        std::array<Row_t, N> tmp2;
         for (int i = 0; i < N; i++)
-          tmp[i] = _data[i] + tr._data[i];
-        return {tmp};
+          tmp2[i].copy_from(tmp1[i].data(), stdx::element_aligned);
+        return {tmp2};
       }
 
       constexpr Matr operator+(const Matr &other) const noexcept {

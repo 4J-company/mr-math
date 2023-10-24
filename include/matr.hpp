@@ -35,10 +35,9 @@ namespace mr {
       }
 
       template <
-        class ... Args,
-        typename std::enable_if_t<sizeof...(Args) == N, int> = 0,
-        typename std::enable_if_t<(std::is_same_v<Row_t, Args> && ...), int> = 0
-      > Matr(Args... args) {
+        class ... Args
+      > requires (sizeof...(Args) == N) && (std::same_as<Args, Row<T, N>> && ...)
+      Matr(Args... args) {
         _data = std::array<Row_t, N>({static_cast<Row_t>(args)...});
       }
 

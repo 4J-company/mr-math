@@ -12,14 +12,12 @@ namespace mr {
         }
 
         template <
-          typename... Args,
-          typename std::enable_if_t<sizeof...(Args) == 0 || sizeof...(Args) == N, int> = 0,
-          typename std::enable_if_t<(std::is_convertible_v<Args, T> && ...), int> = 0
-            >
-            Row(const Args ...args) {
-              std::array<T, N> arr {static_cast<T>(args)...};
-              stdx::fixed_size_simd<T, N>::copy_from(arr.data(), stdx::element_aligned);
-            }
+          typename... Args
+        > requires (sizeof...(Args) == N) && (std::same_as<Args, Row<T, N>> && ...)
+        Row(const Args ...args) {
+          std::array<T, N> arr {static_cast<T>(args)...};
+          stdx::fixed_size_simd<T, N>::copy_from(arr.data(), stdx::element_aligned);
+        }
 
         friend std::ostream & operator<<(std::ostream &s, const Row &v) noexcept {
           s << '(';

@@ -13,7 +13,8 @@ namespace mr {
 
         template <
           typename... Args
-        > requires (sizeof...(Args) == N) && (std::same_as<Args, Row<T, N>> && ...)
+        > requires ((sizeof...(Args) == N) || (sizeof...(Args) == N)) &&
+                   (std::is_convertible_v<Args, T> && ...)
         Row(const Args ...args) {
           std::array<T, N> arr {static_cast<T>(args)...};
           stdx::fixed_size_simd<T, N>::copy_from(arr.data(), stdx::element_aligned);

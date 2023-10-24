@@ -4,7 +4,7 @@
 #include "def.hpp"
 
 namespace mr {
-  template <typename T, std::size_t N>
+  template <typename T, std::size_t N> requires std::is_arithmetic_v<T>
     struct Row : stdx::fixed_size_simd<T, N> {
       public:
         Row(const T *data) {
@@ -12,8 +12,8 @@ namespace mr {
         }
 
         template <
-          typename... Args
-        > requires ((sizeof...(Args) == N) || (sizeof...(Args) == N)) &&
+          typename ... Args
+        > requires ((sizeof...(Args) == 0) || (sizeof...(Args) == N)) &&
                    (std::is_convertible_v<Args, T> && ...)
         Row(const Args ...args) {
           std::array<T, N> arr {static_cast<T>(args)...};

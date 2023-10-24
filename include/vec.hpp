@@ -116,8 +116,8 @@ namespace mr {
           return _data[i];
         }
 
-        template<typename... Args>
-          constexpr void shuffle(Args... args) {
+        template <typename ... Args>
+          constexpr void shuffle(Args ...args) {
             // static_assert(sizeof...(args) == N, "Wrong number of parameters");
 
             // std::array<int, N> tmp1 {args...};
@@ -133,7 +133,7 @@ namespace mr {
             // _data.copy_from(&arr[0], stdx::element_aligned);
           }
 
-        template<typename... Args>
+        template <typename ... Args>
           constexpr Vec shuffled(Args... args) const noexcept {
             // static_assert(sizeof...(args) == N, "Wrong number of parameters");
 

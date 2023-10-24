@@ -35,9 +35,9 @@ namespace mr {
       }
 
       template <
-        class ... Args
+        typename ... Args
       > requires (sizeof...(Args) == N) && (std::same_as<Args, Row<T, N>> && ...)
-      Matr(Args... args) {
+      Matr(Args ...args) {
         _data = std::array<Row_t, N>({static_cast<Row_t>(args)...});
       }
 

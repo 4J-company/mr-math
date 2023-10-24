@@ -5,14 +5,14 @@
 #include "row.hpp"
 
 namespace mr {
-  template<typename T, std::size_t N>
+  template <typename T, std::size_t N>
     class Vec;
 
-  template<typename T>
+  template <typename T>
     using Vec2 = Vec<T, 2>;
-  template<typename T>
+  template <typename T>
     using Vec3 = Vec<T, 3>;
-  template<typename T>
+  template <typename T>
     using Vec4 = Vec<T, 4>;
 
   using Vec2i = Vec<int, 2>;
@@ -31,7 +31,7 @@ namespace mr {
   using Vec3d = Vec<float, 3>;
   using Vec4d = Vec<float, 4>;
 
-  template<typename T, std::size_t N>
+  template <typename T, std::size_t N>
     class [[nodiscard]] Vec {
       private:
         Row<T, N> _data;

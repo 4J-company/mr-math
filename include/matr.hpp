@@ -25,23 +25,22 @@ namespace mr {
       inline static std::array<Row<T, N>, N> id;
       inline static std::once_flag id_calculated_flag;
 
-      std::array<Row<T, N>, N> _data;
+      std::array<Row_t, N> _data;
 
     public:
       Matr() = default;
 
-      Matr(const std::array<Row<T, N>, N> &arr) {
+      Matr(const std::array<Row_t, N> &arr) {
         _data = arr;
       }
 
       template <
         class ... Args,
-              typename std::enable_if_t<sizeof...(Args) == N, int> = 0,
-              typename std::enable_if_t<(std::is_same_v<Row<T, N>, Args> && ...), int> = 0
-                >
-                Matr(Args... args) {
-                  _data = std::array<Row<T, N>, N>({static_cast<Row<T, N>>(args)...});
-                }
+        typename std::enable_if_t<sizeof...(Args) == N, int> = 0,
+        typename std::enable_if_t<(std::is_same_v<Row_t, Args> && ...), int> = 0
+      > Matr(Args... args) {
+        _data = std::array<Row_t, N>({static_cast<Row_t>(args)...});
+      }
 
       // copy semantics
       Matr(const Matr &other) noexcept = default;
@@ -66,14 +65,12 @@ namespace mr {
       }
 
       constexpr Matr & operator+=(const Matr &other) noexcept {
-        std::array<Row<T, N>, N> tmp;
         for (int i = 0; i < N; i++)
           _data[i] += other._data[i];
         return *this;
       }
 
       constexpr Matr & operator-=(const Matr &other) noexcept {
-        std::array<Row<T, N>, N> tmp;
         for (int i = 0; i < N; i++)
           _data[i] -= other._data[i];
         return *this;
@@ -94,21 +91,21 @@ namespace mr {
       }
 
       constexpr Matr operator+(const Matr &other) const noexcept {
-        std::array<Row<T, N>, N> tmp;
+        std::array<Row_t, N> tmp;
         for (int i = 0; i < N; i++)
           tmp[i] = _data[i] + other._data[i];
         return {tmp};
       }
 
       constexpr Matr operator-(const Matr &other) const noexcept {
-        std::array<Row<T, N>, N> tmp;
+        std::array<Row_t, N> tmp;
         for (int i = 0; i < N; i++)
           tmp[i] = _data[i] - other._data[i];
         return {tmp};
       }
 
       [[nodiscard]] constexpr T determinant() const {
-        std::array<Row<T, N>, N> tmp = _data;
+        std::array<Row_t, N> tmp = _data;
 
         for (int i = 1; i < N; i++) {
           for (int j = i; j < N; j++) {
@@ -128,7 +125,7 @@ namespace mr {
       }
 
       [[nodiscard]] constexpr T determinant_safe() const noexcept {
-        std::array<Row<T, N>, N> tmp = _data;
+        std::array<Row_t, N> tmp = _data;
 
         for (int i = 1; i < N; i++) {
           for (int j = i; j < N; j++) {
@@ -152,7 +149,7 @@ namespace mr {
       }
 
       constexpr Matr transposed() const noexcept {
-        std::array<Row<T, N>, N> tmp1;
+        std::array<Row_t, N> tmp1;
         std::array<std::array<T, N>, N> tmp2;
         for (int i = 0; i < N; i++)
           for (int j = 0; j < N; j++)
@@ -200,7 +197,7 @@ namespace mr {
           tmp[i] /= tmp[i][i];
         }
 
-        std::array<Row<T, N>, N> res;
+        std::array<Row_t, N> res;
         for (int i = 0; i < N; i++) {
           auto [a, b] = stdx::split<N, N>(tmp[i]);
           res[i] += stdx::simd_cast<stdx::fixed_size_simd<T, N>>(b);
@@ -236,7 +233,7 @@ namespace mr {
           tmp[i] *= tmp[i][i] == 0 ? 1 : 1 / tmp[i][i];
         }
 
-        std::array<Row<T, N>, N> res;
+        std::array<Row_t, N> res;
         for (int i = 0; i < N; i++) {
           auto [a, b] = stdx::split<N, N>(tmp[i]);
           res[i] += stdx::simd_cast<stdx::fixed_size_simd<T, N>>(b);
@@ -262,7 +259,7 @@ namespace mr {
             std::transform(
                 std::execution::par_unseq,
                 io.begin(), io.end(), tmp.begin(),
-                [&io](auto i) -> Row<T, N> {
+                [&io](auto i) -> Row_t {
                 std::array<T, N> tmp;
                 std::transform(
                     std::execution::par_unseq,

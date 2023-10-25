@@ -7,7 +7,7 @@ namespace mr {
   template <typename T, std::size_t N> requires std::is_arithmetic_v<T>
     struct Row : stdx::fixed_size_simd<T, N> {
       public:
-        Row(const T *data) {
+        constexpr Row(const T *data) {
           stdx::fixed_size_simd<T, N>::copy_from(data, stdx::element_aligned);
         }
 
@@ -15,7 +15,7 @@ namespace mr {
           typename ... Args
         > requires ((sizeof...(Args) == 0) || (sizeof...(Args) == N)) &&
                    (std::is_convertible_v<Args, T> && ...)
-        Row(const Args ...args) {
+        constexpr Row(const Args ...args) {
           std::array<T, N> arr {static_cast<T>(args)...};
           stdx::fixed_size_simd<T, N>::copy_from(arr.data(), stdx::element_aligned);
         }

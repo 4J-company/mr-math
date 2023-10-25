@@ -38,10 +38,10 @@ namespace mr {
 
       public:
         // default constructor
-        Vec() = default;
+        constexpr Vec() = default;
 
         // from simd constructor
-        Vec(Row<T, N> data) : _data(data) {}
+        constexpr Vec(Row<T, N> data) : _data(data) {}
 
         // move semantics
         Vec(Vec &&) noexcept = delete;

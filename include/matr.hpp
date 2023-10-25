@@ -173,9 +173,7 @@ namespace mr {
         auto id = Id()._data;
 
         std::array<Row<T, 2 * N>, N> tmp;
-        for (int i = 0; i < N; i++) {
-          tmp[i] += stdx::concat(_data[i], id[i]);
-        }
+        std::for_each(std::execution::seq, io.begin(), io.end(), [&tmp, this](auto i){tmp[i] += stdx::concat(_data[i], id[i]);});
 
         // null bottom triangle
         for (int i = 1; i < N; i++) {
@@ -192,15 +190,14 @@ namespace mr {
         }
 
         // make main diagonal 1
-        for (int i = 0; i < N; i++) {
-          tmp[i] /= tmp[i][i];
-        }
+        std::for_each(std::execution::seq, io.begin(), io.end(), [&tmp, this](auto i){tmp[i] /= tmp[i][i];});
 
         std::array<Row_t, N> res;
-        for (int i = 0; i < N; i++) {
-          auto [a, b] = stdx::split<N, N>(tmp[i]);
-          res[i] += stdx::simd_cast<stdx::fixed_size_simd<T, N>>(b);
-        }
+        std::for_each(std::execution::seq, io.begin(), io.end(),
+          [&tmp, &res, this](auto i){
+            auto [a, b] = stdx::split<N, N>(tmp[i]);
+            res[i] += stdx::simd_cast<stdx::fixed_size_simd<T, N>>(b);
+          });
 
         return {res};
       }
@@ -209,9 +206,7 @@ namespace mr {
         constexpr auto io = std::ranges::iota_view((size_t)0, N);
 
         std::array<Row<T, 2 * N>, N> tmp;
-        for (int i = 0; i < N; i++) {
-          tmp[i] += stdx::concat(_data[i], id[i]);
-        }
+        std::for_each(std::execution::seq, io.begin(), io.end(), [&tmp, this](auto i){tmp[i] += stdx::concat(_data[i], id[i]);});
 
         // null bottom triangle
         for (int i = 1; i < N; i++) {
@@ -228,15 +223,14 @@ namespace mr {
         }
 
         // make main diagonal 1
-        for (int i = 0; i < N; i++) {
-          tmp[i] *= tmp[i][i] == 0 ? 1 : 1 / tmp[i][i];
-        }
+        std::for_each(std::execution::seq, io.begin(), io.end(), [&tmp, this](auto i){tmp[i] /= tmp[i][i];});
 
         std::array<Row_t, N> res;
-        for (int i = 0; i < N; i++) {
-          auto [a, b] = stdx::split<N, N>(tmp[i]);
-          res[i] += stdx::simd_cast<stdx::fixed_size_simd<T, N>>(b);
-        }
+        std::for_each(std::execution::seq, io.begin(), io.end(),
+          [&tmp, &res, this](auto i){
+            auto [a, b] = stdx::split<N, N>(tmp[i]);
+            res[i] += stdx::simd_cast<stdx::fixed_size_simd<T, N>>(b);
+          });
 
         return {res};
       }
@@ -274,7 +268,7 @@ namespace mr {
       }
 
       friend std::ostream & operator<<(std::ostream &s, const Matr &m) noexcept {
-        for (int i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
           std::cout << m._data[i] << std::endl;
         return s;
       }

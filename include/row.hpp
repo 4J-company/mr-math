@@ -22,7 +22,7 @@ namespace mr {
 
         friend std::ostream & operator<<(std::ostream &s, const Row &v) noexcept {
           s << '(';
-          for (int i = 0; i < N; i++)
+          for (size_t i = 0; i < N; i++)
             s << v[i]
               << (char)(',' * (i < N - 1))
               << (char)(' ' * (i < N - 1));

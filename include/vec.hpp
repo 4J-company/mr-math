@@ -116,43 +116,6 @@ namespace mr {
           return _data[i];
         }
 
-        template <typename ... Args>
-          constexpr void shuffle(Args ...args) {
-            // static_assert(sizeof...(args) == N, "Wrong number of parameters");
-
-            // std::array<int, N> tmp1 {args...};
-            // auto tmp2 = std::views::zip(std::views::iota(0, static_cast<int>(size)), tmp1);
-            // std::array<T, N> arr {};
-            // std::for_each(
-            //     std::execution::par_unseq,
-            //     tmp2.begin(),
-            //     tmp2.end(),
-            //     [&](auto e) {
-            //       arr[std::get<0>(e)] = _data[std::get<1>(e)];
-            //     });
-            // _data.copy_from(&arr[0], stdx::element_aligned);
-          }
-
-        template <typename ... Args>
-          constexpr Vec shuffled(Args... args) const noexcept {
-            // static_assert(sizeof...(args) == N, "Wrong number of parameters");
-
-            // std::array<int, N> tmp1 {args...};
-            // auto tmp2 = std::views::zip(std::views::iota(0, static_cast<int>(size)), tmp1);
-            // std::array<T, N> arr {};
-            // std::for_each(
-            //     std::execution::par_unseq,
-            //     tmp2.begin(), tmp2.end(),
-            //     [&](auto e) {
-            //     arr[std::get<0>(e)] = _data[std::get<1>(e)];
-            //     });
-
-            // stdx::fixed_size_simd<T, N> ans;
-            // ans.copy_from(&arr[0], stdx::element_aligned);
-
-            // return ans;
-          }
-
         constexpr Vec & normalize() {
           _data *= inversed_length();
           return *this;

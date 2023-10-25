@@ -9,6 +9,7 @@
 #include <numeric>
 #include <cassert>
 #include <ranges>
+#include <mutex>
 
 namespace stdx = std::experimental;
 

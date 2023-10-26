@@ -78,27 +78,27 @@ namespace mr {
       constexpr Matr operator*(const Matr &other) const noexcept {
         const Matr<T, N> tr = other.transposed();
         std::array<std::array<T, N>, N> tmp1;
-        for (int i = 0; i < N; i++) {
-          for (int j = 0; j < N; j++) {
+        for (size_t i = 0; i < N; i++) {
+          for (size_t j = 0; j < N; j++) {
             tmp1[i][j] = stdx::reduce(_data[i] * tr._data[j]);
           }
         }
         std::array<Row_t, N> tmp2;
-        for (int i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
           tmp2[i].copy_from(tmp1[i].data(), stdx::element_aligned);
         return {tmp2};
       }
 
       constexpr Matr operator+(const Matr &other) const noexcept {
         std::array<Row_t, N> tmp;
-        for (int i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
           tmp[i] = static_cast<Row_t>(_data[i] + other._data[i]);
         return {tmp};
       }
 
       constexpr Matr operator-(const Matr &other) const noexcept {
         std::array<Row_t, N> tmp;
-        for (int i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
           tmp[i] = _data[i] - other._data[i];
         return {tmp};
       }
@@ -106,8 +106,8 @@ namespace mr {
       [[nodiscard]] constexpr T determinant() const {
         std::array<Row_t, N> tmp = _data;
 
-        for (int i = 1; i < N; i++) {
-          for (int j = i; j < N; j++) {
+        for (size_t i = 1; i < N; i++) {
+          for (size_t j = i; j < N; j++) {
             tmp[j] -= tmp[i - 1] * tmp[j][i - 1] /  tmp[i - 1][i - 1];
           }
         }
@@ -126,8 +126,8 @@ namespace mr {
       [[nodiscard]] constexpr T determinant_safe() const noexcept {
         std::array<Row_t, N> tmp = _data;
 
-        for (int i = 1; i < N; i++) {
-          for (int j = i; j < N; j++) {
+        for (size_t i = 1; i < N; i++) {
+          for (size_t j = i; j < N; j++) {
             tmp[i] -= tmp[i][i - 1] == 0 ? 0 : tmp[i - 1] * tmp[j][i - 1] /  tmp[i - 1][i - 1];
           }
         }
@@ -150,20 +150,20 @@ namespace mr {
       constexpr Matr transposed() const noexcept {
         std::array<Row_t, N> tmp1;
         std::array<std::array<T, N>, N> tmp2;
-        for (int i = 0; i < N; i++)
-          for (int j = 0; j < N; j++)
+        for (size_t i = 0; i < N; i++)
+          for (size_t j = 0; j < N; j++)
             tmp2[i][j] = _data[j][i];
-        for (int i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
           tmp1[i].copy_from(tmp2[i].data(), stdx::element_aligned);
         return {tmp1};
       }
 
       constexpr Matr & transpose() noexcept {
         std::array<std::array<T, N>, N> tmp2;
-        for (int i = 0; i < N; i++)
-          for (int j = 0; j < N; j++)
+        for (size_t i = 0; i < N; i++)
+          for (size_t j = 0; j < N; j++)
             tmp2[i][j] = _data[j][i];
-        for (int i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
           _data[i].copy_from(tmp2[i].data(), stdx::element_aligned);
         return *this;
       }
@@ -175,8 +175,8 @@ namespace mr {
         std::for_each(std::execution::par_unseq, io.begin(), io.end(), [&tmp, this](auto i){tmp[i] += stdx::concat(_data[i], id[i]);});
 
         // null bottom triangle
-        for (int i = 1; i < N; i++) {
-          for (int j = i; j < N; j++) {
+        for (size_t i = 1; i < N; i++) {
+          for (size_t j = i; j < N; j++) {
             tmp[j] -= tmp[i - 1] * tmp[j][i - 1] /  tmp[i - 1][i - 1];
           }
         }
@@ -189,11 +189,11 @@ namespace mr {
         }
 
         // make main diagonal 1
-        std::for_each(std::execution::par_unseq, io.begin(), io.end(), [&tmp, this](auto i){tmp[i] /= tmp[i][i];});
+        std::for_each(std::execution::par_unseq, io.begin(), io.end(), [&tmp](auto i){tmp[i] /= tmp[i][i];});
 
         std::array<Row_t, N> res;
         std::for_each(std::execution::par_unseq, io.begin(), io.end(),
-          [&tmp, &res, this](auto i){
+          [&tmp, &res](auto i){
             auto [a, b] = stdx::split<N, N>(tmp[i]);
             res[i] += stdx::simd_cast<stdx::fixed_size_simd<T, N>>(b);
           });
@@ -208,8 +208,8 @@ namespace mr {
         std::for_each(std::execution::par_unseq, io.begin(), io.end(), [&tmp, this](auto i){tmp[i] += stdx::concat(_data[i], id[i]);});
 
         // null bottom triangle
-        for (int i = 1; i < N; i++) {
-          for (int j = i; j < N; j++) {
+        for (size_t i = 1; i < N; i++) {
+          for (size_t j = i; j < N; j++) {
             tmp[j] -= tmp[i - 1][i - 1] == 0 ? 0 : tmp[i - 1] * tmp[j][i - 1] /  tmp[i - 1][i - 1];
           }
         }
@@ -222,11 +222,11 @@ namespace mr {
         }
 
         // make main diagonal 1
-        std::for_each(std::execution::par_unseq, io.begin(), io.end(), [&tmp, this](auto i){tmp[i] /= tmp[i][i];});
+        std::for_each(std::execution::par_unseq, io.begin(), io.end(), [&tmp](auto i){tmp[i] /= tmp[i][i];});
 
         std::array<Row_t, N> res;
         std::for_each(std::execution::par_unseq, io.begin(), io.end(),
-          [&tmp, &res, this](auto i){
+          [&tmp, &res](auto i){
             auto [a, b] = stdx::split<N, N>(tmp[i]);
             res[i] += stdx::simd_cast<stdx::fixed_size_simd<T, N>>(b);
           });

@@ -92,7 +92,7 @@ namespace mr {
       constexpr Matr operator+(const Matr &other) const noexcept {
         std::array<Row_t, N> tmp;
         for (int i = 0; i < N; i++)
-          tmp[i] = _data[i] + other._data[i];
+          tmp[i] = static_cast<Row_t>(_data[i] + other._data[i]);
         return {tmp};
       }
 
@@ -170,10 +170,9 @@ namespace mr {
 
       constexpr Matr inversed() const {
         constexpr auto io = std::ranges::iota_view((size_t)0, N);
-        auto id = Id()._data;
 
         std::array<Row<T, 2 * N>, N> tmp;
-        std::for_each(std::execution::seq, io.begin(), io.end(), [&tmp, this](auto i){tmp[i] += stdx::concat(_data[i], id[i]);});
+        std::for_each(std::execution::par_unseq, io.begin(), io.end(), [&tmp, this](auto i){tmp[i] += stdx::concat(_data[i], id[i]);});
 
         // null bottom triangle
         for (int i = 1; i < N; i++) {
@@ -190,10 +189,10 @@ namespace mr {
         }
 
         // make main diagonal 1
-        std::for_each(std::execution::seq, io.begin(), io.end(), [&tmp, this](auto i){tmp[i] /= tmp[i][i];});
+        std::for_each(std::execution::par_unseq, io.begin(), io.end(), [&tmp, this](auto i){tmp[i] /= tmp[i][i];});
 
         std::array<Row_t, N> res;
-        std::for_each(std::execution::seq, io.begin(), io.end(),
+        std::for_each(std::execution::par_unseq, io.begin(), io.end(),
           [&tmp, &res, this](auto i){
             auto [a, b] = stdx::split<N, N>(tmp[i]);
             res[i] += stdx::simd_cast<stdx::fixed_size_simd<T, N>>(b);
@@ -206,7 +205,7 @@ namespace mr {
         constexpr auto io = std::ranges::iota_view((size_t)0, N);
 
         std::array<Row<T, 2 * N>, N> tmp;
-        std::for_each(std::execution::seq, io.begin(), io.end(), [&tmp, this](auto i){tmp[i] += stdx::concat(_data[i], id[i]);});
+        std::for_each(std::execution::par_unseq, io.begin(), io.end(), [&tmp, this](auto i){tmp[i] += stdx::concat(_data[i], id[i]);});
 
         // null bottom triangle
         for (int i = 1; i < N; i++) {
@@ -223,10 +222,10 @@ namespace mr {
         }
 
         // make main diagonal 1
-        std::for_each(std::execution::seq, io.begin(), io.end(), [&tmp, this](auto i){tmp[i] /= tmp[i][i];});
+        std::for_each(std::execution::par_unseq, io.begin(), io.end(), [&tmp, this](auto i){tmp[i] /= tmp[i][i];});
 
         std::array<Row_t, N> res;
-        std::for_each(std::execution::seq, io.begin(), io.end(),
+        std::for_each(std::execution::par_unseq, io.begin(), io.end(),
           [&tmp, &res, this](auto i){
             auto [a, b] = stdx::split<N, N>(tmp[i]);
             res[i] += stdx::simd_cast<stdx::fixed_size_simd<T, N>>(b);

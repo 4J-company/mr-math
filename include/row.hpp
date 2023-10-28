@@ -20,11 +20,10 @@ namespace mr {
           stdx::fixed_size_simd<T, N>::copy_from(arr.data(), stdx::element_aligned);
         }
 
-        Row(const stdx::fixed_size_simd<T, N> & other) noexcept {
+        constexpr Row(const stdx::fixed_size_simd<T, N> & other) noexcept {
           stdx::fixed_size_simd<T, N>::operator=(other);
         }
-
-        Row & operator=(const stdx::fixed_size_simd<T, N> & other) noexcept {
+        constexpr Row & operator=(const stdx::fixed_size_simd<T, N> & other) noexcept {
           stdx::fixed_size_simd<T, N>::operator=(other);
         }
 

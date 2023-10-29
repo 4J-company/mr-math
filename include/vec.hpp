@@ -46,8 +46,8 @@ namespace mr {
         constexpr Vec(Row<T, N> data) : Row<T, N>(data) {}
 
         // move semantics
-        constexpr Vec(Vec &&) noexcept = delete;
-        constexpr Vec &operator=(Vec &&) noexcept = delete;
+        constexpr Vec(Vec &&) noexcept = default;
+        constexpr Vec &operator=(Vec &&) noexcept = default;
 
         // copy semantics
         constexpr Vec(const Vec &other) noexcept = default;

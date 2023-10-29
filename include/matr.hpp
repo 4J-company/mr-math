@@ -21,13 +21,6 @@ namespace mr {
     public:
       using Row_t = Row<T, N>;
 
-    private:
-      inline static std::array<Row_t, N> id;
-      inline static std::once_flag id_calculated_flag;
-
-      std::array<Row_t, N> _data;
-
-    public:
       Matr() = default;
 
       constexpr Matr(const std::array<Row_t, N> &arr) {
@@ -76,7 +69,7 @@ namespace mr {
         std::array<Row_t, N> tmp;
         for (size_t i = 0; i < N; i++) {
           for (size_t j = 0; j < N; j++) {
-            tmp[i] += other._data[j] * _data[i][j];
+            tmp[j] += other._data[i] * _data[j][i];
           }
         }
         return {tmp};
@@ -96,27 +89,7 @@ namespace mr {
         return {tmp};
       }
 
-      [[nodiscard]] constexpr T determinant() const {
-        std::array<Row_t, N> tmp = _data;
-
-        for (size_t i = 1; i < N; i++) {
-          for (size_t j = i; j < N; j++) {
-            tmp[j] -= tmp[i - 1] * tmp[j][i - 1] /  tmp[i - 1][i - 1];
-          }
-        }
-
-        constexpr auto io0 = std::ranges::iota_view((size_t)0, N);
-        return std::transform_reduce(
-            std::execution::par_unseq,
-            io0.begin(), io0.end(), 1,
-            std::multiplies {},
-            [&tmp](auto i) {
-            return tmp[i][i];
-            }
-            );
-      }
-
-      [[nodiscard]] constexpr T determinant_safe() const noexcept {
+      [[nodiscard]] constexpr T determinant() const noexcept {
         std::array<Row_t, N> tmp = _data;
 
         for (size_t i = 1; i < N; i++) {
@@ -137,7 +110,7 @@ namespace mr {
       }
 
       [[nodiscard]] constexpr T operator!() const noexcept {
-        return determinant_safe();
+        return determinant();
       }
 
       constexpr Matr transposed() const noexcept {
@@ -161,44 +134,11 @@ namespace mr {
         return *this;
       }
 
-      constexpr Matr inversed() const {
+      constexpr Matr inversed() const noexcept {
         constexpr auto io = std::ranges::iota_view((size_t)0, N);
 
         std::array<Row<T, 2 * N>, N> tmp;
-        std::for_each(std::execution::par_unseq, io.begin(), io.end(), [&tmp, this](auto i){tmp[i] += stdx::concat(_data[i], id[i]);});
-
-        // null bottom triangle
-        for (size_t i = 1; i < N; i++) {
-          for (size_t j = i; j < N; j++) {
-            tmp[j] -= tmp[i - 1] * tmp[j][i - 1] /  tmp[i - 1][i - 1];
-          }
-        }
-
-        // null top triangle
-        for (int i = N - 2; i >= 0; i--) {
-          for (int j = i; j >= 0; j--) {
-            tmp[j] -= tmp[i + 1] * tmp[j][i + 1] /  tmp[i + 1][i + 1];
-          }
-        }
-
-        // make main diagonal 1
-        std::for_each(std::execution::par_unseq, io.begin(), io.end(), [&tmp](auto i){tmp[i] /= tmp[i][i];});
-
-        std::array<Row_t, N> res;
-        std::for_each(std::execution::par_unseq, io.begin(), io.end(),
-          [&tmp, &res](auto i){
-            auto [a, b] = stdx::split<N, N>(tmp[i]);
-            res[i] += stdx::simd_cast<stdx::fixed_size_simd<T, N>>(b);
-          });
-
-        return {res};
-      }
-
-      constexpr Matr inversed_safe() const noexcept {
-        constexpr auto io = std::ranges::iota_view((size_t)0, N);
-
-        std::array<Row<T, 2 * N>, N> tmp;
-        std::for_each(std::execution::par_unseq, io.begin(), io.end(), [&tmp, this](auto i){tmp[i] += stdx::concat(_data[i], id[i]);});
+        std::for_each(std::execution::par_unseq, io.begin(), io.end(), [&tmp, this](auto i){tmp[i] += stdx::concat(_data[i], Id[i]);});
 
         // null bottom triangle
         for (size_t i = 1; i < N; i++) {
@@ -227,43 +167,42 @@ namespace mr {
         return {res};
       }
 
-      constexpr Matr & inverse() const {
+      constexpr Matr & inverse() const noexcept {
         *this = inversed();
         return *this;
       }
 
-      constexpr Matr & inverse_safe() const noexcept {
-        *this = inversed_safe();
-        return *this;
-      }
+    private:
+      constexpr static Matr id() {
+        std::array<Row_t, N> id;
+        constexpr auto io = std::ranges::iota_view{(size_t)0, N};
 
-      constexpr static Matr Id() {
-        std::call_once(id_calculated_flag, [](auto &tmp) {
-            constexpr auto io = std::ranges::iota_view{(size_t)0, N};
-
+        std::transform(
+            std::execution::par_unseq,
+            io.begin(), io.end(), id.begin(),
+            [&io](auto i) -> Row_t {
+            std::array<T, N> tmp;
             std::transform(
                 std::execution::par_unseq,
                 io.begin(), io.end(), tmp.begin(),
-                [&io](auto i) -> Row_t {
-                std::array<T, N> tmp;
-                std::transform(
-                    std::execution::par_unseq,
-                    io.begin(), io.end(), tmp.begin(),
-                    [i](auto i2) -> T {
-                    return i2 == i ? 1 : 0;
-                    });
-                return {tmp.data()};
+                [i](auto i2) -> T {
+                return i2 == i ? 1 : 0;
                 });
-            }, id);
+            return {tmp.data()};
+            });
 
         return {id};
       }
 
+    public:
       friend std::ostream & operator<<(std::ostream &s, const Matr &m) noexcept {
         for (size_t i = 0; i < N; i++)
           std::cout << m._data[i] << std::endl;
         return s;
       }
+
+      inline static Matr Id = id();
+      std::array<Row_t, N> _data;
       };
     }
 

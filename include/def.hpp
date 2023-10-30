@@ -31,6 +31,21 @@ namespace mr {
 
       return y;
     }
+
+  template <typename T>
+    requires (sizeof(T) == sizeof(float) && std::is_trivially_copyable_v<T>)
+    constexpr float ffinv_sqrt(T number) {
+      unsigned i;
+      float x2, y;
+
+      x2 = number * 0.5F;
+      y  = number;
+      i  = std::bit_cast<unsigned>(y);             // evil floating point bit level hacking
+      i  = 0x5f3759df - ( i >> 1 );                // what the fuck?
+      y  = std::bit_cast<float>(i);
+
+      return y;
+    }
 }
 
 #endif // __def_hpp_

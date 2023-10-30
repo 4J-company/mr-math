@@ -80,6 +80,21 @@ namespace mr {
           return {*this * finv_sqrt(l)};
         };
 
+        constexpr Vec & normalize_fast() noexcept {
+          auto l = length2();
+          constexpr double E = 0.001;
+          if (std::abs(l - E) < 0) return *this;
+          *this *= ffinv_sqrt(l);
+          return *this;
+        };
+
+        constexpr Vec normalized_fast() const noexcept {
+          auto l = length2();
+          constexpr double E = 0.001;
+          if (std::abs(l - E) < 0) return {};
+          return {*this * ffinv_sqrt(l)};
+        };
+
         // cross product
         constexpr Vec operator%(const Vec<T, N> &other) const noexcept {
           static_assert(N == 3, "Wrong number of elements");

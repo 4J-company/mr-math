@@ -5,7 +5,7 @@
 
 namespace mr {
   template <typename T, std::size_t N> requires std::is_arithmetic_v<T>
-    struct Row : stdx::fixed_size_simd<T, N> {
+    struct Row {
       public:
         constexpr Row(const T *data) {
           stdx::fixed_size_simd<T, N>::copy_from(data, stdx::element_aligned);
@@ -17,15 +17,97 @@ namespace mr {
                    (std::is_convertible_v<Args, T> && ...)
         constexpr Row(const Args ...args) {
           std::array<T, N> arr {static_cast<T>(args)...};
-          stdx::fixed_size_simd<T, N>::copy_from(arr.data(), stdx::element_aligned);
+          _data.copy_from(arr.data(), stdx::element_aligned);
         }
 
         constexpr Row(const stdx::fixed_size_simd<T, N> & other) noexcept {
-          stdx::fixed_size_simd<T, N>::operator=(other);
+          _data = other;
         }
         constexpr Row & operator=(const stdx::fixed_size_simd<T, N> & other) noexcept {
-          stdx::fixed_size_simd<T, N>::operator=(other);
+          _data = other;
+          return *this;
         }
+
+        // operators returning Row<T, N> type
+        constexpr Row operator+(const Row &other) const noexcept {
+          return {_data + other._data};
+        }
+        constexpr Row operator-(const Row &other) const noexcept {
+          return {_data - other._data};
+        }
+        constexpr Row operator*(const Row &other) const noexcept {
+          return {_data * other._data};
+        }
+        constexpr Row operator/(const Row &other) const noexcept {
+          return {_data / other._data};
+        }
+        constexpr Row operator<<(const Row &other) const noexcept {
+          return {_data << other._data};
+        }
+        constexpr Row operator>>(const Row &other) const noexcept {
+          return {_data >> other._data};
+        }
+        template <typename X> requires std::is_scalar_v<X>
+        constexpr Row operator*(const X x) const noexcept {
+          return {_data * x};
+        }
+        template <typename X> requires std::is_scalar_v<X>
+        constexpr Row operator/(const X x) const noexcept {
+          return {_data / x};
+        }
+        template <typename X> requires std::is_integral_v<X>
+        constexpr Row operator<<(const X x) const noexcept {
+          return {_data << x};
+        }
+        template <typename X> requires std::is_integral_v<X>
+        constexpr Row operator>>(const X x) const noexcept {
+          return {_data >> x};
+        }
+        constexpr Row & operator+=(const Row &other) noexcept {
+          _data += other._data;
+          return *this;
+        }
+        constexpr Row & operator-=(const Row &other) noexcept {
+          _data -= other._data;
+          return *this;
+        }
+        constexpr Row & operator*=(const Row &other) noexcept {
+          _data *= other._data;
+          return *this;
+        }
+        constexpr Row & operator/=(const Row &other) noexcept {
+          _data /= other._data;
+          return *this;
+        }
+        constexpr Row & operator<<=(const Row &other) noexcept {
+          _data <<= other._data;
+          return *this;
+        }
+        constexpr Row & operator>>=(const Row &other) noexcept {
+          _data >>= other._data;
+          return *this;
+        }
+        template <typename X> requires std::is_scalar_v<X>
+        constexpr Row & operator*=(const X x) noexcept {
+          _data *= x;
+          return *this;
+        }
+        template <typename X> requires std::is_scalar_v<X>
+        constexpr Row & operator/=(const X x) noexcept {
+          _data /= x;
+          return *this;
+        }
+        template <typename X> requires std::is_integral_v<X>
+        constexpr Row & operator<<=(const X x) noexcept {
+          _data <<= x;
+          return *this;
+        }
+        template <typename X> requires std::is_integral_v<X>
+        constexpr Row & operator>>=(const X x) noexcept {
+          _data >>= x;
+          return *this;
+        }
+        constexpr bool operator<=>(const Row &other) const noexcept = default;
 
         friend std::ostream & operator<<(std::ostream &s, const Row &v) noexcept {
           s << '(';
@@ -36,6 +118,9 @@ namespace mr {
           s << ')';
           return s;
         }
+
+      protected:
+        stdx::fixed_size_simd<T, N> _data;
     };
 }
 

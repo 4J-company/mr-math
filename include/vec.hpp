@@ -54,7 +54,7 @@ namespace mr {
         constexpr Vec & operator=(const Vec &other) noexcept = default;
 
         [[nodiscard]] constexpr T length2() const noexcept {
-          return stdx::reduce(*this * *this); // sum by default
+          return stdx::reduce(this->_data * this->_data); // sum by default
         }
 
         [[nodiscard]] constexpr T length() const noexcept {
@@ -100,9 +100,9 @@ namespace mr {
           static_assert(N == 3, "Wrong number of elements");
 
           std::array<T, 3> arr {
-            (*this)[1] * other[2] - (*this)[2] * other[1],
-            (*this)[2] * other[0] - (*this)[0] * other[2],
-            (*this)[0] * other[1] - (*this)[1] * other[0]
+            this->_data[1] * other._data[2] - this->_data[2] * other._data[1],
+            this->_data[2] * other._data[0] - this->_data[0] * other._data[2],
+            this->_data[0] * other._data[1] - this->_data[1] * other._data[0]
           };
           stdx::fixed_size_simd<T, N> ans;
           ans.copy_from(arr.data(), stdx::element_aligned);

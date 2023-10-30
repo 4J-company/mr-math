@@ -107,6 +107,9 @@ namespace mr {
           _data >>= x;
           return *this;
         }
+        constexpr T operator[](std::size_t i) const {
+          return _data[i];
+        }
         constexpr bool operator<=>(const Row &other) const noexcept = default;
 
         friend std::ostream & operator<<(std::ostream &s, const Row &v) noexcept {

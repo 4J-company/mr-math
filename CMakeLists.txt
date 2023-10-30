@@ -20,7 +20,7 @@ if (ENABLE_BENCHMARK)
   add_executable(${CMAKE_PROJECT_NAME}-tests "tests/main.cpp")
   set_property(TARGET ${CMAKE_PROJECT_NAME}-tests PROPERTY CXX_STANDARD 20)
   set_property(TARGET ${CMAKE_PROJECT_NAME}-tests PROPERTY CXX_STANDARD_REQUIRED 20)
-  set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-generate -march=native -fno-exceptions -pedantic -Wall -Wextra -ffast-math")
+  set_property(TARGET ${CMAKE_PROJECT_NAME}-tests PROPERTY COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -march=native -fno-exceptions -pedantic -Wall -Wextra -ffast-math")
   target_link_libraries(${CMAKE_PROJECT_NAME}-tests PRIVATE
     ${CMAKE_PROJECT_NAME}
     benchmark

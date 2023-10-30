@@ -25,9 +25,11 @@ namespace mr {
           T width = size;
 
         private:
+          // cached frustum matrix
           mutable bool frustum_calculated = false;
           mutable Matr4<T> frustum;
 
+          // cached ortholinear matrix
           mutable bool ortholinear_calculated = false;
           mutable Matr4<T> ortholinear;
         };
@@ -97,6 +99,10 @@ namespace mr {
           return _projection;
         }
 
+        constexpr const Projection & projection() const noexcept {
+          return _projection;
+        }
+
         constexpr Matr4<T> perspective() const noexcept {
           if (_perspective_calculated) {
             return _perspective;
@@ -117,12 +123,12 @@ namespace mr {
             return _projection.ortholinear;
           }
 
-          const T l = -_projection.height / 2;
-          const T r = _projection.height / 2;
-          const T b = -_projection.width / 2;
-          const T t = _projection.width / 2;
-          const T n = _projection.distance;
-          const T f = _projection.far;
+          const T l = -_projection.height / 2; // left
+          const T r = _projection.height / 2;  // right
+          const T b = -_projection.width / 2;  // bottom
+          const T t = _projection.width / 2;   // top
+          const T n = _projection.distance;    // near
+          const T f = _projection.far;         // far
 
           _projection.ortholinear_calculated = true;
           _projection.ortholinear = mr::Matr4<T>{
@@ -139,12 +145,12 @@ namespace mr {
             return _projection.frustum;
           }
 
-          const T l = -_projection.height / 2;
-          const T r = _projection.height / 2;
-          const T b = -_projection.width / 2;
-          const T t = _projection.width / 2;
-          const T n = _projection.distance;
-          const T f = _projection.far;
+          const T l = -_projection.height / 2; // left
+          const T r = _projection.height / 2;  // right
+          const T b = -_projection.width / 2;  // bottom
+          const T t = _projection.width / 2;   // top
+          const T n = _projection.distance;    // near
+          const T f = _projection.far;         // far
 
           _projection.frustum_calculated = true;
           _projection.frustum = mr::Matr4<T>{

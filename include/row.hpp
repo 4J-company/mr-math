@@ -8,7 +8,7 @@ namespace mr {
     struct Row {
       public:
         constexpr Row(const T *data) {
-          stdx::fixed_size_simd<T, N>::copy_from(data, stdx::element_aligned);
+          _data.copy_from(data, stdx::element_aligned);
         }
 
         template <

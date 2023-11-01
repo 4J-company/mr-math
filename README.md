@@ -1,4 +1,4 @@
-# mr. Math
+![mr. Math](./mr-math-logo.png) 
 ### Lightweight and high-performance linear algebra library for 3d graphics
 
 ### Comparison

@@ -2,6 +2,7 @@
 #define __math_hpp_
 
 #include "vec.hpp"
+#include "rot.hpp"
 #include "matr.hpp"
 #include "camera.hpp"
 

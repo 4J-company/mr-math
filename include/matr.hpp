@@ -16,25 +16,21 @@ namespace mr
   using Matr4f = Matr4<float>;
   using Matr4d = Matr4<double>;
   using Matr4i = Matr4<int>;
-  using Matr4u = Matr4<uint>;
+  using Matr4u = Matr4<uint_t>;
 
   template <ArithmeticT T, std::size_t N>
     class [[nodiscard]] Matr
     {
     public:
-      using Row_t = Row<T, N>;
+      using RowT = Row<T, N>;
 
       Matr() = default;
 
-      constexpr Matr(const std::array<Row_t, N> &arr) {
-        _data = arr;
-      }
+      constexpr Matr(const std::array<RowT, N> &arr)
+        : _data(arr) {}
 
-      template <ArithmeticT... Args>
-      requires(sizeof...(Args) == N) && (std::same_as<Args, Row<T, N>> && ...)
-        constexpr Matr(Args... args) {
-          _data = std::array<Row_t, N>({static_cast<Row_t>(args)...});
-        }
+      constexpr Matr(RowT row0, RowT row1, RowT row2, RowT row3) 
+        : _data{row0, row1, row2, row3} {}
 
       // copy semantics
       constexpr Matr(const Matr &) noexcept = default;
@@ -45,7 +41,7 @@ namespace mr
       constexpr Matr & operator=(Matr &&) noexcept = default;
 
       constexpr Matr & operator*=(const Matr &other) noexcept {
-        std::array<Row_t, N> tmp {};
+        std::array<RowT, N> tmp {};
         for (size_t i = 0; i < N; i++) {
           for (size_t j = 0; j < N; j++) {
             tmp._data[i] += _data[j] * other._data[i][j];
@@ -68,7 +64,7 @@ namespace mr
       }
 
       constexpr Matr operator*(const Matr &other) const noexcept {
-        std::array<Row_t, N> tmp;
+        std::array<RowT, N> tmp;
         for (size_t i = 0; i < N; i++) {
           for (size_t j = 0; j < N; j++) {
             tmp[j] += other._data[i] * _data[j][i];
@@ -78,21 +74,21 @@ namespace mr
       }
 
       constexpr Matr operator+(const Matr &other) const noexcept {
-        std::array<Row_t, N> tmp;
+        std::array<RowT, N> tmp;
         for (size_t i = 0; i < N; i++)
-          tmp[i] = static_cast<Row_t>(_data[i] + other._data[i]);
+          tmp[i] = static_cast<RowT>(_data[i] + other._data[i]);
         return {tmp};
       }
 
       constexpr Matr operator-(const Matr &other) const noexcept {
-        std::array<Row_t, N> tmp;
+        std::array<RowT, N> tmp;
         for (size_t i = 0; i < N; i++)
           tmp[i] = _data[i] - other._data[i];
         return {tmp};
       }
 
       [[nodiscard]] constexpr T determinant() const noexcept {
-        std::array<Row_t, N> tmp = _data;
+        std::array<RowT, N> tmp = _data;
 
         for (size_t i = 1; i < N; i++) {
           for (size_t j = i; j < N; j++) {
@@ -115,7 +111,7 @@ namespace mr
       }
 
       constexpr Matr transposed() const noexcept {
-        std::array<Row_t, N> tmp1;
+        std::array<RowT, N> tmp1;
         std::array<std::array<T, N>, N> tmp2;
         for (size_t i = 0; i < N; i++)
           for (size_t j = 0; j < N; j++)
@@ -160,7 +156,7 @@ namespace mr
         std::for_each(std::execution::par_unseq,
           io.begin(), io.end(), [&tmp](auto i) { tmp[i] /= tmp[i][i]; });
 
-        std::array<Row_t, N> res;
+        std::array<RowT, N> res;
         std::for_each(std::execution::par_unseq, io.begin(), io.end(), 
           [&tmp, &res](auto i) {
             auto [a, b] = stdx::split<N, N>(tmp[i]);
@@ -175,14 +171,16 @@ namespace mr
         return *this;
       }
 
+      constexpr static Matr rotate() noexcept { return {}; }
+
     private:
       constexpr static Matr id() {
-        std::array<Row_t, N> id;
+        std::array<RowT, N> id;
         constexpr auto io = std::ranges::iota_view {(size_t)0, N};
 
         std::transform(std::execution::par_unseq,
           io.begin(), io.end(), id.begin(),
-          [&io](auto i) -> Row_t {
+          [&io](auto i) -> RowT {
             std::array<T, N> tmp;
             std::transform(std::execution::par_unseq,
               io.begin(), io.end(), tmp.begin(),
@@ -201,7 +199,7 @@ namespace mr
       }
 
       inline static Matr Id = id();
-      std::array<Row_t, N> _data;
+      std::array<RowT, N> _data;
     };
 } // namespace mr
 

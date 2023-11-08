@@ -10,16 +10,27 @@
 #include <cassert>
 #include <ranges>
 #include <mutex>
+#include <cmath>
 #include <bit>
 
 namespace stdx = std::experimental;
 
 namespace mr
 {
-  using uint = unsigned int;
+  using uint_t = unsigned int;
+
+  template <std::floating_point T>
+    [[nodiscard]] constexpr T radians(T degrees) {
+      return degrees / 180. * M_PI;
+    }
+
+  template <std::floating_point T>
+    [[nodiscard]] constexpr T degrees(T radians) {
+      return radians * M_1_PI * 180.;
+    }
 
   template <typename T>
-    concept ArithmeticT = requires { std::is_arithmetic_v<T>; };
+    concept ArithmeticT = std::integral<T> || std::floating_point<T>;
 
   template <ArithmeticT T>
     requires(sizeof(T) == sizeof(float))

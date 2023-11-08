@@ -21,9 +21,9 @@ namespace mr
   using Vec3i = Vec<int, 3>;
   using Vec4i = Vec<int, 4>;
 
-  using Vec2u = Vec<uint, 2>;
-  using Vec3u = Vec<uint, 3>;
-  using Vec4u = Vec<uint, 4>;
+  using Vec2u = Vec<uint_t, 2>;
+  using Vec3u = Vec<uint_t, 3>;
+  using Vec4u = Vec<uint_t, 4>;
 
   using Vec2f = Vec<float, 2>;
   using Vec3f = Vec<float, 3>;
@@ -34,21 +34,18 @@ namespace mr
   using Vec4d = Vec<double, 4>;
 
   template <ArithmeticT T, std::size_t N>
-    struct [[nodiscard]] Vec : Row<T, N>
+    struct [[nodiscard]] Vec : public Row<T, N>
     {
-      using Row_t = Row<T, N>;
+      using RowT = Row<T, N>;
       static constexpr T epsilon = std::numeric_limits<T>::epsilon();
-
-      // default constructor
-      constexpr Vec() = default;
 
       // from elements constructor
       template <ArithmeticT... Args>
         requires(sizeof...(Args) <= N) && (std::is_convertible_v<Args, T> && ...)
-      constexpr Vec(const Args... args) : Row_t(args...) {}
+      constexpr Vec(Args... args) : RowT{args...} {}
 
       // from simd constructor
-      constexpr Vec(Row_t data) : Row_t(data) {}
+      constexpr Vec(RowT data) : RowT(data) {}
 
       // move semantics
       constexpr Vec(Vec &&) noexcept = default;
@@ -59,7 +56,7 @@ namespace mr
       constexpr Vec & operator=(const Vec &) noexcept = default;
 
       [[nodiscard]] constexpr T length2() const noexcept {
-        return stdx::reduce(Row_t::_data * Row_t::_data); // sum by default
+        return stdx::reduce(RowT::_data * RowT::_data); // sum by default
       }
 
       [[nodiscard]] constexpr T length() const noexcept {
@@ -109,9 +106,9 @@ namespace mr
         static_assert(N == 3, "Vectors must have 3 components");
 
         std::array<T, 3> arr {
-          Row_t::_data[1] * other._data[2] - Row_t::_data[2] * other._data[1],
-          Row_t::_data[2] * other._data[0] - Row_t::_data[0] * other._data[2],
-          Row_t::_data[0] * other._data[1] - Row_t::_data[1] * other._data[0]};
+          RowT::_data[1] * other._data[2] - RowT::_data[2] * other._data[1],
+          RowT::_data[2] * other._data[0] - RowT::_data[0] * other._data[2],
+          RowT::_data[0] * other._data[1] - RowT::_data[1] * other._data[0]};
 
         stdx::fixed_size_simd<T, N> ans;
         ans.copy_from(arr.data(), stdx::element_aligned);
@@ -124,7 +121,7 @@ namespace mr
 
       // dot product
       [[nodiscard]] constexpr T dot(const Vec<T, N> other) const noexcept {
-        return stdx::reduce(Row_t::_data * other._data);
+        return stdx::reduce(RowT::_data * other._data);
       }
 
       [[nodiscard]] constexpr T operator&(const Vec<T, N> other) const noexcept {

@@ -70,8 +70,7 @@ namespace mr
       // use normalize_fast for higher precision
       constexpr Vec & normalize() noexcept {
         auto len = length2();
-        if (std::abs(len) <= epsilon)
-          return *this;
+        if (std::abs(len) <= epsilon) [[unlikely]] return *this
         *this *= finv_sqrt(len);
         return *this;
       };
@@ -79,16 +78,14 @@ namespace mr
       // use normalized_fast for lower precision
       constexpr Vec normalized() const noexcept {
         auto len = length2();
-        if (std::abs(len) <= epsilon)
-          return {};
+        if (std::abs(len) <= epsilon) [[unlikely]] return {};
         return {*this * finv_sqrt(len)};
       };
 
       // use normalize for higher precision
       constexpr Vec & normalize_fast() noexcept {
         auto len = length2();
-        if (std::abs(len) <= epsilon)
-          return *this;
+        if (std::abs(len) <= epsilon) [[unlikely]] return *this;
         *this *= ffinv_sqrt(len);
         return *this;
       };
@@ -96,9 +93,19 @@ namespace mr
       // use normalized for higher precision
       constexpr Vec normalized_fast() const noexcept {
         auto len = length2();
-        if (std::abs(len) <= epsilon)
-          return {};
+        if (std::abs(len) <= epsilon) [[unlikely]] return {};
         return {*this * ffinv_sqrt(len)};
+      };
+
+      constexpr Vec & normalize_fast_unsafe() {
+        auto l = length2();
+        *this *= ffinv_sqrt(l);
+        return *this;
+      };
+
+      constexpr Vec normalized_fast_unsafe() const {
+        auto l = length2();
+        return {*this * ffinv_sqrt(l)};
       };
 
       // cross product

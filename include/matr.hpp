@@ -24,13 +24,15 @@ namespace mr
     public:
       using RowT = Row<T, N>;
 
-      Matr() = default;
+      template <typename... Args>
+        requires (std::is_same_v<Args, RowT> && ...) &&
+                 ((sizeof...(Args) == 0) || (sizeof...(Args) == N))
+        constexpr Matr(Args... args) noexcept {
+          _data = std::array<RowT, N>({static_cast<RowT>(args)...});
+        }
 
       constexpr Matr(const std::array<RowT, N> &arr)
         : _data(arr) {}
-
-      constexpr Matr(RowT row0, RowT row1, RowT row2, RowT row3) 
-        : _data{row0, row1, row2, row3} {}
 
       // copy semantics
       constexpr Matr(const Matr &) noexcept = default;
@@ -44,7 +46,7 @@ namespace mr
         std::array<RowT, N> tmp {};
         for (size_t i = 0; i < N; i++) {
           for (size_t j = 0; j < N; j++) {
-            tmp._data[i] += _data[j] * other._data[i][j];
+            tmp._data[j] += other._data[i] * _data[j][i];
           }
         }
         *this = tmp;
@@ -93,7 +95,7 @@ namespace mr
         for (size_t i = 1; i < N; i++) {
           for (size_t j = i; j < N; j++) {
             tmp[i] -= tmp[i][i - 1] == 0
-              ? 0 
+              ? 0
               : tmp[i - 1] * tmp[j][i - 1] / tmp[i - 1][i - 1];
           }
         }
@@ -132,7 +134,7 @@ namespace mr
       }
 
       constexpr Matr inversed() const noexcept {
-        constexpr auto io = std::ranges::iota_view((size_t)0, N);
+        constexpr auto io = std::ranges::iota_view{(size_t)0, N};
 
         std::array<Row<T, 2 * N>, N> tmp;
         std::for_each(std::execution::par_unseq, io.begin(), io.end(),
@@ -157,9 +159,9 @@ namespace mr
           io.begin(), io.end(), [&tmp](auto i) { tmp[i] /= tmp[i][i]; });
 
         std::array<RowT, N> res;
-        std::for_each(std::execution::par_unseq, io.begin(), io.end(), 
+        std::for_each(std::execution::par_unseq, io.begin(), io.end(),
           [&tmp, &res](auto i) {
-            auto [a, b] = stdx::split<N, N>(tmp[i]);
+            auto [a, b] = stdx::split<N, N>(tmp[i]._data);
             res[i] += stdx::simd_cast<stdx::fixed_size_simd<T, N>>(b);
           });
 

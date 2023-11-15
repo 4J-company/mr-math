@@ -70,7 +70,7 @@ namespace mr
       // use normalize_fast for higher precision
       constexpr Vec & normalize() noexcept {
         auto len = length2();
-        if (std::abs(len) <= epsilon) [[unlikely]] return *this
+        if (std::abs(len) <= epsilon) [[unlikely]] return *this;
         *this *= finv_sqrt(len);
         return *this;
       };

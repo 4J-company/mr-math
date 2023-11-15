@@ -52,8 +52,19 @@ namespace mr
   // fast algorithm supports only 32-bit floats
   template <ArithmeticT T>
   requires(sizeof(T) == sizeof(double))
-    constexpr float finv_sqrt(T number) {
-      return 1 / std::sqrt(number);
+    constexpr double finv_sqrt(T number) {
+      unsigned long long i;
+      double x2, y;
+      const double threehalfs = 1.5F;
+
+      x2 = number * 0.5F;
+      y = number;
+      i = std::bit_cast<unsigned long long>(y); // evil floating point bit level hacking
+      i = 0x5fe6f7ced9168800 - (i >> 1);      // what the fuck?
+      y = std::bit_cast<double>(i);
+      y = y * (threehalfs - (x2 * y * y)); // 1st iteration
+
+      return y;
     }
 
   // use finv_sqrt or for higher precision (1 / std::sqrt for even higher)
@@ -61,9 +72,8 @@ namespace mr
   requires(sizeof(T) == sizeof(float))
     constexpr float ffinv_sqrt(T number) {
       unsigned i;
-      float x2, y;
+      float y;
 
-      x2 = number * 0.5F;
       y = number;
       i = std::bit_cast<unsigned>(y); // evil floating point bit level hacking
       i = 0x5f3759df - (i >> 1);      // what the fuck?
@@ -75,8 +85,16 @@ namespace mr
   // fast algorithm supports only 32-bit floats
   template <ArithmeticT T>
   requires(sizeof(T) == sizeof(double))
-    constexpr float ffinv_sqrt(T number) {
-      return 1 / std::sqrt(number);
+    constexpr double ffinv_sqrt(T number) {
+      unsigned long long i;
+      double y;
+
+      y = number;
+      i = std::bit_cast<unsigned long long>(y); // evil floating point bit level hacking
+      i = 0x5fe6f7ced9168800 - (i >> 1);      // what the fuck?
+      y = std::bit_cast<double>(i);
+
+      return y;
     }
 } // namespace mr
 

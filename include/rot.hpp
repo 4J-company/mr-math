@@ -6,6 +6,13 @@
 
 namespace mr
 {
+  template <std::floating_point T>
+    struct Rot;
+
+  // aliases
+  using Rotf = Rot<float>;
+  using Rotd = Rot<double>;
+
   // yaw, pitch, roll
   template <std::floating_point T>
     struct [[nodiscard]] Rot : public Row<T, 3>
@@ -31,37 +38,33 @@ namespace mr
       constexpr Rot & operator=(Rot &&) noexcept = default;
 
       // getters & setters
-      constexpr T Yaw() const noexcept {
-        return RowT::_data[yaw_index];
+      constexpr void set(T yaw, T pitch, T roll) noexcept {
+        RowT::set(yaw, pitch, roll);
       }
 
-      constexpr void Yaw(T yaw) const noexcept {
-        RowT::_data[yaw_index] = yaw; // clamp?
+      constexpr T yaw() const noexcept {
+        return RowT::_data[0];
       }
 
-      constexpr T Pitch() const noexcept {
-        return RowT::_data[pitch_index];
+      constexpr void yaw(T yaw) noexcept {
+        set(yaw, pitch(), roll());
       }
 
-      constexpr void Pitch(T pitch) const noexcept {
-        RowT::_data[pitch_index] = pitch; // clamp?
+      constexpr T pitch() const noexcept {
+        return RowT::_data[1];
       }
 
-      constexpr T Roll() const noexcept {
-        return RowT::_data[roll_index];
+      constexpr void pitch(T pitch) noexcept {
+        set(yaw(), pitch, roll());
       }
 
-      constexpr void Roll(T roll) const noexcept {
-        RowT::_data[roll_index] = roll; // clamp?
+      constexpr T roll() const noexcept {
+        return RowT::_data[2];
       }
 
-    private:
-      enum
-      {
-        yaw_index = 0,
-        pitch_index,
-        roll_index
-      };
+      constexpr void roll(T roll) noexcept {
+        set(yaw(), pitch(), roll);
+      }
     };
 }
 

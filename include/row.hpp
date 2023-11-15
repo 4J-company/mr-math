@@ -19,11 +19,9 @@ namespace mr
 
       // from elements constructor
       template <ArithmeticT... Args>
-        requires(sizeof...(Args) <= N) && (std::is_convertible_v<Args, T> && ...)
-      constexpr Row(const Args... args) {
-        std::array<T, N> arr {static_cast<T>(args)...};
-        _data.copy_from(arr.data(), stdx::element_aligned);
-      }
+        constexpr Row(Args... args) {
+          set(args...); // requires sizeof..(Args) <= N
+        }
 
       // copy from simd semantic
       constexpr Row(const stdx::fixed_size_simd<T, N> &other) noexcept {
@@ -35,6 +33,19 @@ namespace mr
         return *this;
       }
 
+    protected:
+      template <ArithmeticT... Args>
+      requires (sizeof...(Args) <= N) && (std::is_convertible_v<Args, T> && ...)
+        constexpr void set(Args... args) noexcept {
+          std::array<T, N> arr {static_cast<T>(args)...};
+          _data.copy_from(arr.data(), stdx::element_aligned);
+        }
+
+      [[nodiscard]] constexpr T operator[](std::size_t i) const {
+        return _data[i];
+      }
+
+    public:
       // operators returning Row<T, N> type
       constexpr Row operator+(const Row &other) const noexcept {
         return {_data + other._data};
@@ -133,10 +144,6 @@ namespace mr
           _data >>= x;
           return *this;
         }
-
-      [[nodiscard]] constexpr T operator[](std::size_t i) const {
-        return _data[i];
-      }
 
       [[nodiscard]] constexpr bool operator<=>(const Row &other) const noexcept = default;
 

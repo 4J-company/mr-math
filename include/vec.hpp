@@ -6,46 +6,47 @@
 
 namespace mr
 {
+  // forward declarations
   template <ArithmeticT T, std::size_t N>
+  requires (N >= 2)
     struct Vec;
 
-  // common types
   template <ArithmeticT T>
-    using Vec2 = Vec<T, 2>;
+    struct Vec2;
   template <ArithmeticT T>
-    using Vec3 = Vec<T, 3>;
+    struct Vec3;
   template <ArithmeticT T>
-    using Vec4 = Vec<T, 4>;
+    struct Vec4;
 
-  using Vec2i = Vec<int, 2>;
-  using Vec3i = Vec<int, 3>;
-  using Vec4i = Vec<int, 4>;
+  // common aliases
+  using Vec2i = Vec2<int>;
+  using Vec3i = Vec3<int>;
+  using Vec4i = Vec4<int>;
 
-  using Vec2u = Vec<uint_t, 2>;
-  using Vec3u = Vec<uint_t, 3>;
-  using Vec4u = Vec<uint_t, 4>;
+  using Vec2u = Vec2<uint_t>;
+  using Vec3u = Vec3<uint_t>;
+  using Vec4u = Vec4<uint_t>;
 
-  using Vec2f = Vec<float, 2>;
-  using Vec3f = Vec<float, 3>;
-  using Vec4f = Vec<float, 4>;
+  using Vec2f = Vec2<float>;
+  using Vec3f = Vec3<float>;
+  using Vec4f = Vec4<float>;
 
-  using Vec2d = Vec<double, 2>;
-  using Vec3d = Vec<double, 3>;
-  using Vec4d = Vec<double, 4>;
+  using Vec2d = Vec2<double>;
+  using Vec3d = Vec3<double>;
+  using Vec4d = Vec4<double>;
 
+  // base vector
   template <ArithmeticT T, std::size_t N>
+  requires (N >= 2)
     struct [[nodiscard]] Vec : public Row<T, N>
     {
-      using RowT = Row<T, N>;
-      static constexpr T epsilon = std::numeric_limits<T>::epsilon();
-
+    public:
       // from elements constructor
       template <ArithmeticT... Args>
-        requires(sizeof...(Args) <= N) && (std::is_convertible_v<Args, T> && ...)
-      constexpr Vec(Args... args) : RowT{args...} {}
+        constexpr Vec(Args... args) : RowT{args...} {}
 
       // from simd constructor
-      constexpr Vec(RowT data) : RowT(data) {}
+      constexpr Vec(Row<T, N> r) : Row<T, N>(r) {};
 
       // move semantics
       constexpr Vec(Vec &&) noexcept = default;
@@ -55,6 +56,7 @@ namespace mr
       constexpr Vec(const Vec &) noexcept = default;
       constexpr Vec & operator=(const Vec &) noexcept = default;
 
+      // length methods
       [[nodiscard]] constexpr T length2() const noexcept {
         return stdx::reduce(RowT::_data * RowT::_data); // sum by default
       }
@@ -127,6 +129,149 @@ namespace mr
       [[nodiscard]] constexpr T operator&(const Vec<T, N> other) const noexcept {
         return dot(other);
       }
+
+      protected:
+        using RowT = Row<T, N>;
+        static constexpr T epsilon = std::numeric_limits<T>::epsilon();
+    };
+
+  // 2D vector
+  template <ArithmeticT T>
+    struct [[nodiscard]] Vec2 : public Vec<T, 2>
+    {
+    public:
+      // default special methods
+      constexpr Vec2() = default;
+      constexpr Vec2(Vec2 &&) noexcept = default;
+      constexpr Vec2(const Vec2 &) noexcept = default;
+      constexpr Vec2 & operator=(Vec2 &&) noexcept = default;
+      constexpr Vec2 & operator=(const Vec2 &) noexcept = default;
+      constexpr ~Vec2() = default;
+
+      // constructors
+      constexpr Vec2(T x, T y) : VecT(x, y) {}
+
+      constexpr Vec2(T xy) : VecT(xy, xy) {}
+
+      explicit constexpr Vec2(Vec3<T> v) : VecT(v.x(), v.y()) {}
+
+      // setters
+      constexpr void set(T x, T y) noexcept { RowT::set(x, y); }
+
+      constexpr void set(T xy) noexcept { RowT::set(xy, xy); }
+
+      constexpr void set(const Vec3<T> &v3) noexcept { RowT::set(v3.x(), v3.y()); }
+
+      constexpr void x(T x) noexcept { set(x, y()); }
+
+      constexpr void y(T y) noexcept { set(x(), y); }
+
+      // getters
+      [[nodiscard]] constexpr T x() const noexcept { return (*this)[0]; }
+
+      [[nodiscard]] constexpr T y() const noexcept { return (*this)[1]; }
+
+    private:
+      using VecT = Vec<T, 2>;
+      using RowT = VecT::RowT;
+    };
+
+  // 3D vector
+  template <ArithmeticT T>
+    struct [[nodiscard]] Vec3 : public Vec<T, 3>
+    {
+    public:
+      // default special methods
+      constexpr Vec3() = default;
+      constexpr Vec3(Vec3 &&) noexcept = default;
+      constexpr Vec3(const Vec3 &) noexcept = default;
+      constexpr Vec3 & operator=(Vec3 &&) noexcept = default;
+      constexpr Vec3 & operator=(const Vec3 &) noexcept = default;
+      constexpr ~Vec3() = default;
+
+      // contrutors
+      constexpr Vec3(T x, T y, T z = 0) : VecT(x, y, z) {}
+
+      explicit constexpr Vec3(T xyz) : VecT(xyz, xyz, xyz) {}
+
+      explicit constexpr Vec3(const Vec2<T> &v2, T z = 0) : VecT(v2.x(), v2.y(), z) {}
+
+      explicit constexpr Vec3(const Vec4<T> &v4) : VecT(v4.x(), v4.y(), v4.z()) {}
+
+      // setters
+      constexpr void set(T x, T y, T z = 0) noexcept { RowT::set(x, y, z); }
+
+      constexpr void set(T xyz) noexcept { RowT::set(xyz, xyz, xyz); }
+
+      constexpr void set(const Vec2<T> &v2, T z = 0) noexcept { RowT::set(v2.x(), v2.y(), z); }
+
+      constexpr void set(const Vec4<T> &v4) noexcept { RowT::set(v4.x(), v4.y(), v4.z()); }
+
+      constexpr void x(T x) noexcept { set(x, y(), z()); }
+
+      constexpr void y(T y) noexcept { set(x(), y, z()); }
+
+      constexpr void z(T z) noexcept { set(x(), y(), z); }
+
+      // getters
+      [[nodiscard]] constexpr T x() const noexcept { return (*this)[0]; }
+
+      [[nodiscard]] constexpr T y() const noexcept { return (*this)[1]; }
+
+      [[nodiscard]] constexpr T z() const noexcept { return (*this)[2]; }
+
+    private:
+      using VecT = Vec<T, 3>;
+      using RowT = VecT::RowT;
+    };
+
+    // 3D vector
+  template <ArithmeticT T>
+    struct [[nodiscard]] Vec4 : public Vec<T, 4>
+    {
+    public:
+      // default special methods
+      constexpr Vec4() = default;
+      constexpr Vec4(Vec4 &&) noexcept = default;
+      constexpr Vec4(const Vec4 &) noexcept = default;
+      constexpr Vec4 & operator=(Vec4 &&) noexcept = default;
+      constexpr Vec4 & operator=(const Vec4 &) noexcept = default;
+      constexpr ~Vec4() = default;
+
+      // contrutors
+      constexpr Vec4(T x, T y, T z = 0, T w = 1) : VecT(x, y, z, w) {}
+
+      explicit constexpr Vec4(T xyzw) : VecT(xyzw, xyzw, xyzw, xyzw) {}
+
+      explicit constexpr Vec4(const Vec3<T> &v3, T w = 1) : VecT(v3.x(), v3.y(), v3.z(), w) {}
+
+      // setters
+      constexpr void set(T x, T y, T z = 0, T w = 1) noexcept { RowT::set(x, y, z, w); }
+
+      constexpr void set(T xyzw) noexcept { RowT::set(xyzw, xyzw, xyzw, xyzw); }
+
+      constexpr void set(const Vec3<T> &v3, T w = 1) noexcept { RowT::set(v3.x(), v3.y(), v3.z(), w); }
+
+      constexpr void x(T x) noexcept { set(x, y(), z(), w()); }
+
+      constexpr void y(T y) noexcept { set(x(), y, z(), w()); }
+
+      constexpr void z(T z) noexcept { set(x(), y(), z, w()); }
+
+      constexpr void w(T w) noexcept { set(x(), y(), z(), w); }
+
+      // getters
+      [[nodiscard]] constexpr T x() const noexcept { return (*this)[0]; }
+
+      [[nodiscard]] constexpr T y() const noexcept { return (*this)[1]; }
+
+      [[nodiscard]] constexpr T z() const noexcept { return (*this)[2]; }
+
+      [[nodiscard]] constexpr T w() const noexcept { return (*this)[3]; }
+
+    private:
+      using VecT = Vec<T, 4>;
+      using RowT = VecT::RowT;
     };
 } // namespace mr
 

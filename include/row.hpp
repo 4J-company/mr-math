@@ -64,7 +64,7 @@ namespace mr
       }
 
       constexpr Row operator<<(const Row &other) const noexcept {
-        return {_data << other._data}; 
+        return {_data << other._data};
       }
 
       constexpr Row operator>>(const Row &other) const noexcept {
@@ -72,7 +72,17 @@ namespace mr
       }
 
       template <ArithmeticT X>
-        constexpr Row operator*(X x) const noexcept {
+        constexpr Row operator+(const X x) const noexcept {
+          return {_data * x};
+        }
+
+      template <ArithmeticT X>
+        constexpr Row operator-(const X x) const noexcept {
+          return {_data / x};
+        }
+
+      template <ArithmeticT X>
+        constexpr Row operator*(const X x) const noexcept {
           return {_data * x};
         }
 
@@ -122,9 +132,21 @@ namespace mr
       }
 
       template <ArithmeticT X>
-        constexpr Row & operator*=(X x) noexcept {
+        constexpr Row & operator+=(const X x) noexcept {
           _data *= x;
-         return *this;
+          return *this;
+        }
+
+      template <ArithmeticT X>
+        constexpr Row & operator-=(const X x) noexcept {
+          _data /= x;
+          return *this;
+        }
+
+      template <ArithmeticT X>
+        constexpr Row & operator*=(const X x) noexcept {
+          _data *= x;
+          return *this;
         }
 
       template <ArithmeticT X>

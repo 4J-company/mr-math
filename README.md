@@ -4,11 +4,11 @@
 ### Comparison
 | Library      | Matrix Multiplication (ns) | Vector normalization (ns) | Scalar triple products (ns) |
 |--------------|----------------------------|---------------------------|-----------------------------|
-| mr. Math     |                            |                           |                             |
-| DirectXMath  |                            |                           |                             |
-| glm          |                            |                           |                             |
-| cglm         |                            |                           |                             |
-| lin          |                            |                           |                             |
+| mr. Math     |              4             |             2             |            6.5              |
+| DirectXMath  |            4.8             |           4.3             |            2.3              |
+| glm          |            5.7             |           3.3             |            1.6              |
+| cglm         |            6.2             |          14.6             |            2.2              |
+| lin          |            5.7             |           3.3             |            2.3              |
 
 ### Usage
 #### Vectors

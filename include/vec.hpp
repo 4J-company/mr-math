@@ -35,7 +35,7 @@ namespace mr
   using Vec3d = Vec3<double>;
   using Vec4d = Vec4<double>;
 
-  // base vector
+  // base vector (use aliases for full functional)
   template <ArithmeticT T, std::size_t N>
   requires (N >= 2)
     struct [[nodiscard]] Vec : public Row<T, N>
@@ -46,7 +46,7 @@ namespace mr
         constexpr Vec(Args... args) : RowT{args...} {}
 
       // from simd constructor
-      constexpr Vec(Row<T, N> r) : Row<T, N>(r) {};
+      explicit constexpr Vec(Row<T, N> r) : Row<T, N>(r) {};
 
       // move semantics
       constexpr Vec(Vec &&) noexcept = default;
@@ -80,14 +80,14 @@ namespace mr
       // use normalized_fast for lower precision
       constexpr Vec normalized() const noexcept {
         auto len = length2();
-        if (std::abs(len) <= epsilon) [[unlikely]] return {};
-        return {*this * finv_sqrt(len)};
+        if (std::abs(len) <= _epsilon) [[unlikely]] return {};
+        return Vec{*this * finv_sqrt(len)};
       };
 
       // use normalize for higher precision
       constexpr Vec & normalize_fast() noexcept {
         auto len = length2();
-        if (std::abs(len) <= epsilon) [[unlikely]] return *this;
+        if (std::abs(len) <= _epsilon) [[unlikely]] return *this;
         *this *= ffinv_sqrt(len);
         return *this;
       };
@@ -95,7 +95,7 @@ namespace mr
       // use normalized for higher precision
       constexpr Vec normalized_fast() const noexcept {
         auto len = length2();
-        if (std::abs(len) <= epsilon) [[unlikely]] return {};
+        if (std::abs(len) <= _epsilon) [[unlikely]] return {};
         return {*this * ffinv_sqrt(len)};
       };
 
@@ -110,24 +110,6 @@ namespace mr
         return {*this * ffinv_sqrt(l)};
       };
 
-      // cross product
-      constexpr Vec cross(const Vec<T, N> &other) const noexcept {
-        static_assert(N == 3, "Vectors must have 3 components");
-
-        std::array<T, 3> arr {
-          RowT::_data[1] * other._data[2] - RowT::_data[2] * other._data[1],
-          RowT::_data[2] * other._data[0] - RowT::_data[0] * other._data[2],
-          RowT::_data[0] * other._data[1] - RowT::_data[1] * other._data[0]};
-
-        stdx::fixed_size_simd<T, N> ans;
-        ans.copy_from(arr.data(), stdx::element_aligned);
-        return {ans};
-      }
-
-      constexpr Vec operator%(const Vec<T, N> &other) const noexcept {
-        return cross(other);
-      }
-
       // dot product
       [[nodiscard]] constexpr T dot(const Vec<T, N> other) const noexcept {
         return stdx::reduce(RowT::_data * other._data);
@@ -139,7 +121,7 @@ namespace mr
 
       protected:
         using RowT = Row<T, N>;
-        static constexpr T epsilon = std::numeric_limits<T>::epsilon();
+        static constexpr T _epsilon = std::numeric_limits<T>::epsilon();
     };
 
   // 2D vector
@@ -163,11 +145,11 @@ namespace mr
       explicit constexpr Vec2(Vec3<T> v) : VecT(v.x(), v.y()) {}
 
       // setters
-      constexpr void set(T x, T y) noexcept { RowT::set(x, y); }
+      constexpr void set(T x, T y) noexcept { RowT::_set(x, y); }
 
-      constexpr void set(T xy) noexcept { RowT::set(xy, xy); }
+      constexpr void set(T xy) noexcept { RowT::_set(xy, xy); }
 
-      constexpr void set(const Vec3<T> &v3) noexcept { RowT::set(v3.x(), v3.y()); }
+      constexpr void set(const Vec3<T> &v3) noexcept { RowT::_set(v3.x(), v3.y()); }
 
       constexpr void x(T x) noexcept { set(x, y()); }
 
@@ -205,14 +187,17 @@ namespace mr
 
       explicit constexpr Vec3(const Vec4<T> &v4) : VecT(v4.x(), v4.y(), v4.z()) {}
 
+      // from simd constructor
+      explicit constexpr Vec3(Row<T, 3> r) : VecT(r) {};
+
       // setters
-      constexpr void set(T x, T y, T z = 0) noexcept { RowT::set(x, y, z); }
+      constexpr void set(T x, T y, T z = 0) noexcept { RowT::_set(x, y, z); }
 
-      constexpr void set(T xyz) noexcept { RowT::set(xyz, xyz, xyz); }
+      constexpr void set(T xyz) noexcept { RowT::_set(xyz, xyz, xyz); }
 
-      constexpr void set(const Vec2<T> &v2, T z = 0) noexcept { RowT::set(v2.x(), v2.y(), z); }
+      constexpr void set(const Vec2<T> &v2, T z = 0) noexcept { RowT::_set(v2.x(), v2.y(), z); }
 
-      constexpr void set(const Vec4<T> &v4) noexcept { RowT::set(v4.x(), v4.y(), v4.z()); }
+      constexpr void set(const Vec4<T> &v4) noexcept { RowT::_set(v4.x(), v4.y(), v4.z()); }
 
       constexpr void x(T x) noexcept { set(x, y(), z()); }
 
@@ -226,6 +211,23 @@ namespace mr
       [[nodiscard]] constexpr T y() const noexcept { return (*this)[1]; }
 
       [[nodiscard]] constexpr T z() const noexcept { return (*this)[2]; }
+
+      // cross product
+      constexpr Vec3 cross(const Vec3 &other) const noexcept {
+
+        std::array<T, 3> arr {
+          RowT::_data[1] * other._data[2] - RowT::_data[2] * other._data[1],
+          RowT::_data[2] * other._data[0] - RowT::_data[0] * other._data[2],
+          RowT::_data[0] * other._data[1] - RowT::_data[1] * other._data[0]};
+
+        stdx::fixed_size_simd<T, 3> ans;
+        ans.copy_from(arr.data(), stdx::element_aligned);
+        return Vec3{ans};
+      }
+
+      constexpr Vec3 operator%(const Vec3 &other) const noexcept {
+        return cross(other);
+      }
 
     private:
       using VecT = Vec<T, 3>;
@@ -253,11 +255,11 @@ namespace mr
       explicit constexpr Vec4(const Vec3<T> &v3, T w = 1) : VecT(v3.x(), v3.y(), v3.z(), w) {}
 
       // setters
-      constexpr void set(T x, T y, T z = 0, T w = 1) noexcept { RowT::set(x, y, z, w); }
+      constexpr void set(T x, T y, T z = 0, T w = 1) noexcept { RowT::_set(x, y, z, w); }
 
-      constexpr void set(T xyzw) noexcept { RowT::set(xyzw, xyzw, xyzw, xyzw); }
+      constexpr void set(T xyzw) noexcept { RowT::_set(xyzw, xyzw, xyzw, xyzw); }
 
-      constexpr void set(const Vec3<T> &v3, T w = 1) noexcept { RowT::set(v3.x(), v3.y(), v3.z(), w); }
+      constexpr void set(const Vec3<T> &v3, T w = 1) noexcept { RowT::_set(v3.x(), v3.y(), v3.z(), w); }
 
       constexpr void x(T x) noexcept { set(x, y(), z(), w()); }
 

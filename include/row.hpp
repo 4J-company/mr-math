@@ -20,7 +20,7 @@ namespace mr
       // from elements constructor
       template <ArithmeticT... Args>
         constexpr Row(Args... args) {
-          set(args...); // requires sizeof..(Args) <= N
+          _set(args...); // requires sizeof..(Args) <= N
         }
 
       // copy from simd semantic
@@ -36,7 +36,7 @@ namespace mr
     protected:
       template <ArithmeticT... Args>
       requires (sizeof...(Args) <= N) && (std::is_convertible_v<Args, T> && ...)
-        constexpr void set(Args... args) noexcept {
+        constexpr void _set(Args... args) noexcept {
           std::array<T, N> arr {static_cast<T>(args)...};
           _data.copy_from(arr.data(), stdx::element_aligned);
         }

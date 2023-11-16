@@ -72,7 +72,7 @@ namespace mr
       // use normalize_fast for higher precision
       constexpr Vec & normalize() noexcept {
         auto len = length2();
-        if (std::abs(len) <= epsilon) [[unlikely]] return *this;
+        if (std::abs(len) <= _epsilon) [[unlikely]] return *this;
         *this *= finv_sqrt(len);
         return *this;
       };
@@ -96,7 +96,7 @@ namespace mr
       constexpr Vec normalized_fast() const noexcept {
         auto len = length2();
         if (std::abs(len) <= _epsilon) [[unlikely]] return {};
-        return {*this * ffinv_sqrt(len)};
+        return Vec{*this * ffinv_sqrt(len)};
       };
 
       constexpr Vec & normalize_fast_unsafe() {
@@ -107,7 +107,7 @@ namespace mr
 
       constexpr Vec normalized_fast_unsafe() const {
         auto l = length2();
-        return {*this * ffinv_sqrt(l)};
+        return Vec{*this * ffinv_sqrt(l)};
       };
 
       // dot product

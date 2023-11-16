@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <iostream>
 #include <numeric>
+#include <numbers>
 #include <cassert>
 #include <ranges>
 #include <mutex>
@@ -18,16 +19,6 @@ namespace stdx = std::experimental;
 namespace mr
 {
   using uint_t = unsigned int;
-
-  template <std::floating_point T>
-    [[nodiscard]] constexpr T radians(T degrees) {
-      return degrees / 180. * M_PI;
-    }
-
-  template <std::floating_point T>
-    [[nodiscard]] constexpr T degrees(T radians) {
-      return radians * M_1_PI * 180.;
-    }
 
   template <typename T>
     concept ArithmeticT = std::integral<T> || std::floating_point<T>;

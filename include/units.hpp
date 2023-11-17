@@ -5,6 +5,32 @@
 
 namespace mr
 {
+  // type that has only 'ArithmeticT value' member
+  // and supports arithmetics operations
+  template <typename T>
+    concept UnitT = requires(T unit)
+    {
+      // member check
+      typename T::ValueT;
+      sizeof(T) == sizeof(typename T::ValueT);
+      requires ArithmeticT<typename T::ValueT>;
+
+      // constructor check
+      T{typename T::ValueT{}};
+
+      // operations check
+      {unit + unit} -> std::same_as<T>;
+      {unit - unit} -> std::same_as<T>;
+      {unit * typename T::ValueT{}} -> std::same_as<T>;
+      {unit / typename T::ValueT{}} -> std::same_as<T>;
+    };
+
+  // extract value from unit type (used for units compatibility)
+  template <typename U>
+    struct GetValue { using T = U; };
+  template <UnitT U>
+    struct GetValue<U> { using T = U::ValueT; };
+
   // forward declarations
   template <std::floating_point T>
     struct Radians;
@@ -19,30 +45,28 @@ namespace mr
   using Degreesf = Degrees<float>;
   using Degreesd = Degrees<double>;
 
-  // aliases for '_rad' and '_deg' suffixes
-  using _RadiansLiteral = Radians<long double>;
-  using _DegreesLiteral = Degrees<long double>;
-
-  //template <std::floating_point T>
-    using std::numbers::pi_v;
 
   template <std::floating_point T>
     struct [[nodiscard]] Radians
     {
     public:
+      using ValueT = T;
+
       T value;
 
+      constexpr Radians() noexcept {};
       explicit constexpr Radians(T x) noexcept : value(x) {};
 
-      // conversation operators
-      explicit constexpr operator Degrees<T>() const noexcept {
-        return value * std::numbers::inv_pi_v<T> * static_cast<T>(180.);
-      };
-      explicit constexpr operator T() const noexcept { return value; };
+      template <typename U>
+        constexpr Radians(const Radians<U> &other) noexcept : value(other.value) {}
 
-      // constructor used with '_rad' literal
-      constexpr Radians(const _RadiansLiteral &other) noexcept : value(other.value) {};
-            // reference used for compilation ^
+      // conversation operators
+      template <typename U>
+        explicit constexpr operator Degrees<U>() const noexcept {
+          return Degrees<U>{static_cast<U>(value) *
+            std::numbers::inv_pi_v<U> * static_cast<U>(180.)};
+        }
+      explicit constexpr operator T() const noexcept { return value; };
 
       // arithmetic operators
       constexpr Radians operator-() const noexcept {
@@ -99,19 +123,22 @@ namespace mr
     struct [[nodiscard]] Degrees
     {
     public:
+      using ValueT = T;
+
       T value;
 
       explicit constexpr Degrees(T x) noexcept : value(x) {};
 
-      // conversation operators
-      explicit constexpr operator Radians<T>() const noexcept {
-        return Radians<T>{value / static_cast<T>(180.) * std::numbers::pi_v<T>};
-      };
-      explicit constexpr operator T() const noexcept { return value; };
+      template <typename U>
+        constexpr Degrees(const Degrees<U> &other) noexcept
+          : value(other.value) {}
 
-      // constructor used with '_deg' literal
-      constexpr Degrees(const _DegreesLiteral &other) noexcept : value(other.value) {};
-            // reference used for compilation ^
+      // conversation operators
+      template <typename U>
+        explicit constexpr operator Radians<U>() const noexcept {
+          return Radians<U>{static_cast<U>(value) / static_cast<U>(180.) * std::numbers::pi_v<U>};
+        }
+      explicit constexpr operator T() const noexcept { return value; };
 
       // arithmetic operators
       constexpr Degrees operator-() const noexcept {
@@ -155,7 +182,7 @@ namespace mr
       }
 
       // comparison operator
-      [[nodiscard]] friend constexpr bool operator<=>(Degrees left, Degrees right﻿) = default;
+      [[nodiscard]] friend constexpr auto operator<=>(Degrees left, Degrees right﻿) = default;
 
       // output operator
       friend std::ostream & operator<<(std::ostream &stream, Degrees Degrees) noexcept {
@@ -163,7 +190,11 @@ namespace mr
         return stream;
       }
     };
-}
+
+  // internal aliases used by '_rad' and '_deg' suffixes
+  using _RadiansLiteral = Radians<long double>;
+  using _DegreesLiteral = Degrees<long double>;
+} 
 
   // literals
   constexpr mr::_RadiansLiteral operator"" _rad(long double value) {
@@ -172,6 +203,10 @@ namespace mr
 
   constexpr mr::_DegreesLiteral operator"" _deg(long double value) {
     return mr::_DegreesLiteral{value};
+  }
+
+  constexpr long double operator"" _pi(long double value) {
+    return value * std::numbers::pi_v<long double>;
   }
 
 #endif // __units_hpp_

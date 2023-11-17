@@ -2,6 +2,7 @@
 #define __rot_hpp_
 
 #include "def.hpp"
+#include "units.hpp"
 #include "row.hpp"
 
 namespace mr
@@ -13,19 +14,24 @@ namespace mr
   using Rotf = Rot<float>;
   using Rotd = Rot<double>;
 
-  // yaw, pitch, roll
+  // yaw, pitch, roll (in radians)
   template <std::floating_point T>
     struct [[nodiscard]] Rot : public Row<T, 3>
     {
+    public:
+      using RadiansT = Radians<T>;
+
+    private:
       using RowT = Row<T, 3>;
 
+    public:
       // constructors
       Rot() = default;
 
       // +/- Yaw   - turn right/left
       // +/- Pitch - lean up/down
       // +/- Roll  - rotate CW/CCW
-      constexpr Rot(T Yaw, T Pitch, T Roll) : RowT(Yaw, Pitch, Roll) {}
+      constexpr Rot(RadiansT Yaw, RadiansT Pitch, RadiansT Roll) : RowT(Yaw.value, Pitch.value, Roll.value) {}
 
       constexpr Rot(RowT data) : RowT(data) {}
 
@@ -38,31 +44,34 @@ namespace mr
       constexpr Rot & operator=(Rot &&) noexcept = default;
 
       // getters & setters
-      constexpr void set(T yaw, T pitch, T roll) noexcept {
-        RowT::set(yaw, pitch, roll);
+      // +/- Yaw   - turn right/left
+      // +/- Pitch - lean up/down
+      // +/- Roll  - rotate CW/CCW
+      constexpr void set(RadiansT yaw, RadiansT pitch, RadiansT roll) noexcept {
+        RowT::set(yaw.value, pitch.value, roll.value);
       }
 
-      constexpr T yaw() const noexcept {
-        return RowT::_data[0];
+      constexpr RadiansT yaw() const noexcept {
+        return RadiansT{RowT::_data[0]};
       }
 
-      constexpr void yaw(T yaw) noexcept {
+      constexpr void yaw(RadiansT yaw) noexcept {
         set(yaw, pitch(), roll());
       }
 
-      constexpr T pitch() const noexcept {
-        return RowT::_data[1];
+      constexpr RadiansT pitch() const noexcept {
+        return RadiansT{RowT::_data[1]};
       }
 
-      constexpr void pitch(T pitch) noexcept {
+      constexpr void pitch(RadiansT pitch) noexcept {
         set(yaw(), pitch, roll());
       }
 
-      constexpr T roll() const noexcept {
-        return RowT::_data[2];
+      constexpr RadiansT roll() const noexcept {
+        return RadiansT{RowT::_data[2]};
       }
 
-      constexpr void roll(T roll) noexcept {
+      constexpr void roll(RadiansT roll) noexcept {
         set(yaw(), pitch(), roll);
       }
     };

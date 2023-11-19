@@ -8,9 +8,7 @@
 #include <iostream>
 #include <numeric>
 #include <numbers>
-#include <cassert>
 #include <ranges>
-#include <mutex>
 #include <cmath>
 #include <bit>
 
@@ -18,8 +16,6 @@ namespace stdx = std::experimental;
 
 namespace mr
 {
-  using uint_t = unsigned int;
-
   template <typename T>
     concept ArithmeticT = std::integral<T> || std::floating_point<T>;
 

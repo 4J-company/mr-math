@@ -17,7 +17,7 @@ namespace mr
   using Matr4f = Matr4<float>;
   using Matr4d = Matr4<double>;
   using Matr4i = Matr4<int>;
-  using Matr4u = Matr4<uint_t>;
+  using Matr4u = Matr4<uint32_t>;
 
   template <ArithmeticT T, std::size_t N>
     class [[nodiscard]] Matr

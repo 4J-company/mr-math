@@ -12,6 +12,9 @@ namespace mr
     struct Row
     {
     public:
+      // default constructor
+      constexpr Row() noexcept = default;
+
       // from elements pointer constructor
       constexpr Row(const T *data) {
         _data.copy_from(data, stdx::element_aligned);
@@ -19,6 +22,7 @@ namespace mr
 
       // from elements constructor
       template <ArithmeticT... Args>
+        requires (sizeof...(Args) >= 1)
         constexpr Row(Args... args) {
           _set(args...); // requires sizeof..(Args) <= N
         }
@@ -35,7 +39,7 @@ namespace mr
 
     protected:
       template <ArithmeticT... Args>
-      requires (sizeof...(Args) <= N) && (std::is_convertible_v<Args, T> && ...)
+        requires (sizeof...(Args) >= 1) && (sizeof...(Args) <= N) && (std::is_convertible_v<Args, T> && ...)
         constexpr void _set(Args... args) noexcept {
           std::array<T, N> arr {static_cast<T>(args)...};
           _data.copy_from(arr.data(), stdx::element_aligned);
@@ -180,7 +184,7 @@ namespace mr
     protected:
       friend class Matr<T, N>;
 
-      stdx::fixed_size_simd<T, N> _data;
+      stdx::fixed_size_simd<T, N> _data {};
     };
 } // namespace mr
 

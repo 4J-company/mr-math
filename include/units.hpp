@@ -107,7 +107,7 @@ namespace mr
       }
 
       // comparison operator
-      [[nodiscard]] friend constexpr auto operator<=>(Radians left, Radians right﻿) = default;
+      [[nodiscard]] friend constexpr auto operator<=>(Radians left, Radians right) = default;
 
       // output operator
       friend std::ostream & operator<<(std::ostream &stream, Radians radians) noexcept {
@@ -179,7 +179,7 @@ namespace mr
       }
 
       // comparison operator
-      [[nodiscard]] friend constexpr auto operator<=>(Degrees left, Degrees right﻿) = default;
+      [[nodiscard]] friend constexpr auto operator<=>(Degrees left, Degrees right) = default;
 
       // output operator
       friend std::ostream & operator<<(std::ostream &stream, Degrees Degrees) noexcept {
@@ -191,7 +191,7 @@ namespace mr
   // internal aliases used by '_rad' and '_deg' suffixes
   using _RadiansLiteral = Radians<long double>;
   using _DegreesLiteral = Degrees<long double>;
-} 
+}
 
   // literals
   constexpr mr::_RadiansLiteral operator"" _rad(long double value) {

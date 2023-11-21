@@ -10,10 +10,7 @@ namespace mr
   template <typename T>
     concept UnitT = requires(T unit)
     {
-      // member check
-      typename T::ValueT;
-      sizeof(T) == sizeof(typename T::ValueT);
-      requires ArithmeticT<typename T::ValueT>;
+      requires ArithmeticT<T>;
 
       // constructor check
       T{typename T::ValueT{}};
@@ -21,8 +18,8 @@ namespace mr
       // operations check
       {unit + unit} -> std::same_as<T>;
       {unit - unit} -> std::same_as<T>;
-      {unit * typename T::ValueT{}} -> std::same_as<T>;
-      {unit / typename T::ValueT{}} -> std::same_as<T>;
+      {unit * ArithmeticT<T>} -> std::same_as<T>;
+      {unit / ArithmeticT<T>} -> std::same_as<T>;
     };
 
   // extract value from unit type (used for units compatibility)

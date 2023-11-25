@@ -37,6 +37,10 @@ namespace mr
         return *this;
       }
 
+      [[nodiscard]] constexpr T operator[](std::size_t i) const {
+        return _data[i];
+      }
+
     protected:
       template <ArithmeticT... Args>
         requires (sizeof...(Args) >= 1) && (sizeof...(Args) <= N) && (std::is_convertible_v<Args, T> && ...)
@@ -44,10 +48,6 @@ namespace mr
           std::array<T, N> arr {static_cast<T>(args)...};
           _data.copy_from(arr.data(), stdx::element_aligned);
         }
-
-      [[nodiscard]] constexpr T operator[](std::size_t i) const {
-        return _data[i];
-      }
 
     public:
       // operators returning Row<T, N> type
@@ -75,6 +75,32 @@ namespace mr
         return {_data >> other._data};
       }
 
+      // std::experimental::fixed_size_simd operators
+      constexpr Row operator+(const stdx::fixed_size_simd<T, N> &other) const noexcept {
+        return {_data + other};
+      }
+
+      constexpr Row operator-(const stdx::fixed_size_simd<T, N> &other) const noexcept {
+        return {_data - other};
+      }
+
+      constexpr Row operator*(const stdx::fixed_size_simd<T, N> &other) const noexcept {
+        return {_data * other};
+      }
+
+      constexpr Row operator/(const stdx::fixed_size_simd<T, N> &other) const noexcept {
+        return {_data / other};
+      }
+
+      constexpr Row operator<<(const stdx::fixed_size_simd<T, N> &other) const noexcept {
+        return {_data << other};
+      }
+
+      constexpr Row operator>>(const stdx::fixed_size_simd<T, N> &other) const noexcept {
+        return {_data >> other};
+      }
+
+      // ArithmeticT operators
       template <ArithmeticT X>
         constexpr Row operator+(const X x) const noexcept {
           return {_data * x};
@@ -105,6 +131,7 @@ namespace mr
           return {_data >> x};
         }
 
+      // Row operators
       constexpr Row & operator+=(const Row &other) noexcept {
         _data += other._data;
         return *this;
@@ -135,6 +162,38 @@ namespace mr
         return *this;
       }
 
+      // std::experimental::fixed_size_simd<T, N> operators
+      constexpr Row & operator+=(const stdx::fixed_size_simd<T, N> &other) noexcept {
+        _data += other;
+        return *this;
+      }
+
+      constexpr Row & operator-=(const stdx::fixed_size_simd<T, N> &other) noexcept {
+        _data -= other;
+        return *this;
+      }
+
+      constexpr Row & operator*=(const stdx::fixed_size_simd<T, N> &other) noexcept {
+        _data *= other;
+        return *this;
+      }
+
+      constexpr Row & operator/=(const stdx::fixed_size_simd<T, N> &other) noexcept {
+        _data /= other;
+        return *this;
+      }
+
+      constexpr Row & operator<<=(const stdx::fixed_size_simd<T, N> &other) noexcept {
+        _data <<= other;
+        return *this;
+      }
+
+      constexpr Row & operator>>=(const stdx::fixed_size_simd<T, N> &other) noexcept {
+        _data >>= other;
+        return *this;
+      }
+
+      // ArithmeticT operators
       template <ArithmeticT X>
         constexpr Row & operator+=(const X x) noexcept {
           _data *= x;
@@ -180,9 +239,6 @@ namespace mr
         s << ')';
         return s;
       }
-
-    protected:
-      friend class Matr<T, N>;
 
       stdx::fixed_size_simd<T, N> _data {};
     };

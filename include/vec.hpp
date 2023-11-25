@@ -119,6 +119,170 @@ namespace mr
         return dot(other);
       }
 
+      constexpr Vec operator+(const Vec &other) const noexcept {
+        return {RowT::_data + other._data};
+      }
+
+      constexpr Vec operator-(const Vec &other) const noexcept {
+        return {RowT::_data - other._data};
+      }
+
+      constexpr Vec operator*(const Vec &other) const noexcept {
+        return {RowT::_data * other._data};
+      }
+
+      constexpr Vec operator/(const Vec &other) const noexcept {
+        return {RowT::_data / other._data};
+      }
+
+      constexpr Vec operator<<(const Vec &other) const noexcept {
+        return {RowT::_data << other._data};
+      }
+
+      constexpr Vec operator>>(const Vec &other) const noexcept {
+        return {RowT::_data >> other._data};
+      }
+
+      // ArithmeticT operators
+      template <ArithmeticT X>
+        constexpr Vec operator+(const X x) const noexcept {
+          return {RowT::_data * x};
+        }
+
+      template <ArithmeticT X>
+        constexpr Vec operator-(const X x) const noexcept {
+          return {RowT::_data / x};
+        }
+
+      template <ArithmeticT X>
+        constexpr Vec operator*(const X x) const noexcept {
+          return {RowT::_data * x};
+        }
+
+      template <ArithmeticT X>
+        constexpr Vec operator/(X x) const noexcept {
+          return {RowT::_data / x};
+        }
+
+      template <std::integral X>
+        constexpr Vec operator<<(X x) const noexcept {
+          return {RowT::_data << x};
+        }
+
+      template <std::integral X>
+        constexpr Vec operator>>(X x) const noexcept {
+          return {RowT::_data >> x};
+        }
+
+      // Vec operators
+      constexpr Vec & operator+=(const Vec &other) noexcept {
+        RowT::_data += other._data;
+        return *this;
+      }
+
+      constexpr Vec & operator-=(const Vec &other) noexcept {
+        RowT::_data -= other._data;
+        return *this;
+      }
+
+      constexpr Vec & operator*=(const Vec &other) noexcept {
+        RowT::_data *= other._data;
+        return *this;
+      }
+
+      constexpr Vec & operator/=(const Vec &other) noexcept {
+        RowT::_data /= other._data;
+        return *this;
+      }
+
+      constexpr Vec & operator<<=(const Vec &other) noexcept {
+        RowT::_data <<= other._data;
+        return *this;
+      }
+
+      constexpr Vec & operator>>=(const Vec &other) noexcept {
+        RowT::_data >>= other._data;
+        return *this;
+      }
+
+      // std::experimental::fixed_size_simd<T, N> operators
+      constexpr Vec & operator+=(const stdx::fixed_size_simd<T, N> &other) noexcept {
+        RowT::_data += other;
+        return *this;
+      }
+
+      constexpr Vec & operator-=(const stdx::fixed_size_simd<T, N> &other) noexcept {
+        RowT::_data -= other;
+        return *this;
+      }
+
+      constexpr Vec & operator*=(const stdx::fixed_size_simd<T, N> &other) noexcept {
+        RowT::_data *= other;
+        return *this;
+      }
+
+      constexpr Vec & operator/=(const stdx::fixed_size_simd<T, N> &other) noexcept {
+        RowT::_data /= other;
+        return *this;
+      }
+
+      constexpr Vec & operator<<=(const stdx::fixed_size_simd<T, N> &other) noexcept {
+        RowT::_data <<= other;
+        return *this;
+      }
+
+      constexpr Vec & operator>>=(const stdx::fixed_size_simd<T, N> &other) noexcept {
+        RowT::_data >>= other;
+        return *this;
+      }
+
+      // ArithmeticT operators
+      template <ArithmeticT X>
+        constexpr Vec & operator+=(const X x) noexcept {
+          RowT::_data *= x;
+          return *this;
+        }
+
+      template <ArithmeticT X>
+        constexpr Vec & operator-=(const X x) noexcept {
+          RowT::_data /= x;
+          return *this;
+        }
+
+      template <ArithmeticT X>
+        constexpr Vec & operator*=(const X x) noexcept {
+          RowT::_data *= x;
+          return *this;
+        }
+
+      template <ArithmeticT X>
+        constexpr Vec & operator/=(X x) noexcept {
+          RowT::_data /= x;
+          return *this;
+        }
+
+      template <std::integral X>
+        constexpr Vec & operator<<=(X x) noexcept {
+          RowT::_data <<= x;
+          return *this;
+        }
+
+      template <std::integral X>
+        constexpr Vec & operator>>=(X x) noexcept {
+          RowT::_data >>= x;
+          return *this;
+        }
+
+      [[nodiscard]] constexpr bool operator<=>(const Vec &other) const noexcept = default;
+
+      friend std::ostream & operator<<(std::ostream &s, const Vec &v) noexcept {
+        s << '(';
+        for (size_t i = 0; i < N; i++)
+          s << v[i] << (char)(',' * (i < N - 1)) << (char)(' ' * (i < N - 1));
+        s << ')';
+        return s;
+      }
+
       protected:
         using RowT = Row<T, N>;
         static constexpr T _epsilon = std::numeric_limits<T>::epsilon();
@@ -146,6 +310,8 @@ namespace mr
       // constructors
       constexpr Vec2(T x, T y) : VecT(x, y) {}
       constexpr Vec2(T xy) : VecT(xy, xy) {}
+      template <std::size_t N> requires (N >= 2)
+        constexpr Vec2(const Vec<T, N> &v) noexcept : VecT(v[0], v[1]) {}
 
       explicit constexpr Vec2(Vec3<T> v) : VecT(v.x(), v.y()) {}
 
@@ -190,6 +356,8 @@ namespace mr
       constexpr Vec3(T xyz) : VecT(xyz, xyz, xyz) {}
       explicit constexpr Vec3(const Vec2<T> &v2, T z = 0) : VecT(v2.x(), v2.y(), z) {}
       explicit constexpr Vec3(const Vec4<T> &v4) : VecT(v4.x(), v4.y(), v4.z()) {}
+      template <std::size_t N> requires (N >= 3)
+        constexpr Vec3(const Vec<T, N> &v) noexcept : VecT(v[0], v[1], v[2]) {}
 
       // from simd constructor
       explicit constexpr Vec3(Row<T, 3> r) : VecT(r) {};
@@ -254,6 +422,8 @@ namespace mr
       constexpr Vec4(T x, T y, T z = 0, T w = 1) : VecT(x, y, z, w) {}
       constexpr Vec4(T xyzw) : VecT(xyzw, xyzw, xyzw, xyzw) {}
       explicit constexpr Vec4(const Vec3<T> &v3, T w = 1) : VecT(v3.x(), v3.y(), v3.z(), w) {}
+      template <std::size_t N> requires (N >= 4)
+        constexpr Vec4(const Vec<T, N> &v) noexcept : VecT(v[0], v[1], v[2], v[3]) {}
 
       // setters
       constexpr void set(T x, T y, T z = 0, T w = 1) noexcept { RowT::_set(x, y, z, w); }
@@ -270,6 +440,8 @@ namespace mr
       [[nodiscard]] constexpr T y() const noexcept { return (*this)[1]; }
       [[nodiscard]] constexpr T z() const noexcept { return (*this)[2]; }
       [[nodiscard]] constexpr T w() const noexcept { return (*this)[3]; }
+
+      //
 
     private:
       using VecT = Vec<T, 4>;

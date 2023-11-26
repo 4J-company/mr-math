@@ -3,6 +3,7 @@
 
 #include "def.hpp"
 #include "row.hpp"
+#include "units.hpp"
 
 namespace mr
 {
@@ -93,6 +94,10 @@ namespace mr
       }
 
       // matrix related operations
+      [[nodiscard]] constexpr const RowT & operator[](size_t i) const noexcept {
+        return _data[i];
+      }
+
       [[nodiscard]] constexpr T determinant() const noexcept {
         std::array<RowT, N> tmp = _data;
 
@@ -141,9 +146,8 @@ namespace mr
         constexpr auto io = std::ranges::iota_view{(size_t)0, N};
 
         std::array<Row<T, 2 * N>, N> tmp;
-        Matr id = identity();
         std::for_each(std::execution::par_unseq, io.begin(), io.end(),
-                      [&tmp, &id, this](auto i) { tmp[i] += stdx::concat(_data[i], id[i]); });
+                      [&tmp, this](auto i) { tmp[i] += stdx::simd_cast<stdx::fixed_size_simd<T, 2 * N>>(stdx::concat(_data[i]._data, identity[i]._data)); });
 
         // null bottom triangle
         for (size_t i = 1; i < N; i++) {
@@ -176,6 +180,82 @@ namespace mr
       constexpr Matr & inverse() const noexcept {
         *this = inversed();
         return *this;
+      }
+
+      static constexpr Matr4<T> scale(const Vec3<T> &vec) noexcept {
+        return Matr4<T> {
+          typename mr::Matr4<T>::RowT(vec[0], 0, 0, 0),
+          typename mr::Matr4<T>::RowT(0, vec[1], 0, 0),
+          typename mr::Matr4<T>::RowT(0, 0, vec[2], 0),
+          typename mr::Matr4<T>::RowT(0, 0, 0, 1)
+        };
+      }
+
+      static constexpr Matr4<T> translate(const Vec3<T> &vec) noexcept {
+        return Matr4<T> {
+          typename mr::Matr4<T>::RowT(1, 0, 0, 0),
+          typename mr::Matr4<T>::RowT(0, 1, 0, 0),
+          typename mr::Matr4<T>::RowT(0, 0, 1, 0),
+          typename mr::Matr4<T>::RowT(vec[0], vec[1], vec[2], 1)
+        };
+      }
+
+      static constexpr Matr4<T> rotate_x(const Radians<T> &rad) noexcept {
+        T co = std::cos(rad.value);
+        T si = std::sin(rad.value);
+
+        return Matr4<T> {
+          typename mr::Matr4<T>::RowT(1, 0, 0, 0),
+          typename mr::Matr4<T>::RowT(0, co, si, 0),
+          typename mr::Matr4<T>::RowT(0, -si, co, 0),
+          typename mr::Matr4<T>::RowT(0, 0, 0, 1)
+        };
+      }
+
+      static constexpr Matr4<T> rotate_y(const Radians<T> &rad) noexcept {
+        T co = std::cos(rad.value);
+        T si = std::sin(rad.value);
+
+        return Matr4<T> {
+          typename mr::Matr4<T>::RowT(co, 0, -si, 0),
+          typename mr::Matr4<T>::RowT(0, 1, 0, 0),
+          typename mr::Matr4<T>::RowT(si, 0, co, 0),
+          typename mr::Matr4<T>::RowT(0, 0, 0, 1)
+        };
+      }
+
+      static constexpr Matr4<T> rotate_z(const Radians<T> &rad) noexcept {
+        T co = std::cos(rad.value);
+        T si = std::sin(rad.value);
+
+        return Matr4<T> {
+          typename mr::Matr4<T>::RowT(co, si, 0, 0),
+          typename mr::Matr4<T>::RowT(-si, co, 0, 0),
+          typename mr::Matr4<T>::RowT(0, 0, 1, 0),
+          typename mr::Matr4<T>::RowT(0, 0, 0, 1)
+        };
+      }
+
+      static constexpr Matr4<T> rotate(const Radians<T> &rad, const Vec3<T> &vec) noexcept {
+        T co = std::cos(rad.value);
+        T si = std::sin(rad.value);
+        T nco = 1 - co;
+        Vec4<T> tmp = Vec4<T>(vec * vec * nco + co);
+        Matr4<T> tmp1 = scale(tmp);
+        Matr4<T> tmp2 = Matr4<T> {
+          typename mr::Matr4<T>::RowT(0, vec[0] * vec[1] * nco, vec[0] * vec[2] * nco, 0),
+          typename mr::Matr4<T>::RowT(vec[0] * vec[1] * nco, 0, vec[1] * vec[2] * nco, 0),
+          typename mr::Matr4<T>::RowT(vec[0] * vec[2] * nco, vec[1] * vec[2] * nco, 0, 0),
+          typename mr::Matr4<T>::RowT(0, 0, 0, 0)
+        };
+        Matr4<T> tmp3 = Matr4<T> {
+          typename mr::Matr4<T>::RowT(0, vec[2] * si, -vec[1] * si, 0),
+          typename mr::Matr4<T>::RowT(-vec[2] * si, 0, vec[0] * si, 0),
+          typename mr::Matr4<T>::RowT(vec[1] * si, -vec[0] * si, 0, 0),
+          typename mr::Matr4<T>::RowT(0, 0, 0, 0)
+        };
+
+        return tmp1 + tmp2 + tmp3;
       }
 
       friend std::ostream & operator<<(std::ostream &s, const Matr &m) noexcept {

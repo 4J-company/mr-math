@@ -191,7 +191,14 @@ namespace mr
   // internal aliases used by '_rad' and '_deg' suffixes
   using _RadiansLiteral = Radians<long double>;
   using _DegreesLiteral = Degrees<long double>;
-}
+
+  inline constexpr auto pi = mr::Radiansf(std::numbers::pi_v<float>);
+
+  namespace axis {
+    inline mr::Vec3f x {1, 0, 0};
+    inline mr::Vec3f y {0, 1, 0};
+    inline mr::Vec3f z {0, 0, -1};
+  }
 
   // literals
   constexpr mr::_RadiansLiteral operator"" _rad(long double value) {
@@ -205,5 +212,6 @@ namespace mr
   constexpr long double operator"" _pi(long double value) {
     return value * std::numbers::pi_v<long double>;
   }
+}
 
 #endif // __units_hpp_

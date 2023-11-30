@@ -50,7 +50,7 @@ namespace mr
         std::array<RowT, N> tmp {};
         for (size_t i = 0; i < N; i++) {
           for (size_t j = 0; j < N; j++) {
-            tmp._data[j] += other._data[i] * _data[j][i];
+            tmp[j] += other._data[i] * _data[j][i];
           }
         }
         *this = tmp;
@@ -240,18 +240,19 @@ namespace mr
         T co = std::cos(rad.value);
         T si = std::sin(rad.value);
         T nco = 1 - co;
-        Vec4<T> tmp = Vec4<T>(vec * vec * nco + co);
+        auto v = vec.normalized();
+        Vec4<T> tmp = Vec4<T>(v * v * nco + co);
         Matr4<T> tmp1 = scale(tmp);
         Matr4<T> tmp2 = Matr4<T> {
-          typename mr::Matr4<T>::RowT(0, vec[0] * vec[1] * nco, vec[0] * vec[2] * nco, 0),
-          typename mr::Matr4<T>::RowT(vec[0] * vec[1] * nco, 0, vec[1] * vec[2] * nco, 0),
-          typename mr::Matr4<T>::RowT(vec[0] * vec[2] * nco, vec[1] * vec[2] * nco, 0, 0),
+          typename mr::Matr4<T>::RowT(0, v[0] * v[1] * nco, v[0] * v[2] * nco, 0),
+          typename mr::Matr4<T>::RowT(v[0] * v[1] * nco, 0, v[1] * v[2] * nco, 0),
+          typename mr::Matr4<T>::RowT(v[0] * v[2] * nco, v[1] * v[2] * nco, 0, 0),
           typename mr::Matr4<T>::RowT(0, 0, 0, 0)
         };
         Matr4<T> tmp3 = Matr4<T> {
-          typename mr::Matr4<T>::RowT(0, vec[2] * si, -vec[1] * si, 0),
-          typename mr::Matr4<T>::RowT(-vec[2] * si, 0, vec[0] * si, 0),
-          typename mr::Matr4<T>::RowT(vec[1] * si, -vec[0] * si, 0, 0),
+          typename mr::Matr4<T>::RowT(0, -v[2] * si, v[1] * si, 0),
+          typename mr::Matr4<T>::RowT(v[2] * si, 0, -v[0] * si, 0),
+          typename mr::Matr4<T>::RowT(-v[1] * si, v[0] * si, 0, 0),
           typename mr::Matr4<T>::RowT(0, 0, 0, 0)
         };
 

@@ -36,7 +36,13 @@ jobs:
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
     - name: Run benchmark
-      run: ./build/mr-math-tests
+      run: ./build/mr-math-tests --benchmark_format=json | tee benchmark_result.json
+      
+    - name: Download previous results
+      uses: actions/cache@v1
+      with:
+        path: ./cache
+        key: ${{ runner.os }}-benchmark
 
     - name: Store benchmark result
       uses: benchmark-action/github-action-benchmark@v1

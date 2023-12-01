@@ -23,6 +23,31 @@ mr::Matr4f m2 {
 
 mr::Camera<float> cam {};
 
+static void BM_camera_perspective(benchmark::State& state) {
+  for (auto _ : state) {
+    auto m = cam.calculate_perspective();
+    benchmark::DoNotOptimize(m);
+  }
+}
+BENCHMARK(BM_camera_perspective);
+
+static void BM_camera_ortholinear(benchmark::State& state) {
+  for (auto _ : state) {
+    auto m = cam.calculate_ortholinear();
+    benchmark::DoNotOptimize(m);
+    benchmark::ClobberMemory();
+  }
+}
+BENCHMARK(BM_camera_ortholinear);
+
+static void BM_camera_frustum(benchmark::State& state) {
+  for (auto _ : state) {
+    auto m = cam.calculate_frustum();
+    benchmark::DoNotOptimize(m);
+  }
+}
+BENCHMARK(BM_camera_frustum);
+
 static void BM_camera_rotation(benchmark::State& state) {
   for (auto _ : state) {
     cam += mr::Yaw(mr::pi);

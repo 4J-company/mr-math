@@ -21,14 +21,45 @@ mr::Matr4f m2 {
   mr::Matr4f::RowT{a, 3, 2, 1}
 };
 
+mr::Camera<float> cam {};
+
+static void BM_camera_rotation(benchmark::State& state) {
+  for (auto _ : state) {
+    cam += mr::Yaw(mr::pi);
+  }
+}
+BENCHMARK(BM_camera_rotation);
+
+static void BM_vector_rotation(benchmark::State& state) {
+  for (auto _ : state) {
+    auto v3 = v1 * mr::Matr4f::rotate_z(mr::Radiansf(mr::pi));
+    benchmark::DoNotOptimize(v3);
+  }
+}
+BENCHMARK(BM_vector_rotation);
+
+static void BM_vector_const_multiplication(benchmark::State& state) {
+  for (auto _ : state) {
+    auto v3 = v1 * 3;
+    benchmark::DoNotOptimize(v3);
+  }
+}
+BENCHMARK(BM_vector_const_multiplication);
+
+static void BM_vector_matrix_multiplication(benchmark::State& state) {
+  for (auto _ : state) {
+    auto v3 = v1 * m1;
+    benchmark::DoNotOptimize(v3);
+  }
+}
+BENCHMARK(BM_vector_matrix_multiplication);
+
 static void BM_normalized(benchmark::State& state) {
   for (auto _ : state) {
     auto v3 = v1.normalized();
     benchmark::DoNotOptimize(v3);
   }
 }
-BENCHMARK(BM_normalized);
-BENCHMARK(BM_normalized);
 BENCHMARK(BM_normalized);
 
 static void BM_normalized_fast(benchmark::State& state) {
@@ -38,8 +69,6 @@ static void BM_normalized_fast(benchmark::State& state) {
   }
 }
 BENCHMARK(BM_normalized_fast);
-BENCHMARK(BM_normalized_fast);
-BENCHMARK(BM_normalized_fast);
 
 static void BM_dot(benchmark::State& state) {
   for (auto _ : state) {
@@ -47,8 +76,6 @@ static void BM_dot(benchmark::State& state) {
     benchmark::DoNotOptimize(v4);
   }
 }
-BENCHMARK(BM_dot);
-BENCHMARK(BM_dot);
 BENCHMARK(BM_dot);
 
 static void BM_cross(benchmark::State& state) {
@@ -58,18 +85,6 @@ static void BM_cross(benchmark::State& state) {
   }
 }
 BENCHMARK(BM_cross);
-BENCHMARK(BM_cross);
-BENCHMARK(BM_cross);
-
-static void BM_scalar_triple_product(benchmark::State& state) {
-  for (auto _ : state) {
-    auto v4 = v1.cross(v2).dot(v3);
-    benchmark::DoNotOptimize(v4);
-  }
-}
-BENCHMARK(BM_scalar_triple_product);
-BENCHMARK(BM_scalar_triple_product);
-BENCHMARK(BM_scalar_triple_product);
 
 static void BM_matrix_multiplication(benchmark::State& state) {
   for (auto _ : state) {
@@ -78,8 +93,6 @@ static void BM_matrix_multiplication(benchmark::State& state) {
   }
 }
 
-BENCHMARK(BM_matrix_multiplication);
-BENCHMARK(BM_matrix_multiplication);
 BENCHMARK(BM_matrix_multiplication);
 
 BENCHMARK_MAIN();

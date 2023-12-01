@@ -94,6 +94,19 @@ namespace mr
           return *this;
         }
 
+        // getters
+        constexpr Vec3<T> direction() const noexcept {
+          return Vec3<T>(_data[0]);
+        }
+
+        constexpr Vec3<T> right() const noexcept {
+          return Vec3<T>(_data[1]);
+        }
+
+        constexpr Vec3<T> up() const noexcept {
+          return Vec3<T>(_data[2]);
+        }
+
       private:
         MatrT _data {
           RowT(0, 0, -1, 0), // direction

@@ -274,7 +274,6 @@ namespace mr
         return *this;
       }
 
-// #warning "Threeway comparison operator causes ICE"
       [[nodiscard]] bool operator<=>(const RowOperators<T, N, ReturnT> &other) const noexcept = default;
 
       friend std::ostream &operator<<(std::ostream &s, const ReturnT &v) noexcept {
@@ -290,6 +289,45 @@ namespace mr
     struct Row : virtual RowImpl<T, N>, RowOperators<T, N, ReturnT> {
       using RowImplT = RowImpl<T, N>;
       using RowOperatorsT = RowOperators<T, N, ReturnT>;
+
+      // default constructor
+      constexpr Row() noexcept = default;
+
+      // from const constructor
+      constexpr Row(const T data) : RowImplT(data) {}
+
+      // from elements pointer constructor
+      constexpr Row(const T *data) : RowImplT(data) {}
+
+      // from elements constructor
+      template <ArithmeticT... Args> requires (sizeof...(Args) >= 2 && sizeof...(Args) <= N)
+        constexpr Row(Args... args) : RowImplT(args...) {}
+
+      // copy from simd semantic
+      template <ArithmeticT R, std::size_t S>
+        constexpr Row(const Row<R, S, ReturnT> &other) noexcept : RowImplT(other) {}
+
+      // copy from simd semantic
+      template <ArithmeticT R, std::size_t S, ArithmeticT ... Args>
+        requires (sizeof...(Args) + S == N)
+        constexpr Row(const Row<R, S, ReturnT> &other, Args ... args) noexcept : RowImplT(other, args...) {}
+
+      // copy from simd semantic
+      template <ArithmeticT R, std::size_t S>
+        constexpr Row(const RowImplT &other) noexcept : RowImplT(other) {}
+
+      // copy from simd semantic
+      template <ArithmeticT R, std::size_t S, ArithmeticT ... Args>
+        requires (sizeof...(Args) + S == N)
+        constexpr Row(const RowImplT &other, Args ... args) noexcept : RowImplT(other, args...) {}
+
+      template <ArithmeticT R>
+        constexpr Row(const stdx::fixed_size_simd<R, N> &other) noexcept : RowImplT(other) {}
+
+      constexpr Row & operator=(const stdx::fixed_size_simd<T, N> &other) noexcept {
+        RowImplT::operator=(other);
+        return *this;
+      }
     };
 } // namespace mr
 

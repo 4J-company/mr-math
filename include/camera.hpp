@@ -109,48 +109,40 @@ namespace mr {
           if (_perspective_calculated) [[likely]] {
             return _perspective;
           }
-          std::lock_guard lg(_perspective_mutex);
-
-          auto direction = _rotation[0];
-          auto right = _rotation[1];
-          auto up = _rotation[2];
-          _perspective_calculated = true;
-          _perspective = mr::Matr4<T>{
-            typename mr::Matr4<T>::RowT{right[0], up[0], direction[0], 0},
-            typename mr::Matr4<T>::RowT{right[1], up[1], direction[1], 0},
-            typename mr::Matr4<T>::RowT{right[2], up[2], direction[2], 0},
-            typename mr::Matr4<T>::RowT{-(_position & right), -(_position & up), (_position & direction), 1}
-          };
-          return _perspective;
+          return calculate_perspective();
         }
 
         constexpr Matr4<T> ortholinear() const noexcept {
           if (_projection.ortholinear_calculated) [[likely]] {
             return _projection.ortholinear;
           }
-          std::lock_guard lg(_perspective_mutex);
-
-          const T l = -_projection.height / 2; // left
-          const T r = _projection.height / 2;  // right
-          const T b = -_projection.width / 2;  // bottom
-          const T t = _projection.width / 2;   // top
-          const T n = _projection.distance;    // near
-          const T f = _projection.far;         // far
-
-          _projection.ortholinear_calculated = true;
-          _projection.ortholinear = mr::Matr4<T>{
-            typename mr::Matr4<T>::RowT(2 / (r - l), 0, 0, 0),
-            typename mr::Matr4<T>::RowT(0, 2 / (t - b), 0, 0),
-            typename mr::Matr4<T>::RowT(0, 0, 2 / (n - f), 0),
-            typename mr::Matr4<T>::RowT((r + l) / (l - r), (t + b) / (b - t), (f + n) / (n - f), 1)
-          };
-          return _projection.ortholinear;
+          return calculate_ortholinear();
         }
 
         constexpr Matr4<T> frustum() const noexcept {
           if (_projection.frustum_calculated) [[likely]] {
             return _projection.frustum;
           }
+          return calculate_frustum();
+        }
+
+        constexpr Matr4<T> calculate_perspective() const noexcept {
+          std::lock_guard lg(_perspective_mutex);
+
+          const auto direction = _rotation.direction();
+          const auto right = _rotation.right();
+          const auto up = _rotation.up();
+          _perspective = mr::Matr4<T>{
+            typename mr::Matr4<T>::RowT{right[0], up[0], direction[0], 0},
+            typename mr::Matr4<T>::RowT{right[1], up[1], direction[1], 0},
+            typename mr::Matr4<T>::RowT{right[2], up[2], direction[2], 0},
+            typename mr::Matr4<T>::RowT{-(_position & right), -(_position & up), (_position & direction), 1}
+          };
+          _perspective_calculated = true;
+          return _perspective;
+        }
+
+        constexpr Matr4<T> calculate_ortholinear() const noexcept {
           std::lock_guard lg(_perspective_mutex);
 
           const T l = -_projection.height / 2; // left
@@ -160,13 +152,33 @@ namespace mr {
           const T n = _projection.distance;    // near
           const T f = _projection.far;         // far
 
-          _projection.frustum_calculated = true;
+          _projection.ortholinear = mr::Matr4<T>{
+            typename mr::Matr4<T>::RowT(2 / (r - l), 0, 0, 0),
+            typename mr::Matr4<T>::RowT(0, 2 / (t - b), 0, 0),
+            typename mr::Matr4<T>::RowT(0, 0, 2 / (n - f), 0),
+            typename mr::Matr4<T>::RowT((r + l) / (l - r), (t + b) / (b - t), (f + n) / (n - f), 1)
+          };
+          _projection.ortholinear_calculated = true;
+          return _projection.ortholinear;
+        }
+
+        constexpr Matr4<T> calculate_frustum() const noexcept {
+          std::lock_guard lg(_perspective_mutex);
+
+          const T l = -_projection.height / 2; // left
+          const T r = _projection.height / 2;  // right
+          const T b = -_projection.width / 2;  // bottom
+          const T t = _projection.width / 2;   // top
+          const T n = _projection.distance;    // near
+          const T f = _projection.far;         // far
+
           _projection.frustum = mr::Matr4<T>{
             typename mr::Matr4<T>::RowT(2 * n / (r - l), 0, 0, 0),
             typename mr::Matr4<T>::RowT(0, 2 * n / (t - b), 0, 0),
             typename mr::Matr4<T>::RowT((r + l) / (r - l), (t + b) / (t - b), (f + n) / (n - f), -1),
             typename mr::Matr4<T>::RowT(0, 0, 2 * n * f / (n - f), 0)
           };
+          _projection.frustum_calculated = true;
           return _projection.frustum;
         }
 

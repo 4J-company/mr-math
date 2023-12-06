@@ -34,6 +34,7 @@ namespace mr
         }
 
       constexpr Matr(const std::array<RowT, N> &arr) : _data(arr) {}
+      constexpr Matr(std::array<RowT, N> &&arr) : _data(std::move(arr)) {}
 
       // copy semantics
       constexpr Matr(const Matr &) noexcept = default;
@@ -100,21 +101,17 @@ namespace mr
 
       [[nodiscard]] constexpr T determinant() const noexcept {
         std::array<RowT, N> tmp = _data;
+        T det = 1;
 
+        tmp[N - 1] /= tmp[N - 1][N - 1];
         for (size_t i = 1; i < N; i++) {
+          det *= tmp[i - 1][i - 1];
+          tmp[i - 1] /= tmp[i - 1][i - 1] == 0 ? static_cast<T>(1) : tmp[i - 1][i - 1];
           for (size_t j = i; j < N; j++) {
-            tmp[i] -= tmp[i][i - 1] == 0
-              ? 0
-              : tmp[i - 1] * tmp[j][i - 1] / tmp[i - 1][i - 1];
+            tmp[i] -= tmp[i - 1] * tmp[j][i - 1];
           }
         }
-
-        constexpr auto io0 = std::ranges::iota_view((size_t)0, N);
-        return std::transform_reduce(
-          std::execution::par_unseq,
-          io0.begin(), io0.end(), 1,
-          std::multiplies {},
-          [&tmp](auto i) { return tmp[i][i]; });
+        return det;
       }
 
       [[nodiscard]] constexpr T operator!() const noexcept {
@@ -123,22 +120,14 @@ namespace mr
 
       constexpr Matr transposed() const noexcept {
         std::array<RowT, N> tmp1;
-        std::array<std::array<T, N>, N> tmp2;
         for (size_t i = 0; i < N; i++)
-          for (size_t j = 0; j < N; j++)
-            tmp2[i][j] = _data[j][i];
-        for (size_t i = 0; i < N; i++)
-          tmp1[i]._data.copy_from(tmp2[i].data(), stdx::element_aligned);
+          tmp1[i] = stdx::fixed_size_simd<T, N>([this, i](auto j){ return _data[j][i]; });
         return {tmp1};
       }
 
       constexpr Matr & transpose() noexcept {
-        std::array<std::array<T, N>, N> tmp2;
         for (size_t i = 0; i < N; i++)
-          for (size_t j = 0; j < N; j++)
-            tmp2[i][j] = _data[j][i];
-        for (size_t i = 0; i < N; i++)
-          _data[i].copy_from(tmp2[i].data(), stdx::element_aligned);
+          _data[i] = stdx::fixed_size_simd<T, N>([this, i](auto j){ return _data[j][i]; });
         return *this;
       }
 
@@ -151,27 +140,25 @@ namespace mr
 
         // null bottom triangle
         for (size_t i = 1; i < N; i++) {
+          tmp[i - 1] /= tmp[i - 1][i - 1];
           for (size_t j = i; j < N; j++) {
-            tmp[j] -= tmp[i - 1][i - 1] == 0 ? 0 : tmp[i - 1] * tmp[j][i - 1] / tmp[i - 1][i - 1];
+            tmp[j] -= tmp[i - 1][i - 1] == 0 ? static_cast<T>(0) : tmp[i - 1] * tmp[j][i - 1];
           }
         }
+        tmp[N - 1] /= tmp[N - 1][N - 1];
 
         // null top triangle
         for (int i = N - 2; i >= 0; i--) {
           for (int j = i; j >= 0; j--) {
-            tmp[j] -= tmp[i + 1][i + 1] == 0 ? 0 : tmp[i + 1] * tmp[j][i + 1] / tmp[i + 1][i + 1];
+            tmp[j] -= tmp[i + 1][i + 1] == 0 ? static_cast<T>(0) : tmp[i + 1] * tmp[j][i + 1];
           }
         }
-
-        // make main diagonal 1
-        std::for_each(std::execution::par_unseq,
-          io.begin(), io.end(), [&tmp](auto i) { tmp[i] /= tmp[i][i]; });
 
         std::array<RowT, N> res;
         std::for_each(std::execution::par_unseq, io.begin(), io.end(),
           [&tmp, &res](auto i) {
             auto [a, b] = stdx::split<N, N>(tmp[i]._data);
-            res[i] += stdx::simd_cast<stdx::fixed_size_simd<T, N>>(b);
+            res[i] = stdx::static_simd_cast<stdx::fixed_size_simd<T, N>>(b);
           });
 
         return {res};
@@ -265,7 +252,7 @@ namespace mr
         return s;
       }
 
-    private:
+    // private:
       static Matr _identity() {
         std::array<RowT, N> id;
         constexpr auto io = std::ranges::iota_view {(size_t)0, N};
@@ -273,11 +260,7 @@ namespace mr
         std::transform(std::execution::par_unseq,
           io.begin(), io.end(), id.begin(),
           [&io](auto i) -> RowT {
-            std::array<T, N> tmp;
-            std::transform(std::execution::par_unseq,
-              io.begin(), io.end(), tmp.begin(),
-              [i](auto i2) -> T { return i2 == i ? 1 : 0; });
-            return {tmp.data()};
+            return stdx::fixed_size_simd<T, N>([i](auto i2) { return i2 == i ? 1 : 0; });
           });
 
         return {id};

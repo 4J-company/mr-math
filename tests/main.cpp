@@ -63,6 +63,14 @@ static void BM_vector_rotation(benchmark::State& state) {
 }
 BENCHMARK(BM_vector_rotation);
 
+static void BM_vector_scale(benchmark::State& state) {
+  for (auto _ : state) {
+    auto v3 = v1 * mr::Matr4f::scale({1, 2, 3});
+    benchmark::DoNotOptimize(v3);
+  }
+}
+BENCHMARK(BM_vector_scale);
+
 static void BM_vector_const_multiplication(benchmark::State& state) {
   for (auto _ : state) {
     auto v3 = v1 * 3;
@@ -119,6 +127,32 @@ static void BM_matrix_multiplication(benchmark::State& state) {
 }
 
 BENCHMARK(BM_matrix_multiplication);
+
+static void BM_matrix_inversed(benchmark::State& state) {
+  for (auto _ : state) {
+    auto m3 = m1.inversed();
+    benchmark::DoNotOptimize(m3);
+  }
+}
+
+BENCHMARK(BM_matrix_inversed);
+
+static void BM_matrix_determinant(benchmark::State& state) {
+  for (auto _ : state) {
+    auto m3 = m1.determinant();
+    benchmark::DoNotOptimize(m3);
+  }
+}
+
+BENCHMARK(BM_matrix_determinant);
+
+static void BM_matrix_transposed(benchmark::State& state) {
+  for (auto _ : state) {
+    auto v3 = m1.transposed();
+    benchmark::DoNotOptimize(v3);
+  }
+}
+BENCHMARK(BM_matrix_transposed);
 
 BENCHMARK_MAIN();
 

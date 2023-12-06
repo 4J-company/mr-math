@@ -252,7 +252,7 @@ namespace mr
         return s;
       }
 
-    // private:
+    private:
       static Matr _identity() {
         std::array<RowT, N> id;
         constexpr auto io = std::ranges::iota_view {(size_t)0, N};

@@ -59,14 +59,16 @@ namespace mr
       }
 
       constexpr Matr & operator+=(const Matr &other) noexcept {
-        for (int i = 0; i < N; i++)
+        for (int i = 0; i < N; i++) {
           _data[i] += other._data[i];
+        }
         return *this;
       }
 
       constexpr Matr & operator-=(const Matr &other) noexcept {
-        for (int i = 0; i < N; i++)
+        for (int i = 0; i < N; i++) {
           _data[i] -= other._data[i];
+        }
         return *this;
       }
 
@@ -82,15 +84,17 @@ namespace mr
 
       constexpr Matr operator+(const Matr &other) const noexcept {
         std::array<RowT, N> tmp;
-        for (size_t i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++) {
           tmp[i] = static_cast<RowT>(_data[i] + other._data[i]);
+        }
         return {tmp};
       }
 
       constexpr Matr operator-(const Matr &other) const noexcept {
         std::array<RowT, N> tmp;
-        for (size_t i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++) {
           tmp[i] = _data[i] - other._data[i];
+        }
         return {tmp};
       }
 
@@ -120,14 +124,16 @@ namespace mr
 
       constexpr Matr transposed() const noexcept {
         std::array<RowT, N> tmp1;
-        for (size_t i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++) {
           tmp1[i] = stdx::fixed_size_simd<T, N>([this, i](auto j){ return _data[j][i]; });
+        }
         return {tmp1};
       }
 
       constexpr Matr & transpose() noexcept {
-        for (size_t i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++) {
           _data[i] = stdx::fixed_size_simd<T, N>([this, i](auto j){ return _data[j][i]; });
+        }
         return *this;
       }
 
@@ -228,8 +234,8 @@ namespace mr
         T si = std::sin(rad.value);
         T nco = 1 - co;
         auto v = vec.normalized();
-        Vec4<T> tmp = Vec4<T>(v * v * nco + co);
-        Matr4<T> tmp1 = scale(tmp);
+
+        Matr4<T> tmp1 = scale(v * v * nco + co);
         Matr4<T> tmp2 = Matr4<T> {
           typename mr::Matr4<T>::RowT(0, v[0] * v[1] * nco, v[0] * v[2] * nco, 0),
           typename mr::Matr4<T>::RowT(v[0] * v[1] * nco, 0, v[1] * v[2] * nco, 0),
@@ -247,8 +253,10 @@ namespace mr
       }
 
       friend std::ostream & operator<<(std::ostream &s, const Matr &m) noexcept {
-        for (size_t i = 0; i < N; i++)
+        std::cout << std::endl;
+        for (size_t i = 0; i < N; i++) {
           std::cout << m._data[i] << std::endl;
+        }
         return s;
       }
 

@@ -21,8 +21,7 @@ namespace mr
   template <typename T>
     concept ArithmeticT = std::integral<T> || std::floating_point<T>;
 
-  template <ArithmeticT T>
-    requires(sizeof(T) == sizeof(float))
+  template <ArithmeticT T> requires(sizeof(T) == sizeof(float))
     constexpr float finv_sqrt(T number) {
       unsigned i;
       float x2, y;
@@ -39,8 +38,7 @@ namespace mr
     }
 
   // fast algorithm supports only 32-bit floats
-  template <ArithmeticT T>
-  requires(sizeof(T) == sizeof(double))
+  template <ArithmeticT T> requires(sizeof(T) == sizeof(double))
     constexpr double finv_sqrt(T number) {
       unsigned long long i;
       double x2, y;
@@ -57,8 +55,7 @@ namespace mr
     }
 
   // use finv_sqrt or for higher precision (1 / std::sqrt for even higher)
-  template <ArithmeticT T>
-  requires(sizeof(T) == sizeof(float))
+  template <ArithmeticT T> requires(sizeof(T) == sizeof(float))
     constexpr float ffinv_sqrt(T number) {
       unsigned i;
       float y;
@@ -71,9 +68,8 @@ namespace mr
       return y;
     }
 
-  // fast algorithm supports only 32-bit floats
-  template <ArithmeticT T>
-  requires(sizeof(T) == sizeof(double))
+  // use finv_sqrt or for higher precision (1 / std::sqrt for even higher)
+  template <ArithmeticT T> requires(sizeof(T) == sizeof(double))
     constexpr double ffinv_sqrt(T number) {
       unsigned long long i;
       double y;

@@ -182,12 +182,12 @@ namespace mr
       // ArithmeticT operators
       template <ArithmeticT X>
         constexpr Vec operator+(const X x) const noexcept {
-          return {RowT::_data * x};
+          return {RowT::_data + x};
         }
 
       template <ArithmeticT X>
         constexpr Vec operator-(const X x) const noexcept {
-          return {RowT::_data / x};
+          return {RowT::_data - x};
         }
 
       template <ArithmeticT X>

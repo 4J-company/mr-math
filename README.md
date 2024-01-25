@@ -40,10 +40,6 @@ mr::Vec3f v5 {3, 4, 0};
 float l = v5.length();
 std::cout << l << std::endl; // output: 5
 
-// calculates 1/length (faster)
-float l = v5.inversed_length();
-std::cout << l << std::endl; // output: 0.2
-
 // calculates squared length (fastest)
 float l = v5.length2();
 std::cout << l << std::endl; // output: 25
@@ -56,16 +52,16 @@ Initialization
 ```cpp
 /// alias for mr::Matr<float, 4>
 mr::Matr4f m1 {
-    mr::Matr4f::Row_t{1, 0, 0, 0},
-    mr::Matr4f::Row_t{1, 0, 0, 0},
-    mr::Matr4f::Row_t{1, 0, 0, 0},
-    mr::Matr4f::Row_t{1, 0, 0, 0},
+    mr::Matr4f::RowT{1, 0, 0, 0},
+    mr::Matr4f::RowT{1, 0, 0, 0},
+    mr::Matr4f::RowT{1, 0, 0, 0},
+    mr::Matr4f::RowT{1, 0, 0, 0},
     };
 mr::Matr<float, 4> m2 {
-    mr::Matr4f::Row_t{1, 2, 3, 4},
-    mr::Matr4f::Row_t{1, 2, 3, 4},
-    mr::Matr4f::Row_t{1, 2, 3, 4},
-    mr::Matr4f::Row_t{1, 2, 3, 4},
+    mr::Matr4f::RowT{1, 2, 3, 4},
+    mr::Matr4f::RowT{1, 2, 3, 4},
+    mr::Matr4f::RowT{1, 2, 3, 4},
+    mr::Matr4f::RowT{1, 2, 3, 4},
     };
 ```
 Operations
@@ -83,10 +79,10 @@ m1.transposed();
 m1.transpose();
 
 mr::Matr4f m4 {
-    mr::Matr4f::Row_t{2, 0, 0, 0},
-    mr::Matr4f::Row_t{0, 2, 0, 0},
-    mr::Matr4f::Row_t{0, 0, 2, 0},
-    mr::Matr4f::Row_t{0, 0, 0, 2}
+    mr::Matr4f::RowT{2, 0, 0, 0},
+    mr::Matr4f::RowT{0, 2, 0, 0},
+    mr::Matr4f::RowT{0, 0, 2, 0},
+    mr::Matr4f::RowT{0, 0, 0, 2}
     };
 // returns inversed copy
 mr::Matr4f m5 = m4.inversed();

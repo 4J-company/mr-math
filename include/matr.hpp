@@ -33,6 +33,21 @@ namespace mr
           _data = std::array<RowT, N>({args...});
         }
 
+      template <typename... Args>
+        requires (std::is_convertible_v<Args, T>) &&
+                 (sizeof...(Args) == N * N)
+        constexpr Matr(Args... args) noexcept {
+          std::array<T, N * N> tmp {static_cast<T>(args)...};
+          for (int i = 0; i < N; i++) {
+            _data[i] = RowT {
+              tmp[N * i + 0],
+              tmp[N * i + 1],
+              tmp[N * i + 2],
+              tmp[N * i + 3]
+            };
+          }
+        }
+
       constexpr Matr(const std::array<RowT, N> &arr) : _data(arr) {}
       constexpr Matr(std::array<RowT, N> &&arr) : _data(std::move(arr)) {}
 

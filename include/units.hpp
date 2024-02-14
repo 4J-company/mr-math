@@ -201,15 +201,15 @@ namespace mr
   }
 
   // literals
-  constexpr mr::_RadiansLiteral operator"" _rad(long long value) {
+  constexpr mr::_RadiansLiteral operator"" _rad(unsigned long long value) {
     return mr::_RadiansLiteral{value};
   }
 
-  constexpr mr::_DegreesLiteral operator"" _deg(long long value) {
+  constexpr mr::_DegreesLiteral operator"" _deg(unsigned long long value) {
     return mr::_DegreesLiteral{value};
   }
 
-  constexpr float operator"" _pi(long long value) {
+  constexpr float operator"" _pi(unsigned long long value) {
     return value * std::numbers::pi_v<long double>;
   }
 
@@ -221,7 +221,7 @@ namespace mr
     return mr::_DegreesLiteral{value};
   }
 
-  constexpr float operator"" _pi(long double value) {
+  constexpr mr::_RadiansLiteral operator"" _pi(long double value) {
     return value * mr::pi;
   }
 }

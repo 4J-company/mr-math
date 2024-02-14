@@ -133,9 +133,9 @@ namespace mr {
           const auto right = _rotation.right();
           const auto up = _rotation.up();
           _perspective = mr::Matr4<T>{
-            typename mr::Matr4<T>::RowT{right[0], up[0], direction[0], 0},
-            typename mr::Matr4<T>::RowT{right[1], up[1], direction[1], 0},
-            typename mr::Matr4<T>::RowT{right[2], up[2], direction[2], 0},
+            typename mr::Matr4<T>::RowT{right.x(), up.x(), direction.x(), 0},
+            typename mr::Matr4<T>::RowT{right.y(), up.y(), direction.y(), 0},
+            typename mr::Matr4<T>::RowT{right.z(), up.z(), direction.z(), 0},
             typename mr::Matr4<T>::RowT{-(_position & right), -(_position & up), (_position & direction), 1}
           };
           _perspective_calculated = true;

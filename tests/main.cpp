@@ -33,7 +33,7 @@ BENCHMARK(BM_camera_perspective);
 
 static void BM_camera_ortholinear(benchmark::State& state) {
   for (auto _ : state) {
-    auto m = cam.calculate_ortholinear();
+    auto m = cam.calculate_orthographic();
     benchmark::DoNotOptimize(m);
     benchmark::ClobberMemory();
   }

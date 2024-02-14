@@ -34,7 +34,7 @@ namespace mr
         }
 
       template <typename... Args>
-        requires (std::is_convertible_v<Args, T>) &&
+        requires (std::is_convertible_v<Args, T> && ...) &&
                  (sizeof...(Args) == N * N)
         constexpr Matr(Args... args) noexcept {
           std::array<T, N * N> tmp {static_cast<T>(args)...};
@@ -125,7 +125,7 @@ namespace mr
         tmp[N - 1] /= tmp[N - 1][N - 1];
         for (size_t i = 1; i < N; i++) {
           det *= tmp[i - 1][i - 1];
-          tmp[i - 1] /= tmp[i - 1][i - 1] == 0 ? static_cast<T>(1) : tmp[i - 1][i - 1];
+          tmp[i - 1] /= std::abs(tmp[i - 1][i - 1]) < _epsilon ? static_cast<T>(1) : tmp[i - 1][i - 1];
           for (size_t j = i; j < N; j++) {
             tmp[i] -= tmp[i - 1] * tmp[j][i - 1];
           }
@@ -157,13 +157,16 @@ namespace mr
 
         std::array<Row<T, 2 * N>, N> tmp;
         std::for_each(std::execution::par_unseq, io.begin(), io.end(),
-                      [&tmp, this](auto i) { tmp[i] += stdx::simd_cast<stdx::fixed_size_simd<T, 2 * N>>(stdx::concat(_data[i]._data, identity[i]._data)); });
+                      [&tmp, this](auto i) {
+                        const auto concatinated = stdx::concat(_data[i]._data._data, identity[i]._data._data);
+                        tmp[i] += stdx::static_simd_cast<stdx::fixed_size_simd<T, 2 * N>>(concatinated);
+                      });
 
         // null bottom triangle
         for (size_t i = 1; i < N; i++) {
           tmp[i - 1] /= tmp[i - 1][i - 1];
           for (size_t j = i; j < N; j++) {
-            tmp[j] -= tmp[i - 1][i - 1] == 0 ? static_cast<T>(0) : tmp[i - 1] * tmp[j][i - 1];
+            tmp[j] -= std::abs(tmp[i - 1][i - 1]) < _epsilon ? static_cast<T>(0) : tmp[i - 1] * tmp[j][i - 1];
           }
         }
         tmp[N - 1] /= tmp[N - 1][N - 1];
@@ -171,14 +174,14 @@ namespace mr
         // null top triangle
         for (int i = N - 2; i >= 0; i--) {
           for (int j = i; j >= 0; j--) {
-            tmp[j] -= tmp[i + 1][i + 1] == 0 ? static_cast<T>(0) : tmp[i + 1] * tmp[j][i + 1];
+            tmp[j] -= std::abs(tmp[i + 1][i + 1]) < _epsilon ? static_cast<T>(0) : tmp[i + 1] * tmp[j][i + 1];
           }
         }
 
         std::array<RowT, N> res;
         std::for_each(std::execution::par_unseq, io.begin(), io.end(),
           [&tmp, &res](auto i) {
-            auto [a, b] = stdx::split<N, N>(tmp[i]._data);
+            auto [a, b] = stdx::split<N, N>(tmp[i]._data._data);
             res[i] = stdx::static_simd_cast<stdx::fixed_size_simd<T, N>>(b);
           });
 
@@ -192,9 +195,9 @@ namespace mr
 
       static constexpr Matr4<T> scale(const Vec3<T> &vec) noexcept {
         return Matr4<T> {
-          typename mr::Matr4<T>::RowT(vec[0], 0, 0, 0),
-          typename mr::Matr4<T>::RowT(0, vec[1], 0, 0),
-          typename mr::Matr4<T>::RowT(0, 0, vec[2], 0),
+          typename mr::Matr4<T>::RowT(vec.x(), 0, 0, 0),
+          typename mr::Matr4<T>::RowT(0, vec.y(), 0, 0),
+          typename mr::Matr4<T>::RowT(0, 0, vec.z(), 0),
           typename mr::Matr4<T>::RowT(0, 0, 0, 1)
         };
       }
@@ -204,7 +207,7 @@ namespace mr
           typename mr::Matr4<T>::RowT(1, 0, 0, 0),
           typename mr::Matr4<T>::RowT(0, 1, 0, 0),
           typename mr::Matr4<T>::RowT(0, 0, 1, 0),
-          typename mr::Matr4<T>::RowT(vec[0], vec[1], vec[2], 1)
+          typename mr::Matr4<T>::RowT(vec.x(), vec.y(), vec.z(), 1)
         };
       }
 
@@ -252,15 +255,15 @@ namespace mr
 
         Matr4<T> tmp1 = scale(v * v * nco + co);
         Matr4<T> tmp2 = Matr4<T> {
-          typename mr::Matr4<T>::RowT(0, v[0] * v[1] * nco, v[0] * v[2] * nco, 0),
-          typename mr::Matr4<T>::RowT(v[0] * v[1] * nco, 0, v[1] * v[2] * nco, 0),
-          typename mr::Matr4<T>::RowT(v[0] * v[2] * nco, v[1] * v[2] * nco, 0, 0),
+          typename mr::Matr4<T>::RowT(0, v.x() * v.y() * nco, v.x() * v.z() * nco, 0),
+          typename mr::Matr4<T>::RowT(v.x() * v.y() * nco, 0, v.y() * v.z() * nco, 0),
+          typename mr::Matr4<T>::RowT(v.x() * v.z() * nco, v.y() * v.z() * nco, 0, 0),
           typename mr::Matr4<T>::RowT(0, 0, 0, 0)
         };
         Matr4<T> tmp3 = Matr4<T> {
-          typename mr::Matr4<T>::RowT(0, -v[2] * si, v[1] * si, 0),
-          typename mr::Matr4<T>::RowT(v[2] * si, 0, -v[0] * si, 0),
-          typename mr::Matr4<T>::RowT(-v[1] * si, v[0] * si, 0, 0),
+          typename mr::Matr4<T>::RowT(0, -v.z() * si, v.y() * si, 0),
+          typename mr::Matr4<T>::RowT(v.z() * si, 0, -v.x() * si, 0),
+          typename mr::Matr4<T>::RowT(-v.y() * si, v.x() * si, 0, 0),
           typename mr::Matr4<T>::RowT(0, 0, 0, 0)
         };
 
@@ -286,12 +289,14 @@ namespace mr
             return stdx::fixed_size_simd<T, N>([i](auto i2) { return i2 == i ? 1 : 0; });
           });
 
-        return {id};
+        return id;
       }
 
     public:
       inline static const Matr identity = _identity();
       std::array<RowT, N> _data;
+    private:
+      static constexpr T _epsilon = std::numeric_limits<T>::epsilon();
     };
 } // namespace mr
 

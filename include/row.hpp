@@ -424,7 +424,7 @@ namespace mr {
         return *this;
       }
 
-      [[nodiscard]] constexpr T operator[](std::size_t i) const {
+      [[nodiscard]] constexpr T operator[](std::size_t i) const noexcept {
         return _data[i];
       }
     };

@@ -158,8 +158,7 @@ namespace mr
         std::array<Row<T, 2 * N>, N> tmp;
         std::for_each(std::execution::par_unseq, io.begin(), io.end(),
                       [&tmp, this](auto i) {
-                        const auto concatinated = stdx::concat(_data[i]._data._data, identity[i]._data._data);
-                        tmp[i] += stdx::static_simd_cast<stdx::fixed_size_simd<T, 2 * N>>(concatinated);
+                        tmp[i] += stdx::static_simd_cast<stdx::fixed_size_simd<T, 2 * N>>(stdx::concat(_data[i]._data._data, identity[i]._data._data));
                       });
 
         // null bottom triangle

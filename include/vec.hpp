@@ -38,24 +38,28 @@ namespace mr
 
   // base vector (use aliases for full functional)
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
-    struct [[nodiscard]] Vec : public Row<T, N, Vec<T, N>>
+    struct [[nodiscard]] Vec : public RowOperators<T, N, Vec<T, N>, RowImpl<T, N>, Row<T, N>, Vec<T, N>>
     {
     public:
       using RowImplT = RowImpl<T, N>;
-      using RowT = Row<T, N, Vec<T, N>>;
+      using RowT = Row<T, N>;
+
+      RowImplT _data;
 
       // from simd constructor
-      constexpr Vec(RowT r) : RowT(r) {};
+      constexpr Vec(RowT row) : _data(row._data) {};
+      constexpr Vec(RowImplT row) : _data(row) {};
+      constexpr Vec(RowImplT::SimdImplT row) : _data(row) {};
 
       // from elements constructor
       template <ArithmeticT... Args>
-        constexpr Vec(Args... args) : RowImplT{static_cast<T>(args)...} {}
+        constexpr Vec(Args... args) : _data(static_cast<T>(args)...) {}
 
       // conversion constructor
       template <ArithmeticT R, std::size_t S>
-        constexpr Vec(const Vec<R, S> &v) noexcept : RowT(static_cast<RowImpl<R, S>>(v)) {}
+        constexpr Vec(const Vec<R, S> &v) noexcept : _data(v._data) {}
       template <ArithmeticT R, std::size_t S, ArithmeticT ... Args>
-        constexpr Vec(const Vec<R, S> &v, Args ... args) noexcept : RowT(static_cast<Row<R, S>>(v), args...) {}
+        constexpr Vec(const Vec<R, S> &v, Args ... args) noexcept : _data(v, args...) {}
 
       // move semantics
       constexpr Vec(Vec &&) noexcept = default;
@@ -72,17 +76,17 @@ namespace mr
       constexpr void w(T w) noexcept requires (N >= 4) { _set_ind(3, w); }
 
       // getters
-      [[nodiscard]] constexpr T x() const noexcept requires (N >= 1) { return RowT::_data[0]; }
-      [[nodiscard]] constexpr T y() const noexcept requires (N >= 2) { return RowT::_data[1]; }
-      [[nodiscard]] constexpr T z() const noexcept requires (N >= 3) { return RowT::_data[2]; }
-      [[nodiscard]] constexpr T w() const noexcept requires (N >= 4) { return RowT::_data[3]; }
+      [[nodiscard]] constexpr T x() const noexcept requires (N >= 1) { return _data[0]; }
+      [[nodiscard]] constexpr T y() const noexcept requires (N >= 2) { return _data[1]; }
+      [[nodiscard]] constexpr T z() const noexcept requires (N >= 3) { return _data[2]; }
+      [[nodiscard]] constexpr T w() const noexcept requires (N >= 4) { return _data[3]; }
 
       // cross product
       constexpr Vec cross(const Vec &other) const noexcept requires (N == 3) {
         std::array<T, 3> arr {
-          RowT::_data[1] * other._data[2] - RowT::_data[2] * other._data[1],
-          RowT::_data[2] * other._data[0] - RowT::_data[0] * other._data[2],
-          RowT::_data[0] * other._data[1] - RowT::_data[1] * other._data[0]};
+          _data[1] * other._data[2] - _data[2] * other._data[1],
+          _data[2] * other._data[0] - _data[0] * other._data[2],
+          _data[0] * other._data[1] - _data[1] * other._data[0]};
 
         stdx::fixed_size_simd<T, 3> ans;
         ans.copy_from(arr.data(), stdx::element_aligned);
@@ -95,7 +99,7 @@ namespace mr
 
       // length methods
       [[nodiscard]] constexpr T length2() const noexcept {
-        return stdx::reduce(RowT::_data * RowT::_data); // sum by default
+        return stdx::reduce(_data._data * _data._data); // sum by default
       }
 
       [[nodiscard]] constexpr T length() const noexcept {
@@ -149,7 +153,7 @@ namespace mr
 
       // dot product
       [[nodiscard]] constexpr T dot(const Vec<T, N> other) const noexcept {
-        return stdx::reduce(RowT::_data * other._data);
+        return stdx::reduce(_data._data * other._data._data);
       }
 
       [[nodiscard]] constexpr T operator&(const Vec<T, N> other) const noexcept {
@@ -160,7 +164,7 @@ namespace mr
         constexpr Vec operator*(const Matr<R, N> &other) const noexcept {
           mr::Vec<T, N> tmp {};
           for (size_t i = 0; i < N; i++) {
-            tmp._data += (other._data[i] * RowT::_data[i])._data;
+            tmp._data += (other._data[i] * _data[i])._data;
           }
           return tmp;
         }
@@ -181,7 +185,7 @@ namespace mr
         constexpr Vec & operator*=(const Matr<R, N> &other) noexcept {
           mr::Vec<T, N> tmp {};
           for (size_t i = 0; i < N; i++) {
-            tmp._data += (other._data[i] * RowT::_data[i])._data;
+            tmp._data += (other._data[i] * _data[i])._data;
           }
           *this = tmp;
           return *this;

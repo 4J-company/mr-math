@@ -16,11 +16,12 @@
 
 namespace stdx = std::experimental;
 
-namespace mr
-{
+namespace mr {
   template <typename T>
     concept ArithmeticT = std::integral<T> || std::floating_point<T>;
 
+  // fast inverse implementation for floats
+  // use 1 / std::sqrt for higher precision
   template <ArithmeticT T> requires(sizeof(T) == sizeof(float))
     constexpr float finv_sqrt(T number) {
       unsigned i;
@@ -37,7 +38,8 @@ namespace mr
       return y;
     }
 
-  // fast algorithm supports only 32-bit floats
+  // fast inverse implementation for doubles
+  // use 1 / std::sqrt for higher precision
   template <ArithmeticT T> requires(sizeof(T) == sizeof(double))
     constexpr double finv_sqrt(T number) {
       unsigned long long i;
@@ -54,6 +56,7 @@ namespace mr
       return y;
     }
 
+  // fast inverse implementation for floats without Newton iteration
   // use finv_sqrt or for higher precision (1 / std::sqrt for even higher)
   template <ArithmeticT T> requires(sizeof(T) == sizeof(float))
     constexpr float ffinv_sqrt(T number) {
@@ -68,6 +71,7 @@ namespace mr
       return y;
     }
 
+  // fast inverse implementation for doubles without Newton iteration
   // use finv_sqrt or for higher precision (1 / std::sqrt for even higher)
   template <ArithmeticT T> requires(sizeof(T) == sizeof(double))
     constexpr double ffinv_sqrt(T number) {

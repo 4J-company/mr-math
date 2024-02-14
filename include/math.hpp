@@ -1,6 +1,7 @@
 #ifndef __math_hpp_
 #define __math_hpp_
 
+#include "def.hpp"
 #include "vec.hpp"
 #include "rot.hpp"
 #include "matr.hpp"

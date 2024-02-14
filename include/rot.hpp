@@ -75,21 +75,21 @@ namespace mr
 
         // angle in radians
         constexpr Rotation & operator+=(Pitch<T> angle_rad) noexcept {
-          _data *= Matr4<T>::rotate(angle_rad, mr::Vec3f(_data[1]));
+          _data *= Matr4<T>::rotate(angle_rad, mr::Vec3f(right()));
 
           return *this;
         }
 
         // angle in radians
         constexpr Rotation & operator+=(Yaw<T> angle_rad) noexcept {
-          _data *= Matr4<T>::rotate(angle_rad, mr::Vec3f(_data[2]));
+          _data *= Matr4<T>::rotate(angle_rad, mr::Vec3f(up()));
 
           return *this;
         }
 
         // angle in radians
         constexpr Rotation & operator+=(Roll<T> angle_rad) noexcept {
-          _data *= Matr4<T>::rotate(angle_rad, mr::Vec3f(_data[0]));
+          _data *= Matr4<T>::rotate(angle_rad, mr::Vec3f(direction()));
 
           return *this;
         }

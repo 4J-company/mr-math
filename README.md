@@ -22,8 +22,13 @@ Operations
 ```cpp
 // cross product
 std::cout << v1 % v2 << std::endl; // output: (0, 0, 1)
+// alternative
+std::cout << v1.cross(v2) << std::endl; // output: (0, 0, 1)
+
 // dot product
 std::cout << v1 & v2 << std::endl; // output: 0
+// alternative
+std::cout << v1.dot(v2) << std::endl; // output: (0, 0, 1)
 
 // returns normalized copy
 mr::Vec3f v3 {2, 0, 0};
@@ -51,13 +56,14 @@ std::cout << l << std::endl; // output: 25
 Initialization
 ```cpp
 /// alias for mr::Matr<float, 4>
+// Initialization list elements have to have exact RowT type
 mr::Matr4f m1 {
     mr::Matr4f::RowT{1, 0, 0, 0},
     mr::Matr4f::RowT{1, 0, 0, 0},
     mr::Matr4f::RowT{1, 0, 0, 0},
     mr::Matr4f::RowT{1, 0, 0, 0},
     };
-mr::Matr<float, 4> m2 {
+mr::Matr4f m2 {
     mr::Matr4f::RowT{1, 2, 3, 4},
     mr::Matr4f::RowT{1, 2, 3, 4},
     mr::Matr4f::RowT{1, 2, 3, 4},
@@ -99,6 +105,45 @@ mr::Matr4f m6 = m4.inverse();
 
 // etc (+ - * [][] ...)
 ```
+#### Camera
+Initialization
+```cpp
+mr::Camera cam1 {{0}};
+mr::Camera cam2 {{0}, mr::axis::z};
+```
+
+Movement and rotation
+```cpp
+cam1 += mr::Vec3f{1, 2, 3}; // same as moving camera by {1, 2, 3}
+cam1.position({1, 2, 3});   // same as placing camera at {1, 2, 3}
+
+cam1 += mr::Yawf{mr::pi};
+cam1 += mr::Pitchf{mr::pi};
+cam1 += mr::Rollf{mr::pi};
+```
+
+Perspective matrices
+```cpp
+auto perspective = cam1.perspective(); // world -> device
+auto frustum = cam1.frustum();         // device -> screen (realistic depth perseption)
+auto ortholinear = cam1.orthographic(); // device -> screen (no depth to size corelation)
+```
+
+#### Useful stuff
+```cpp
+// variable with value of pi and type mr::Radiansf
+mr::pi = mr::Radiansf(std::numbers::pi_v<float>);
+
+// default axis directions (can be changed according to your needs)
+mr::axis::x = {1, 0, 0};
+mr::axis::y = {0, 1, 0};
+mr::axis::z = {0, 0, -1};
+
+// literals
+1_rad == mr::Radiansf(1)
+1_deg == mr::Degreesf(1)
+1_pi  == 1 * mr::pi
+```
 
 ### Installation
 #### Using [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake):
@@ -108,14 +153,16 @@ CPMAddPackage(
   GITHUB_REPOSITORY 4J-company/mr-math
   VERSION 1.0.0
 )
+target_link_libraries(<your-project>
+            PUBLIC/INTERFACE/PRIVATE
+            mr-math)
 ```
 #### Manually:
 ##### Clone to your project subdirectory
 ```bash
 git clone https://github.com/4J-company/mr-math
 ```
-
-##### Link mr-math to your project
+##### In cmake script:
 ```cmake
 add_subdirectory(mr-math)
 target_link_libraries(<your-project>
@@ -124,6 +171,6 @@ target_link_libraries(<your-project>
 ```
 
 ### Benchmarking
-##### To build projects benchmarks you have to generate CMake with -DENABLE_BENCHMARK option.
+##### To build projects benchmarks you have to generate CMake with -DENABLE_BENCHMARK=true argument.
 ##### Then build the executable (by default it compiles into architechture specific assembly)
 

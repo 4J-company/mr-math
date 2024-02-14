@@ -86,7 +86,8 @@ namespace mr
         std::array<T, 3> arr {
           _data[1] * other._data[2] - _data[2] * other._data[1],
           _data[2] * other._data[0] - _data[0] * other._data[2],
-          _data[0] * other._data[1] - _data[1] * other._data[0]};
+          _data[0] * other._data[1] - _data[1] * other._data[0]
+        };
 
         stdx::fixed_size_simd<T, 3> ans;
         ans.copy_from(arr.data(), stdx::element_aligned);

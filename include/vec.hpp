@@ -38,36 +38,32 @@ namespace mr
 
   // base vector (use aliases for full functional)
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
-    struct [[nodiscard]] Vec : public RowOperators<T, N, Vec<T, N>, RowImpl<T, N>, Row<T, N>, Vec<T, N>>
+    struct [[nodiscard]] Vec : public RowOperators<Vec<T, N>, Vec<T, N>>
     {
     public:
-      using RowImplT = RowImpl<T, N>;
+      using ValueT = T;
       using RowT = Row<T, N>;
 
-      RowImplT _data;
+      static constexpr size_t size = N;
+
+      RowT _data;
+
+      constexpr Vec() = default;
 
       // from simd constructor
       constexpr Vec(RowT row) : _data(row._data) {};
-      constexpr Vec(RowImplT row) : _data(row) {};
-      constexpr Vec(RowImplT::SimdImplT row) : _data(row) {};
 
       // from elements constructor
       template <ArithmeticT... Args>
-        constexpr Vec(Args... args) : _data(static_cast<T>(args)...) {}
+      requires (sizeof...(Args) >= 2) && (sizeof...(Args) <= N)
+        constexpr Vec(Args... args) : _data(args...) {}
 
       // conversion constructor
       template <ArithmeticT R, std::size_t S>
         constexpr Vec(const Vec<R, S> &v) noexcept : _data(v._data) {}
+
       template <ArithmeticT R, std::size_t S, ArithmeticT ... Args>
         constexpr Vec(const Vec<R, S> &v, Args ... args) noexcept : _data(v, args...) {}
-
-      // move semantics
-      constexpr Vec(Vec &&) noexcept = default;
-      constexpr Vec & operator=(Vec &&) noexcept = default;
-
-      // copy semantics
-      constexpr Vec(const Vec &) noexcept = default;
-      constexpr Vec & operator=(const Vec &) noexcept = default;
 
       // setters
       constexpr void x(T x) noexcept requires (N >= 1) { _set_ind(0, x); }
@@ -80,6 +76,9 @@ namespace mr
       [[nodiscard]] constexpr T y() const noexcept requires (N >= 2) { return _data[1]; }
       [[nodiscard]] constexpr T z() const noexcept requires (N >= 3) { return _data[2]; }
       [[nodiscard]] constexpr T w() const noexcept requires (N >= 4) { return _data[3]; }
+      [[nodiscard]] constexpr T operator[](std::size_t i) const {
+        return _data[i];
+      }
 
       // cross product
       constexpr Vec cross(const Vec &other) const noexcept requires (N == 3) {
@@ -89,7 +88,7 @@ namespace mr
           _data[0] * other._data[1] - _data[1] * other._data[0]
         };
 
-        stdx::fixed_size_simd<T, 3> ans;
+        SimdImpl<T, 3> ans;
         ans.copy_from(arr.data(), stdx::element_aligned);
         return {ans};
       }
@@ -111,7 +110,7 @@ namespace mr
         return finv_sqrt(length2());
       }
 
-      // use normalize_fast for higher precision
+      // use normalize_fast for lower precision
       constexpr Vec & normalize() noexcept {
         auto len = length2();
         if (std::abs(len) <= _epsilon) [[unlikely]] return *this;

@@ -88,7 +88,7 @@ namespace mr
       }
 
       constexpr Matr operator*(const Matr &other) const noexcept {
-        std::array<RowT, N> tmp;
+        std::array<RowT, N> tmp{};
         for (size_t i = 0; i < N; i++) {
           for (size_t j = 0; j < N; j++) {
             tmp[j] += other._data[i] * _data[j][i];
@@ -140,14 +140,14 @@ namespace mr
       constexpr Matr transposed() const noexcept {
         std::array<RowT, N> tmp1;
         for (size_t i = 0; i < N; i++) {
-          tmp1[i] = stdx::fixed_size_simd<T, N>([this, i](auto j){ return _data[j][i]; });
+          tmp1[i] = SimdImpl<T, N>([this, i](auto j){ return _data[j][i]; });
         }
         return {tmp1};
       }
 
       constexpr Matr & transpose() noexcept {
         for (size_t i = 0; i < N; i++) {
-          _data[i] = stdx::fixed_size_simd<T, N>([this, i](auto j){ return _data[j][i]; });
+          _data[i] = SimdImpl<T, N>([this, i](auto j){ return _data[j][i]; });
         }
         return *this;
       }
@@ -158,8 +158,8 @@ namespace mr
         std::array<Row<T, 2 * N>, N> tmp;
         std::for_each(std::execution::par_unseq, io.begin(), io.end(),
                       [&tmp, this](auto i) {
-                        const auto concatinated = stdx::concat(_data[i]._data._data, identity[i]._data._data);
-                        tmp[i] += stdx::static_simd_cast<stdx::fixed_size_simd<T, 2 * N>>(concatinated);
+                        const auto concatenated = stdx::concat(_data[i]._data, identity[i]._data);
+                        tmp[i] += stdx::static_simd_cast<SimdImpl<T, 2 * N>>(concatenated);
                       });
 
         // null bottom triangle
@@ -181,8 +181,8 @@ namespace mr
         std::array<RowT, N> res;
         std::for_each(std::execution::par_unseq, io.begin(), io.end(),
           [&tmp, &res](auto i) {
-            auto [a, b] = stdx::split<N, N>(tmp[i]._data._data);
-            res[i] = stdx::static_simd_cast<stdx::fixed_size_simd<T, N>>(b);
+            auto [a, b] = stdx::split<N, N>(tmp[i]._data);
+            res[i] = stdx::static_simd_cast<SimdImpl<T, N>>(b);
           });
 
         return {res};
@@ -253,7 +253,7 @@ namespace mr
         T nco = 1 - co;
         auto v = vec.normalized();
 
-        Matr4<T> tmp1 = scale(v * v * nco + co);
+        Matr4<T> tmp1 = scale(v * v * nco + Vec<T, 3>{co});
         Matr4<T> tmp2 = Matr4<T> {
           typename mr::Matr4<T>::RowT(0, v.x() * v.y() * nco, v.x() * v.z() * nco, 0),
           typename mr::Matr4<T>::RowT(v.x() * v.y() * nco, 0, v.y() * v.z() * nco, 0),
@@ -286,7 +286,7 @@ namespace mr
         std::transform(std::execution::par_unseq,
           io.begin(), io.end(), id.begin(),
           [&io](auto i) -> RowT {
-            return stdx::fixed_size_simd<T, N>([i](auto i2) { return i2 == i ? 1 : 0; });
+            return SimdImpl<T, N>([i](auto i2) { return i2 == i ? 1 : 0; });
           });
 
         return id;

@@ -213,7 +213,7 @@ namespace mr
 
       static constexpr Matr4<T> rotate_x(const Radians<T> &rad) noexcept {
         T co = std::cos(rad._data);
-        T si = std::sin(rad._value);
+        T si = std::sin(rad._data);
 
         return Matr4<T> {
           typename mr::Matr4<T>::RowT(1, 0, 0, 0),
@@ -224,8 +224,8 @@ namespace mr
       }
 
       static constexpr Matr4<T> rotate_y(const Radians<T> &rad) noexcept {
-        T co = std::cos(rad.value);
-        T si = std::sin(rad.value);
+        T co = std::cos(rad._data);
+        T si = std::sin(rad._data);
 
         return Matr4<T> {
           typename mr::Matr4<T>::RowT(co, 0, -si, 0),

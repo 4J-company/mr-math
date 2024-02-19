@@ -7,124 +7,127 @@ namespace mr {
   template <typename T, std::size_t N>
     using SimdImpl = stdx::fixed_size_simd<T, N>;
 
-  template <typename ReturnT, typename InputT = void, typename... RestTs>
-    struct RowOperators : RowOperators<ReturnT, RestTs...> {
-
-      friend constexpr ReturnT
-      operator+(const ReturnT &lhs, const InputT &rhs) noexcept {
-        return {lhs._data + rhs._data};
+  template <typename DerivedT>
+    struct UnitOperators {
+      friend constexpr DerivedT
+      operator+(const DerivedT &lhs, const DerivedT &rhs) noexcept {
+        return DerivedT{lhs._data + rhs._data};
       }
 
-      friend constexpr ReturnT
-      operator-(const ReturnT &lhs, const InputT &rhs) noexcept {
-        return {lhs._data - rhs._data};
+      friend constexpr DerivedT
+      operator-(const DerivedT &lhs, const DerivedT &rhs) noexcept {
+        return DerivedT{lhs._data - rhs._data};
       }
 
-      friend constexpr ReturnT
-      operator*(const ReturnT &lhs, const InputT &rhs) noexcept {
-        return {lhs._data * rhs._data};
-      }
-
-      friend constexpr ReturnT
-      operator/(const ReturnT &lhs, const InputT &rhs) noexcept {
-        return {lhs._data / rhs._data};
-      }
-
-      friend constexpr ReturnT
-      operator<<(const ReturnT &lhs, const InputT &rhs) noexcept {
-        return {lhs._data << rhs._data};
-      }
-
-      friend constexpr ReturnT
-      operator>>(const ReturnT &lhs, const InputT &rhs) noexcept {
-        return {lhs._data >> rhs._data};
-      }
-
-      friend constexpr ReturnT &
-      operator+=(ReturnT &lhs, const InputT &rhs) noexcept {
+      friend constexpr DerivedT &
+      operator+=(DerivedT &lhs, const DerivedT &rhs) noexcept {
         lhs._data += rhs._data;
         return lhs;
       }
 
-      friend constexpr ReturnT &
-      operator-=(ReturnT &lhs, const InputT &rhs) noexcept {
+      friend constexpr DerivedT &
+      operator-=(DerivedT &lhs, const DerivedT &rhs) noexcept {
         lhs._data -= rhs._data;
         return lhs;
       }
 
-      friend constexpr ReturnT &
-      operator*=(ReturnT &lhs, const InputT &rhs) noexcept {
-        lhs._data *= rhs._data;
-        return lhs;
+      friend constexpr DerivedT
+      operator*(const DerivedT &lhs, const ArithmeticT auto x) noexcept {
+        return DerivedT{lhs._data * x};
       }
 
-      friend constexpr ReturnT &
-      operator/=(ReturnT &lhs, const InputT &rhs) noexcept {
-        lhs._data /= rhs._data;
-        return lhs;
+      friend constexpr DerivedT
+      operator/(const DerivedT &lhs, const ArithmeticT auto x) noexcept {
+        return DerivedT{lhs._data / x};
       }
 
-      friend constexpr ReturnT &
-      operator<<=(ReturnT &lhs, const InputT &rhs) noexcept {
-        lhs._data <<= rhs._data;
-        return lhs;
+      friend constexpr DerivedT
+      operator*(const ArithmeticT auto x, const DerivedT &lhs) noexcept {
+        return DerivedT{lhs._data * x};
       }
 
-      friend constexpr ReturnT &
-      operator>>=(ReturnT &lhs, const InputT &rhs) noexcept {
-        lhs._data >>= rhs._data;
-        return lhs;
-      }
-  };
-
-  // specialization for operators with scalars
-  template <typename ReturnT>
-    struct RowOperators<ReturnT> {
-
-      friend constexpr ReturnT
-      operator*(const ReturnT &lhs, const ArithmeticT auto x) noexcept {
-        return {lhs._data * x};
-      }
-
-      friend constexpr ReturnT
-      operator/(const ReturnT &lhs, const ArithmeticT auto x) noexcept {
-        return {lhs._data / x};
-      }
-
-      friend constexpr ReturnT
-      operator*(const ArithmeticT auto x, const ReturnT &lhs) noexcept {
-        return {lhs._data * x};
-      }
-
-      friend constexpr ReturnT &
-      operator*=(ReturnT &lhs, const ArithmeticT auto x) noexcept {
+      friend constexpr DerivedT &
+      operator*=(DerivedT &lhs, const ArithmeticT auto x) noexcept {
         lhs._data *= x;
         return lhs;
       }
 
-      friend constexpr ReturnT &
-      operator/=(ReturnT &lhs, const ArithmeticT auto x) noexcept {
+      friend constexpr DerivedT &
+      operator/=(DerivedT &lhs, const ArithmeticT auto x) noexcept {
         lhs._data /= x;
         return lhs;
       }
 
+      friend constexpr DerivedT
+      operator-(const DerivedT &rhs) noexcept {
+        return -rhs._data;
+      }
+
       friend std::ostream &
-      operator<<(std::ostream &s, const ReturnT &v) noexcept {
+      operator<<(std::ostream &s, const DerivedT &v) noexcept {
         s << '(';
-        for (size_t i = 0; i < ReturnT::size; i++) {
-          s << v[i] << (char)(',' * (i < ReturnT::size - 1)) << (char)(' ' * (i < ReturnT::size - 1));
+        for (size_t i = 0; i < DerivedT::size; i++) {
+          s << v[i] << (char)(',' * (i < DerivedT::size - 1)) << (char)(' ' * (i < DerivedT::size - 1));
         }
-        s << ')';
+        s << ')' << DerivedT::strname;
         return s;
       }
     };
 
+  template <typename DerivedT>
+    struct RowOperators : UnitOperators<DerivedT> {
+      friend constexpr DerivedT
+      operator*(const DerivedT &lhs, const DerivedT &rhs) noexcept {
+        return DerivedT{lhs._data * rhs._data};
+      }
+
+      friend constexpr DerivedT
+      operator/(const DerivedT &lhs, const DerivedT &rhs) noexcept {
+        return DerivedT{lhs._data / rhs._data};
+      }
+
+      friend constexpr DerivedT
+      operator<<(const DerivedT &lhs, const DerivedT &rhs) noexcept {
+        return DerivedT{lhs._data << rhs._data};
+      }
+
+      friend constexpr DerivedT
+      operator>>(const DerivedT &lhs, const DerivedT &rhs) noexcept {
+        return DerivedT{lhs._data >> rhs._data};
+      }
+
+      friend constexpr DerivedT &
+      operator*=(DerivedT &lhs, const DerivedT &rhs) noexcept {
+        lhs._data *= rhs._data;
+        return lhs;
+      }
+
+      friend constexpr DerivedT &
+      operator/=(DerivedT &lhs, const DerivedT &rhs) noexcept {
+        lhs._data /= rhs._data;
+        return lhs;
+      }
+
+      friend constexpr DerivedT &
+      operator<<=(DerivedT &lhs, const DerivedT &rhs) noexcept {
+        lhs._data <<= rhs._data;
+        return lhs;
+      }
+
+      friend constexpr DerivedT &
+      operator>>=(DerivedT &lhs, const DerivedT &rhs) noexcept {
+        lhs._data >>= rhs._data;
+        return lhs;
+      }
+    };
+
   template <ArithmeticT T, std::size_t N>
-    struct Row : RowOperators<Row<T, N>, Row<T, N>> {
+    struct Row : RowOperators<Row<T, N>> {
 
     public:
       using SimdT = SimdImpl<T, N>;
 
+      static constexpr auto strname = "row";
       static constexpr size_t size = N;
 
       SimdT _data{};

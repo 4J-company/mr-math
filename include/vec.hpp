@@ -38,12 +38,13 @@ namespace mr
 
   // base vector (use aliases for full functional)
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
-    struct [[nodiscard]] Vec : public RowOperators<Vec<T, N>, Vec<T, N>>
+    struct [[nodiscard]] Vec : public RowOperators<Vec<T, N>>
     {
     public:
       using ValueT = T;
       using RowT = Row<T, N>;
 
+      static constexpr auto strname = "vec";
       static constexpr size_t size = N;
 
       RowT _data;

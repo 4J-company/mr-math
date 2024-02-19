@@ -154,5 +154,24 @@ static void BM_matrix_transposed(benchmark::State& state) {
 }
 BENCHMARK(BM_matrix_transposed);
 
+
+[[maybe_unused]]
+static void compile_test() {
+  auto f = [](mr::Vec3f v) { std::cout << v; };
+  mr::Vec3f v(30);
+  mr::Row<float, 3> r{47.f, 47.f, 47.f};
+  mr::SimdImpl<float, 3> s(102);
+  v *= -2;
+  v = 3.f * r;
+  r -= s / 2;
+  v *= mr::Vec3f(1.0);
+  v = {0, 102, 0};
+  v -= {0, 102, 0};
+  // v = v - {0, 102, 0};
+  v += r;
+  f(v);
+  f(r);
+}
+
 BENCHMARK_MAIN();
 

@@ -125,7 +125,7 @@ namespace mr
         tmp[N - 1] /= tmp[N - 1][N - 1];
         for (size_t i = 1; i < N; i++) {
           det *= tmp[i - 1][i - 1];
-          tmp[i - 1] /= std::abs(tmp[i - 1][i - 1]) < _epsilon ? static_cast<T>(1) : tmp[i - 1][i - 1];
+          tmp[i - 1] /= std::abs(tmp[i - 1][i - 1]) <= _epsilon ? static_cast<T>(1) : tmp[i - 1][i - 1];
           for (size_t j = i; j < N; j++) {
             tmp[i] -= tmp[i - 1] * tmp[j][i - 1];
           }
@@ -158,15 +158,15 @@ namespace mr
         std::array<Row<T, 2 * N>, N> tmp;
         std::for_each(std::execution::par_unseq, io.begin(), io.end(),
                       [&tmp, this](auto i) {
-                        const auto concatenated = stdx::concat(_data[i]._data, identity[i]._data);
-                        tmp[i] += stdx::static_simd_cast<SimdImpl<T, 2 * N>>(concatenated);
+                        // adding temporary variable here brings performance down 2.5 times (reason unknown)
+                        tmp[i] += stdx::static_simd_cast<SimdImpl<T, 2 * N>>(stdx::concat(_data[i]._data, identity[i]._data));
                       });
 
         // null bottom triangle
         for (size_t i = 1; i < N; i++) {
           tmp[i - 1] /= tmp[i - 1][i - 1];
           for (size_t j = i; j < N; j++) {
-            tmp[j] -= std::abs(tmp[i - 1][i - 1]) < _epsilon ? static_cast<T>(0) : tmp[i - 1] * tmp[j][i - 1];
+            tmp[j] -= std::abs(tmp[i - 1][i - 1]) <= _epsilon ? static_cast<T>(0) : tmp[i - 1] * tmp[j][i - 1];
           }
         }
         tmp[N - 1] /= tmp[N - 1][N - 1];
@@ -174,7 +174,7 @@ namespace mr
         // null top triangle
         for (int i = N - 2; i >= 0; i--) {
           for (int j = i; j >= 0; j--) {
-            tmp[j] -= std::abs(tmp[i + 1][i + 1]) < _epsilon ? static_cast<T>(0) : tmp[i + 1] * tmp[j][i + 1];
+            tmp[j] -= std::abs(tmp[i + 1][i + 1]) <= _epsilon ? static_cast<T>(0) : tmp[i + 1] * tmp[j][i + 1];
           }
         }
 
@@ -212,8 +212,8 @@ namespace mr
       }
 
       static constexpr Matr4<T> rotate_x(const Radians<T> &rad) noexcept {
-        T co = std::cos(rad.value);
-        T si = std::sin(rad.value);
+        T co = std::cos(rad._data);
+        T si = std::sin(rad._value);
 
         return Matr4<T> {
           typename mr::Matr4<T>::RowT(1, 0, 0, 0),
@@ -236,8 +236,8 @@ namespace mr
       }
 
       static constexpr Matr4<T> rotate_z(const Radians<T> &rad) noexcept {
-        T co = std::cos(rad.value);
-        T si = std::sin(rad.value);
+        T co = std::cos(rad._data);
+        T si = std::sin(rad._data);
 
         return Matr4<T> {
           typename mr::Matr4<T>::RowT(co, si, 0, 0),
@@ -248,8 +248,8 @@ namespace mr
       }
 
       static constexpr Matr4<T> rotate(const Radians<T> &rad, const Vec3<T> &vec) noexcept {
-        T co = std::cos(rad.value);
-        T si = std::sin(rad.value);
+        T co = std::cos(rad._data);
+        T si = std::sin(rad._data);
         T nco = 1 - co;
         auto v = vec.normalized();
 
@@ -295,6 +295,7 @@ namespace mr
     public:
       inline static const Matr identity = _identity();
       std::array<RowT, N> _data;
+
     private:
       static constexpr T _epsilon = std::numeric_limits<T>::epsilon();
     };

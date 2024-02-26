@@ -44,155 +44,66 @@ namespace mr
 
 
   template <std::floating_point T>
-    struct [[nodiscard]] Radians
-    {
+    struct [[nodiscard]] Radians : UnitOperators<Radians<T>> {
     public:
       using ValueT = T;
 
-      T value;
+      static constexpr auto strname = "rad";
+      static constexpr std::size_t size = 1;
+
+      T _data;
 
       constexpr Radians() noexcept {};
-      explicit constexpr Radians(T x) noexcept : value(x) {};
+      explicit constexpr Radians(T x) noexcept : _data(x) {};
 
       template <typename U>
-        constexpr Radians(const Radians<U> &other) noexcept : value(other.value) {}
+        constexpr Radians(const Radians<U> &other) noexcept : _data(other._data) {}
 
       // conversation operators
       template <typename U>
         explicit constexpr operator Degrees<U>() const noexcept {
-          return Degrees<U>{static_cast<U>(value) *
+          return Degrees<U>{static_cast<U>(_data) *
             std::numbers::inv_pi_v<U> * static_cast<U>(180.)};
         }
-      explicit constexpr operator T() const noexcept { return value; };
-
-      // arithmetic operators
-      constexpr Radians operator-() const noexcept {
-        return Radians{-value};
-      }
-      constexpr Radians operator+(Radians other) const noexcept {
-        return Radians{value + other.value};
-      }
-      constexpr Radians operator-(Radians other) const noexcept {
-        return Radians{value - other.value};
-      }
-      constexpr Radians operator*(T other) const noexcept {
-        return Radians{value * other};
-      }
-      constexpr Radians operator/(T other) const noexcept {
-        return Radians{value / other};
-      }
-      friend constexpr Radians operator*(T left, Radians right) noexcept {
-        return Radians{right.value * left};
-      }
-      friend constexpr Radians operator/(T left, Radians right) noexcept {
-        return Radians{right.value / left};
-      }
-
-      // assign operators
-      constexpr Radians & operator+=(Radians other) noexcept {
-        value += other.value;
-        return *this;
-      }
-      constexpr Radians & operator-=(Radians other) noexcept {
-        value -= other.value;
-        return *this;
-      }
-      constexpr Radians & operator*=(T other) noexcept {
-        value *= other;
-        return *this;
-      }
-      constexpr Radians & operator/=(T other) noexcept {
-        value /= other;
-        return *this;
-      }
+      explicit constexpr operator T() const noexcept { return _data; };
 
       // comparison operator
-      [[nodiscard]] friend constexpr auto operator<=>(Radians left, Radians right) = default;
-
-      // output operator
-      friend std::ostream & operator<<(std::ostream &stream, Radians radians) noexcept {
-        stream << radians.value << "rad";
-        return stream;
-      }
+      [[nodiscard]] friend constexpr auto operator<=>(Radians lhs, Radians rhs) = default;
     };
 
   template <std::floating_point T>
-    struct [[nodiscard]] Degrees
-    {
+    struct [[nodiscard]] Degrees : UnitOperators<Degrees<T>> {
     public:
       using ValueT = T;
 
-      T value;
+      static constexpr auto strname = "deg";
+      static constexpr std::size_t size = 1;
 
-      explicit constexpr Degrees(T x) noexcept : value(x) {};
+      T _data;
+
+      explicit constexpr Degrees(T x) noexcept : _data(x) {};
 
       template <typename U>
         constexpr Degrees(const Degrees<U> &other) noexcept
-          : value(other.value) {}
+          : _data(other._data) {}
 
       // conversation operators
       template <typename U>
         explicit constexpr operator Radians<U>() const noexcept {
-          return Radians<U>{static_cast<U>(value) / static_cast<U>(180.) * std::numbers::pi_v<U>};
+          return Radians<U>{static_cast<U>(_data) / static_cast<U>(180.) * std::numbers::pi_v<U>};
         }
-      explicit constexpr operator T() const noexcept { return value; };
 
-      // arithmetic operators
-      constexpr Degrees operator-() const noexcept {
-        return Degrees{-value};
-      }
-      constexpr Degrees operator+(Degrees other) const noexcept {
-        return Degrees{value + other.value};
-      }
-      constexpr Degrees operator-(Degrees other) const noexcept {
-        return Degrees{value - other.value};
-      }
-      constexpr Degrees operator*(T other) const noexcept {
-        return Degrees{value * other};
-      }
-      constexpr Degrees operator/(T other) const noexcept {
-        return Degrees{value / other};
-      }
-      friend constexpr Degrees operator*(T left, Degrees right) noexcept {
-        return Degrees{right.value * left};
-      }
-      friend constexpr Degrees operator/(T left, Degrees right) noexcept {
-        return Degrees{right.value / left};
-      }
-
-      // assign operators
-      constexpr Degrees & operator+=(Degrees other) noexcept {
-        value += other.value;
-        return *this;
-      }
-      constexpr Degrees & operator-=(Degrees other) noexcept {
-        value -= other.value;
-        return *this;
-      }
-      constexpr Degrees & operator*=(T other) noexcept {
-        value *= other;
-        return *this;
-      }
-      constexpr Degrees & operator/=(T other) noexcept {
-        value /= other;
-        return *this;
-      }
+      explicit constexpr operator T() const noexcept { return _data; };
 
       // comparison operator
-      [[nodiscard]] friend constexpr auto operator<=>(Degrees left, Degrees right) = default;
-
-      // output operator
-      friend std::ostream & operator<<(std::ostream &stream, Degrees Degrees) noexcept {
-        stream << Degrees.value << "deg";
-        return stream;
-      }
+      [[nodiscard]] friend constexpr auto operator<=>(Degrees lhs, Degrees rhs) = default;
     };
 
   // internal aliases used by '_rad' and '_deg' suffixes
-  using _RadiansLiteral = Radians<long double>;
-  using _DegreesLiteral = Degrees<long double>;
+  using _RadiansLiteral = Radians<float>;
+  using _DegreesLiteral = Degrees<float>;
 
-  inline constexpr auto pi = mr::Radiansf(std::numbers::pi_v<float>);
+  inline const auto pi = mr::Radiansf(std::numbers::pi_v<float>);
 
   namespace axis {
     inline mr::Vec3f x {1, 0, 0};
@@ -201,16 +112,28 @@ namespace mr
   }
 
   // literals
+  constexpr mr::_RadiansLiteral operator"" _rad(unsigned long long value) {
+    return mr::_RadiansLiteral{static_cast<float>(value)};
+  }
+
+  constexpr mr::_DegreesLiteral operator"" _deg(unsigned long long value) {
+    return mr::_DegreesLiteral{static_cast<float>(value)};
+  }
+
+  constexpr mr::_RadiansLiteral operator"" _pi(unsigned long long value) {
+    return value * mr::pi;
+  }
+
   constexpr mr::_RadiansLiteral operator"" _rad(long double value) {
-    return mr::_RadiansLiteral{value};
+    return mr::_RadiansLiteral{static_cast<float>(value)};
   }
 
   constexpr mr::_DegreesLiteral operator"" _deg(long double value) {
-    return mr::_DegreesLiteral{value};
+    return mr::_DegreesLiteral{static_cast<float>(value)};
   }
 
-  constexpr long double operator"" _pi(long double value) {
-    return value * std::numbers::pi_v<long double>;
+  constexpr mr::_RadiansLiteral operator"" _pi(long double value) {
+    return value * mr::pi;
   }
 }
 

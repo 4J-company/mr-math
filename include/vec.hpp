@@ -38,31 +38,33 @@ namespace mr
 
   // base vector (use aliases for full functional)
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
-    struct [[nodiscard]] Vec : public Row<T, N>
+    struct [[nodiscard]] Vec : public RowOperators<Vec<T, N>>
     {
     public:
+      using ValueT = T;
       using RowT = Row<T, N>;
 
+      static constexpr auto strname = "vec";
+      static constexpr size_t size = N;
+
+      RowT _data;
+
+      constexpr Vec() = default;
+
       // from simd constructor
-      constexpr Vec(Row<T, N> r) : RowT(r) {};
+      constexpr Vec(RowT row) : _data(row._data) {};
 
       // from elements constructor
       template <ArithmeticT... Args>
-        constexpr Vec(Args... args) : RowT{static_cast<T>(args)...} {}
+      requires (sizeof...(Args) >= 2) && (sizeof...(Args) <= N)
+        constexpr Vec(Args... args) : _data(args...) {}
 
       // conversion constructor
       template <ArithmeticT R, std::size_t S>
-        constexpr Vec(const Vec<R, S> &v) noexcept : RowT(static_cast<Row<R, S>>(v)) {}
+        constexpr Vec(const Vec<R, S> &v) noexcept : _data(v._data) {}
+
       template <ArithmeticT R, std::size_t S, ArithmeticT ... Args>
-        constexpr Vec(const Vec<R, S> &v, Args ... args) noexcept : RowT(static_cast<Row<R, S>>(v), args...) {}
-
-      // move semantics
-      constexpr Vec(Vec &&) noexcept = default;
-      constexpr Vec & operator=(Vec &&) noexcept = default;
-
-      // copy semantics
-      constexpr Vec(const Vec &) noexcept = default;
-      constexpr Vec & operator=(const Vec &) noexcept = default;
+        constexpr Vec(const Vec<R, S> &v, Args ... args) noexcept : _data(v, args...) {}
 
       // setters
       constexpr void x(T x) noexcept requires (N >= 1) { _set_ind(0, x); }
@@ -71,19 +73,23 @@ namespace mr
       constexpr void w(T w) noexcept requires (N >= 4) { _set_ind(3, w); }
 
       // getters
-      [[nodiscard]] constexpr T x() const noexcept requires (N >= 1) { return RowT::_data[0]; }
-      [[nodiscard]] constexpr T y() const noexcept requires (N >= 2) { return RowT::_data[1]; }
-      [[nodiscard]] constexpr T z() const noexcept requires (N >= 3) { return RowT::_data[2]; }
-      [[nodiscard]] constexpr T w() const noexcept requires (N >= 4) { return RowT::_data[3]; }
+      [[nodiscard]] constexpr T x() const noexcept requires (N >= 1) { return _data[0]; }
+      [[nodiscard]] constexpr T y() const noexcept requires (N >= 2) { return _data[1]; }
+      [[nodiscard]] constexpr T z() const noexcept requires (N >= 3) { return _data[2]; }
+      [[nodiscard]] constexpr T w() const noexcept requires (N >= 4) { return _data[3]; }
+      [[nodiscard]] constexpr T operator[](std::size_t i) const {
+        return _data[i];
+      }
 
       // cross product
       constexpr Vec cross(const Vec &other) const noexcept requires (N == 3) {
         std::array<T, 3> arr {
-          RowT::_data[1] * other._data[2] - RowT::_data[2] * other._data[1],
-          RowT::_data[2] * other._data[0] - RowT::_data[0] * other._data[2],
-          RowT::_data[0] * other._data[1] - RowT::_data[1] * other._data[0]};
+          _data[1] * other._data[2] - _data[2] * other._data[1],
+          _data[2] * other._data[0] - _data[0] * other._data[2],
+          _data[0] * other._data[1] - _data[1] * other._data[0]
+        };
 
-        stdx::fixed_size_simd<T, 3> ans;
+        SimdImpl<T, 3> ans;
         ans.copy_from(arr.data(), stdx::element_aligned);
         return {ans};
       }
@@ -94,7 +100,7 @@ namespace mr
 
       // length methods
       [[nodiscard]] constexpr T length2() const noexcept {
-        return stdx::reduce(RowT::_data * RowT::_data); // sum by default
+        return stdx::reduce(_data._data * _data._data); // sum by default
       }
 
       [[nodiscard]] constexpr T length() const noexcept {
@@ -105,7 +111,7 @@ namespace mr
         return finv_sqrt(length2());
       }
 
-      // use normalize_fast for higher precision
+      // use normalize_fast for lower precision
       constexpr Vec & normalize() noexcept {
         auto len = length2();
         if (std::abs(len) <= _epsilon) [[unlikely]] return *this;
@@ -148,174 +154,18 @@ namespace mr
 
       // dot product
       [[nodiscard]] constexpr T dot(const Vec<T, N> other) const noexcept {
-        return stdx::reduce(RowT::_data * other._data);
+        return stdx::reduce(_data._data * other._data._data);
       }
 
       [[nodiscard]] constexpr T operator&(const Vec<T, N> other) const noexcept {
         return dot(other);
       }
 
-      constexpr Vec operator+(const Vec &other) const noexcept {
-        return {RowT::_data + other._data};
-      }
-
-      constexpr Vec operator-(const Vec &other) const noexcept {
-        return {RowT::_data - other._data};
-      }
-
-      constexpr Vec operator*(const Vec &other) const noexcept {
-        return {RowT::_data * other._data};
-      }
-
-      constexpr Vec operator/(const Vec &other) const noexcept {
-        return {RowT::_data / other._data};
-      }
-
-      constexpr Vec operator<<(const Vec &other) const noexcept {
-        return {RowT::_data << other._data};
-      }
-
-      constexpr Vec operator>>(const Vec &other) const noexcept {
-        return {RowT::_data >> other._data};
-      }
-
-      // ArithmeticT operators
-      template <ArithmeticT X>
-        constexpr Vec operator+(const X x) const noexcept {
-          return {RowT::_data * x};
-        }
-
-      template <ArithmeticT X>
-        constexpr Vec operator-(const X x) const noexcept {
-          return {RowT::_data / x};
-        }
-
-      template <ArithmeticT X>
-        constexpr Vec operator*(const X x) const noexcept {
-          return {RowT::_data * x};
-        }
-
-      template <ArithmeticT X>
-        constexpr Vec operator/(X x) const noexcept {
-          return {RowT::_data / x};
-        }
-
-      template <std::integral X>
-        constexpr Vec operator<<(X x) const noexcept {
-          return {RowT::_data << x};
-        }
-
-      template <std::integral X>
-        constexpr Vec operator>>(X x) const noexcept {
-          return {RowT::_data >> x};
-        }
-
-      // Vec operators
-      constexpr Vec & operator+=(const Vec &other) noexcept {
-        RowT::_data += other._data;
-        return *this;
-      }
-
-      constexpr Vec & operator-=(const Vec &other) noexcept {
-        RowT::_data -= other._data;
-        return *this;
-      }
-
-      constexpr Vec & operator*=(const Vec &other) noexcept {
-        RowT::_data *= other._data;
-        return *this;
-      }
-
-      constexpr Vec & operator/=(const Vec &other) noexcept {
-        RowT::_data /= other._data;
-        return *this;
-      }
-
-      constexpr Vec & operator<<=(const Vec &other) noexcept {
-        RowT::_data <<= other._data;
-        return *this;
-      }
-
-      constexpr Vec & operator>>=(const Vec &other) noexcept {
-        RowT::_data >>= other._data;
-        return *this;
-      }
-
-      // std::experimental::fixed_size_simd<T, N> operators
-      constexpr Vec & operator+=(const stdx::fixed_size_simd<T, N> &other) noexcept {
-        RowT::_data += other;
-        return *this;
-      }
-
-      constexpr Vec & operator-=(const stdx::fixed_size_simd<T, N> &other) noexcept {
-        RowT::_data -= other;
-        return *this;
-      }
-
-      constexpr Vec & operator*=(const stdx::fixed_size_simd<T, N> &other) noexcept {
-        RowT::_data *= other;
-        return *this;
-      }
-
-      constexpr Vec & operator/=(const stdx::fixed_size_simd<T, N> &other) noexcept {
-        RowT::_data /= other;
-        return *this;
-      }
-
-      constexpr Vec & operator<<=(const stdx::fixed_size_simd<T, N> &other) noexcept {
-        RowT::_data <<= other;
-        return *this;
-      }
-
-      constexpr Vec & operator>>=(const stdx::fixed_size_simd<T, N> &other) noexcept {
-        RowT::_data >>= other;
-        return *this;
-      }
-
-      // ArithmeticT operators
-      template <ArithmeticT X>
-        constexpr Vec & operator+=(const X x) noexcept {
-          RowT::_data *= x;
-          return *this;
-        }
-
-      template <ArithmeticT X>
-        constexpr Vec & operator-=(const X x) noexcept {
-          RowT::_data /= x;
-          return *this;
-        }
-
-      template <ArithmeticT X>
-        constexpr Vec & operator*=(const X x) noexcept {
-          RowT::_data *= x;
-          return *this;
-        }
-
-      template <ArithmeticT X>
-        constexpr Vec & operator/=(X x) noexcept {
-          RowT::_data /= x;
-          return *this;
-        }
-
-      template <std::integral X>
-        constexpr Vec & operator<<=(X x) noexcept {
-          RowT::_data <<= x;
-          return *this;
-        }
-
-      template <std::integral X>
-        constexpr Vec & operator>>=(X x) noexcept {
-          RowT::_data >>= x;
-          return *this;
-        }
-
-      [[nodiscard]] constexpr bool operator<=>(const Vec &other) const noexcept = default;
-
       template<ArithmeticT R>
         constexpr Vec operator*(const Matr<R, N> &other) const noexcept {
           mr::Vec<T, N> tmp {};
           for (size_t i = 0; i < N; i++) {
-            tmp._data += (other._data[i] * RowT::_data[i])._data;
+            tmp._data += (other._data[i] * _data[i])._data;
           }
           return tmp;
         }
@@ -336,7 +186,7 @@ namespace mr
         constexpr Vec & operator*=(const Matr<R, N> &other) noexcept {
           mr::Vec<T, N> tmp {};
           for (size_t i = 0; i < N; i++) {
-            tmp._data += (other._data[i] * RowT::_data[i])._data;
+            tmp._data += (other._data[i] * _data[i])._data;
           }
           *this = tmp;
           return *this;
@@ -354,14 +204,6 @@ namespace mr
           *this = mr::Vec<T, N>(tmp);
           return *this;
         }
-
-      friend std::ostream & operator<<(std::ostream &s, const Vec &v) noexcept {
-        s << '(';
-        for (size_t i = 0; i < N; i++)
-          s << v[i] << (char)(',' * (i < N - 1)) << (char)(' ' * (i < N - 1));
-        s << ')';
-        return s;
-      }
 
       private:
         static constexpr T _epsilon = std::numeric_limits<T>::epsilon();

@@ -26,9 +26,9 @@ namespace mr {
           mutable bool frustum_calculated = false;
           mutable Matr4<T> frustum;
 
-          // cached ortholinear matrix
-          mutable bool ortholinear_calculated = false;
-          mutable Matr4<T> ortholinear;
+          // cached orthographics matrix
+          mutable bool orthographic_calculated = false;
+          mutable Matr4<T> orthographic;
         };
 
         constexpr Camera() = default;
@@ -112,11 +112,11 @@ namespace mr {
           return calculate_perspective();
         }
 
-        constexpr Matr4<T> ortholinear() const noexcept {
-          if (_projection.ortholinear_calculated) [[likely]] {
-            return _projection.ortholinear;
+        constexpr Matr4<T> orthographic() const noexcept {
+          if (_projection.orthographic_calculated) [[likely]] {
+            return _projection.orthographic;
           }
-          return calculate_ortholinear();
+          return calculate_orthographic();
         }
 
         constexpr Matr4<T> frustum() const noexcept {
@@ -133,16 +133,16 @@ namespace mr {
           const auto right = _rotation.right();
           const auto up = _rotation.up();
           _perspective = mr::Matr4<T>{
-            typename mr::Matr4<T>::RowT{right[0], up[0], direction[0], 0},
-            typename mr::Matr4<T>::RowT{right[1], up[1], direction[1], 0},
-            typename mr::Matr4<T>::RowT{right[2], up[2], direction[2], 0},
+            typename mr::Matr4<T>::RowT{right.x(), up.x(), direction.x(), 0},
+            typename mr::Matr4<T>::RowT{right.y(), up.y(), direction.y(), 0},
+            typename mr::Matr4<T>::RowT{right.z(), up.z(), direction.z(), 0},
             typename mr::Matr4<T>::RowT{-(_position & right), -(_position & up), (_position & direction), 1}
           };
           _perspective_calculated = true;
           return _perspective;
         }
 
-        constexpr Matr4<T> calculate_ortholinear() const noexcept {
+        constexpr Matr4<T> calculate_orthographic() const noexcept {
           std::lock_guard lg(_perspective_mutex);
 
           const T l = -_projection.height / 2; // left
@@ -152,14 +152,14 @@ namespace mr {
           const T n = _projection.distance;    // near
           const T f = _projection.far;         // far
 
-          _projection.ortholinear = mr::Matr4<T>{
+          _projection.orthographic = mr::Matr4<T>{
             typename mr::Matr4<T>::RowT(2 / (r - l), 0, 0, 0),
             typename mr::Matr4<T>::RowT(0, 2 / (t - b), 0, 0),
             typename mr::Matr4<T>::RowT(0, 0, 2 / (n - f), 0),
             typename mr::Matr4<T>::RowT((r + l) / (l - r), (t + b) / (b - t), (f + n) / (n - f), 1)
           };
-          _projection.ortholinear_calculated = true;
-          return _projection.ortholinear;
+          _projection.orthographic_calculated = true;
+          return _projection.orthographic;
         }
 
         constexpr Matr4<T> calculate_frustum() const noexcept {

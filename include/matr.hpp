@@ -38,7 +38,7 @@ namespace mr
                  (sizeof...(Args) == N * N)
         constexpr Matr(Args... args) noexcept {
           std::array<T, N * N> tmp {static_cast<T>(args)...};
-          for (int i = 0; i < N; i++) {
+          for (size_t i = 0; i < N; i++) {
             _data[i] = RowT {
               tmp[N * i + 0],
               tmp[N * i + 1],

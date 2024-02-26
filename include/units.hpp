@@ -99,41 +99,46 @@ namespace mr
       [[nodiscard]] friend constexpr auto operator<=>(Degrees lhs, Degrees rhs) = default;
     };
 
-  // internal aliases used by '_rad' and '_deg' suffixes
-  using _RadiansLiteral = Radians<float>;
-  using _DegreesLiteral = Degrees<float>;
 
   inline const auto pi = mr::Radiansf(std::numbers::pi_v<float>);
 
   namespace axis {
-    inline mr::Vec3f x {1, 0, 0};
-    inline mr::Vec3f y {0, 1, 0};
-    inline mr::Vec3f z {0, 0, -1};
+    inline Vec3f x {1, 0, 0};
+    inline Vec3f y {0, 1, 0};
+    inline Vec3f z {0, 0, -1};
   }
 
-  // literals
-  constexpr mr::_RadiansLiteral operator"" _rad(unsigned long long value) {
-    return mr::_RadiansLiteral{static_cast<float>(value)};
-  }
+  namespace literals {
 
-  constexpr mr::_DegreesLiteral operator"" _deg(unsigned long long value) {
-    return mr::_DegreesLiteral{static_cast<float>(value)};
-  }
+    namespace details {
+      // internal aliases used by suffixes
+      using RadiansLiteral = Radians<float>;
+      using DegreesLiteral = Degrees<float>;
+    }
 
-  constexpr mr::_RadiansLiteral operator"" _pi(unsigned long long value) {
-    return value * mr::pi;
-  }
+    constexpr details::RadiansLiteral operator"" _rad(unsigned long long value) {
+      return details::RadiansLiteral{static_cast<float>(value)};
+    }
 
-  constexpr mr::_RadiansLiteral operator"" _rad(long double value) {
-    return mr::_RadiansLiteral{static_cast<float>(value)};
-  }
+    constexpr details::DegreesLiteral operator"" _deg(unsigned long long value) {
+      return details::DegreesLiteral{static_cast<float>(value)};
+    }
 
-  constexpr mr::_DegreesLiteral operator"" _deg(long double value) {
-    return mr::_DegreesLiteral{static_cast<float>(value)};
-  }
+    constexpr details::RadiansLiteral operator"" _pi(unsigned long long value) {
+      return value * pi;
+    }
 
-  constexpr mr::_RadiansLiteral operator"" _pi(long double value) {
-    return value * mr::pi;
+    constexpr details::RadiansLiteral operator"" _rad(long double value) {
+      return details::RadiansLiteral{static_cast<float>(value)};
+    }
+
+    constexpr details::DegreesLiteral operator"" _deg(long double value) {
+      return details::DegreesLiteral{static_cast<float>(value)};
+    }
+
+    constexpr details::RadiansLiteral operator"" _pi(long double value) {
+      return value * pi;
+    }
   }
 }
 

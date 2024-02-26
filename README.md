@@ -21,14 +21,14 @@ mr::Vec3f v2 {0, 1, 0};
 Operations
 ```cpp
 // cross product
-std::cout << v1 % v2 << std::endl; // output: (0, 0, 1)
-// alternative
 std::cout << v1.cross(v2) << std::endl; // output: (0, 0, 1)
+// alternative
+std::cout << v1 % v2 << std::endl; // output: (0, 0, 1)
 
 // dot product
-std::cout << v1 & v2 << std::endl; // output: 0
-// alternative
 std::cout << v1.dot(v2) << std::endl; // output: (0, 0, 1)
+// alternative
+std::cout << v1 & v2 << std::endl; // output: 0
 
 // returns normalized copy
 mr::Vec3f v3 {2, 0, 0};
@@ -56,7 +56,6 @@ std::cout << l << std::endl; // output: 25
 Initialization
 ```cpp
 /// alias for mr::Matr<float, 4>
-// Initialization list elements have to have exact RowT type
 mr::Matr4f m1 {
     mr::Matr4f::RowT{1, 0, 0, 0},
     mr::Matr4f::RowT{1, 0, 0, 0},
@@ -64,10 +63,10 @@ mr::Matr4f m1 {
     mr::Matr4f::RowT{1, 0, 0, 0},
     };
 mr::Matr4f m2 {
-    mr::Matr4f::RowT{1, 2, 3, 4},
-    mr::Matr4f::RowT{1, 2, 3, 4},
-    mr::Matr4f::RowT{1, 2, 3, 4},
-    mr::Matr4f::RowT{1, 2, 3, 4},
+    1, 2, 3, 4,
+    1, 2, 3, 4,
+    1, 2, 3, 4,
+    1, 2, 3, 4,
     };
 ```
 Operations
@@ -140,6 +139,7 @@ mr::axis::y = {0, 1, 0};
 mr::axis::z = {0, 0, -1};
 
 // literals
+using namespace mr::literals;
 1_rad == mr::Radiansf(1)
 1_deg == mr::Degreesf(1)
 1_pi  == 1 * mr::pi

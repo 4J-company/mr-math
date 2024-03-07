@@ -77,9 +77,10 @@ namespace mr
       [[nodiscard]] constexpr T y() const noexcept requires (N >= 2) { return _data[1]; }
       [[nodiscard]] constexpr T z() const noexcept requires (N >= 3) { return _data[2]; }
       [[nodiscard]] constexpr T w() const noexcept requires (N >= 4) { return _data[3]; }
-      [[nodiscard]] constexpr T operator[](std::size_t i) const {
-        return _data[i];
-      }
+      [[nodiscard]] constexpr T operator[](std::size_t i) const { return _data[i]; }
+
+      // structured binding support
+      template<size_t I> requires (I < N) constexpr T get() const { return _data[I]; }
 
       // cross product
       constexpr Vec cross(const Vec &other) const noexcept requires (N == 3) {
@@ -210,4 +211,17 @@ namespace mr
     };
 } // namespace mr
 
+// specializations for structured binding support
+namespace std
+{
+  template <mr::ArithmeticT T, std::size_t N>
+  struct tuple_size<mr::Vec<T, N>>
+      : std::integral_constant<size_t, N> {};
+
+  template <mr::ArithmeticT T, std::size_t N, std::size_t I>
+  struct tuple_element<I, mr::Vec<T, N>> {
+    using type = T;
+  };
+
+}
 #endif // __Vec_hpp_

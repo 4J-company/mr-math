@@ -49,6 +49,10 @@ std::cout << l << std::endl; // output: 5
 float l = v5.length2();
 std::cout << l << std::endl; // output: 25
 
+// structured binding
+mr::Vec3f v6 {30, 47, 102};
+auto [x, y, _] = v6;
+
 // etc (+ - [0..N-1])
 ```
 

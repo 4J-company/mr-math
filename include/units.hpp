@@ -10,7 +10,10 @@ namespace mr
   template <typename T>
     concept UnitT = requires(T unit)
     {
-      requires ArithmeticT<T>;
+      // member check
+      typename T::ValueT;
+      sizeof(T) == sizeof(typename T::ValueT);
+      requires ArithmeticT<typename T::ValueT>;
 
       // constructor check
       T{typename T::ValueT{}};
@@ -18,8 +21,8 @@ namespace mr
       // operations check
       {unit + unit} -> std::same_as<T>;
       {unit - unit} -> std::same_as<T>;
-      {unit * ArithmeticT<T>} -> std::same_as<T>;
-      {unit / ArithmeticT<T>} -> std::same_as<T>;
+      {unit * typename T::ValueT{}} -> std::same_as<T>;
+      {unit / typename T::ValueT{}} -> std::same_as<T>;
     };
 
   // extract value from unit type (used for units compatibility)
@@ -48,9 +51,6 @@ namespace mr
     public:
       using ValueT = T;
 
-      static constexpr auto strname = "rad";
-      static constexpr std::size_t size = 1;
-
       T _data;
 
       constexpr Radians() noexcept {};
@@ -69,15 +69,17 @@ namespace mr
 
       // comparison operator
       [[nodiscard]] friend constexpr auto operator<=>(Radians lhs, Radians rhs) = default;
+
+      friend std::ostream & operator<<(std::ostream &os, const Radians &r) noexcept {
+        os << r._data << "rad";
+        return os;
+      }
     };
 
   template <std::floating_point T>
     struct [[nodiscard]] Degrees : UnitOperators<Degrees<T>> {
     public:
       using ValueT = T;
-
-      static constexpr auto strname = "deg";
-      static constexpr std::size_t size = 1;
 
       T _data;
 
@@ -97,6 +99,11 @@ namespace mr
 
       // comparison operator
       [[nodiscard]] friend constexpr auto operator<=>(Degrees lhs, Degrees rhs) = default;
+
+      friend std::ostream & operator<<(std::ostream &os, const Degrees &d) noexcept {
+        os << d._data << "deg";
+        return os;
+      }
     };
 
 

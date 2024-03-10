@@ -62,16 +62,6 @@ namespace mr {
       operator-(const DerivedT &rhs) noexcept {
         return -rhs._data;
       }
-
-      friend std::ostream &
-      operator<<(std::ostream &s, const DerivedT &v) noexcept {
-        s << '(';
-        for (size_t i = 0; i < DerivedT::size; i++) {
-          s << v[i] << (char)(',' * (i < DerivedT::size - 1)) << (char)(' ' * (i < DerivedT::size - 1));
-        }
-        s << ')' << DerivedT::strname;
-        return s;
-      }
     };
 
   template <typename DerivedT>
@@ -119,15 +109,22 @@ namespace mr {
         lhs._data >>= rhs._data;
         return lhs;
       }
+
+      friend std::ostream &
+      operator<<(std::ostream &s, const DerivedT &v) noexcept {
+        s << '(';
+        for (size_t i = 0; i < DerivedT::size - 1; i++) {
+          s << v[i] << ", ";
+        }
+        s << v[DerivedT::size - 1] << ')';
+        return s;
+      }
     };
 
   template <ArithmeticT T, std::size_t N>
     struct Row : RowOperators<Row<T, N>> {
-
     public:
       using SimdT = SimdImpl<T, N>;
-
-      static constexpr auto strname = "row";
       static constexpr size_t size = N;
 
       SimdT _data{};
@@ -202,5 +199,24 @@ namespace mr {
       }
     };
 } // namespace mr
+
+// std::format support
+namespace std {
+  template <mr::ArithmeticT T, size_t N>
+    struct formatter<mr::Row<T, N>> {
+      template<typename ParseContext>
+        constexpr auto parse(ParseContext& ctx) {
+          // skip all format specifiers
+          return ctx.end();
+        }
+  
+      template<typename FmtContext>
+        auto format(const mr::Row<T, N> &r, FmtContext& ctx) const {
+          ostringstream out;
+          out << r;
+          return ranges::copy(move(out).str(), ctx.out()).out;
+        }
+    };
+} // namespace std
 
 #endif // __Row_hpp_

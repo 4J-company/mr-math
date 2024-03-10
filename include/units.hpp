@@ -149,4 +149,22 @@ namespace mr
   }
 }
 
+// std::format support
+namespace std {
+  template <mr::UnitT U>
+    struct formatter<U> {
+      template<typename ParseContext>
+        constexpr auto parse(ParseContext& ctx) {
+          // skip all format specifiers
+          return ctx.end();
+        }
+  
+      template<typename FmtContext>
+        auto format(U u, FmtContext& ctx) const {
+          ostringstream out;
+          out << u;
+          return ranges::copy(move(out).str(), ctx.out()).out;
+        }
+    };
+} // namespace std
 #endif // __units_hpp_

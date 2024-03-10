@@ -301,4 +301,27 @@ namespace mr
     };
 } // namespace mr
 
+// std::format support
+namespace std {
+  template <mr::ArithmeticT T, size_t N>
+    struct formatter<mr::Matr<T, N>> {
+      template<typename ParseContext>
+        constexpr auto parse(ParseContext& ctx) {
+          // skip all format specifiers
+          return ctx.end();
+        }
+  
+      template<typename FmtContext>
+        auto format(const mr::Matr<T, N> &m, FmtContext& ctx) const {
+          ostringstream out;
+          out << '(' << m[0] << ",\n";
+          for (size_t i = 1; i < N - 1; i++)
+            out << ' ' << m[i] << ",\n";
+          out << ' ' << m[N - 1] << ')';
+
+          return ranges::copy(move(out).str(), ctx.out()).out;
+        }
+    };
+} // namespace std
+
 #endif // __Matr_hpp_

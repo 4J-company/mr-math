@@ -7,9 +7,11 @@
 #include <algorithm>
 #include <concepts>
 #include <iostream>
+#include <sstream>
 #include <numeric>
 #include <numbers>
 #include <ranges>
+#include <format>
 #include <mutex>
 #include <cmath>
 #include <bit>

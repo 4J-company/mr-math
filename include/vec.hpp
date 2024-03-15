@@ -43,8 +43,6 @@ namespace mr
     public:
       using ValueT = T;
       using RowT = Row<T, N>;
-
-      static constexpr auto strname = "vec";
       static constexpr size_t size = N;
 
       RowT _data;
@@ -80,7 +78,7 @@ namespace mr
       [[nodiscard]] constexpr T operator[](std::size_t i) const { return _data[i]; }
 
       // structured binding support
-      template<size_t I> requires (I < N) constexpr T get() const { return _data[I]; }
+      template <size_t I> requires (I < N) constexpr T get() const { return _data[I]; }
 
       // cross product
       constexpr Vec cross(const Vec &other) const noexcept requires (N == 3) {
@@ -211,6 +209,7 @@ namespace mr
     };
 } // namespace mr
 
+#ifdef __cpp_structured_bindings
 // specializations for structured binding support
 namespace std
 {
@@ -224,4 +223,6 @@ namespace std
   };
 
 }
+#endif
+
 #endif // __Vec_hpp_

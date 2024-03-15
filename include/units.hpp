@@ -149,6 +149,7 @@ namespace mr
   }
 }
 
+#ifdef __cpp_lib_format
 // std::format support
 namespace std {
   template <mr::UnitT U>
@@ -167,4 +168,6 @@ namespace std {
         }
     };
 } // namespace std
+#endif
+
 #endif // __units_hpp_

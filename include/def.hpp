@@ -11,10 +11,12 @@
 #include <numeric>
 #include <numbers>
 #include <ranges>
-#include <format>
 #include <mutex>
 #include <cmath>
 #include <bit>
+#ifdef __cpp_lib_format
+  #include <format>
+#endif
 
 namespace stdx = std::experimental;
 

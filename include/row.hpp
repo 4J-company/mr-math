@@ -200,6 +200,7 @@ namespace mr {
     };
 } // namespace mr
 
+#ifdef __cpp_lib_format
 // std::format support
 namespace std {
   template <mr::ArithmeticT T, size_t N>
@@ -218,5 +219,6 @@ namespace std {
         }
     };
 } // namespace std
+#endif
 
 #endif // __Row_hpp_

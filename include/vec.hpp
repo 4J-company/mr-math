@@ -6,6 +6,21 @@
 
 namespace mr
 {
+  template <typename V, size_t N, size_t ...Args>
+    struct Swizzle
+    {
+      const V &ref;
+
+      Swizzle(const V &v) : ref(v) {}
+
+      Swizzle<V, N + 1, Args..., 0> x() { return {ref}; }
+      Swizzle<V, N + 1, Args..., 1> y() { return {ref}; }
+      Swizzle<V, N + 1, Args..., 2> z() { return {ref}; }
+      Swizzle<V, N + 1, Args..., 3> w() { return {ref}; }
+
+      operator typename V::ValueT() requires (N == 1) { return ref.template get<Args...>(); }
+    };
+
   // forward declarations
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
     struct Vec;
@@ -53,7 +68,7 @@ namespace mr
       constexpr Vec(RowT row) : _data(row._data) {};
 
       // from elements constructor
-      template <ArithmeticT... Args>
+      template <std::convertible_to<T>... Args>
       requires (sizeof...(Args) >= 2) && (sizeof...(Args) <= N)
         constexpr Vec(Args... args) : _data(args...) {}
 
@@ -61,8 +76,18 @@ namespace mr
       template <ArithmeticT R, std::size_t S>
         constexpr Vec(const Vec<R, S> &v) noexcept : _data(v._data) {}
 
-      template <ArithmeticT R, std::size_t S, ArithmeticT ... Args>
-        constexpr Vec(const Vec<R, S> &v, Args ... args) noexcept : _data(v, args...) {}
+      template <ArithmeticT R, std::size_t S, std::convertible_to<T>... Args>
+        constexpr Vec(const Vec<R, S> &v, Args... args) noexcept : _data(v, args...) {}
+
+      // frow swizzle constructor
+      template <typename V, size_t X, size_t Y> requires (N == 2)
+        Vec(Swizzle<V, N, X, Y> p) : Vec{p.ref.template get<X>(), p.ref.template get<Y>()} {}
+
+      template <typename V, size_t X, size_t Y, size_t Z> requires (N == 3)
+        Vec(Swizzle<V, N, X, Y, Z> p) : Vec{p.ref.template get<X>(), p.ref.template get<Y>(), p.ref.template get<Z>()} {}
+
+      template <typename V, size_t X, size_t Y, size_t Z, size_t W> requires (N == 4)
+        Vec(Swizzle<V, N, X, Y, Z, W> p) : Vec{p.ref.template get<X>(), p.ref.template get<Y>(), p.ref.template get<Z>(), p.ref.template get<W>()} {}
 
       // setters
       constexpr void x(T x) noexcept requires (N >= 1) { _set_ind(0, x); }
@@ -71,10 +96,14 @@ namespace mr
       constexpr void w(T w) noexcept requires (N >= 4) { _set_ind(3, w); }
 
       // getters
-      [[nodiscard]] constexpr T x() const noexcept requires (N >= 1) { return _data[0]; }
-      [[nodiscard]] constexpr T y() const noexcept requires (N >= 2) { return _data[1]; }
-      [[nodiscard]] constexpr T z() const noexcept requires (N >= 3) { return _data[2]; }
-      [[nodiscard]] constexpr T w() const noexcept requires (N >= 4) { return _data[3]; }
+      // [[nodiscard]] constexpr T x() const noexcept requires (N >= 1) { return _data[0]; }
+      // [[nodiscard]] constexpr T y() const noexcept requires (N >= 2) { return _data[1]; }
+      // [[nodiscard]] constexpr T z() const noexcept requires (N >= 3) { return _data[2]; }
+      // [[nodiscard]] constexpr T w() const noexcept requires (N >= 4) { return _data[3]; }
+      [[nodiscard]] constexpr Swizzle<Vec, 1, 0> x() const noexcept requires (N >= 1) { return {*this}; }
+      [[nodiscard]] constexpr Swizzle<Vec, 1, 1> y() const noexcept requires (N >= 2) { return {*this}; }
+      [[nodiscard]] constexpr Swizzle<Vec, 1, 2> z() const noexcept requires (N >= 3) { return {*this}; }
+      [[nodiscard]] constexpr Swizzle<Vec, 1, 3> w() const noexcept requires (N >= 4) { return {*this}; }
       [[nodiscard]] constexpr T operator[](std::size_t i) const { return _data[i]; }
 
       // structured binding support

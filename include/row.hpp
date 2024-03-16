@@ -141,7 +141,7 @@ namespace mr {
       }
 
       // from elements constructor
-      template <ArithmeticT... Args>
+      template <std::convertible_to<T>... Args>
       requires (sizeof...(Args) >= 2) && (sizeof...(Args) <= N)
         constexpr Row(Args... args) {
           _set(args...);
@@ -162,9 +162,9 @@ namespace mr {
           _data = tmp2;
         }
 
-      template <ArithmeticT R, std::size_t S, ArithmeticT ... Args>
+      template <ArithmeticT R, std::size_t S, std::convertible_to<R>... Args>
         requires (sizeof...(Args) + S == N)
-        constexpr Row(const Row<R, S> &rhs, Args ... args) noexcept {
+        constexpr Row(const Row<R, S> &rhs, Args ...args) noexcept {
           // size conversion
           std::array<R, N> tmp1;
           rhs._data.copy_to(tmp1.data(), stdx::element_aligned);
@@ -184,7 +184,7 @@ namespace mr {
       }
 
     protected:
-      template <ArithmeticT... Args>
+      template <std::convertible_to<T>... Args>
         requires (sizeof...(Args) >= 1) && (sizeof...(Args) <= N)
         constexpr void _set(Args... args) noexcept {
           std::array<T, N> arr {static_cast<T>(args)...};

@@ -4,8 +4,7 @@
 #include "def.hpp"
 #include "row.hpp"
 
-namespace mr
-{
+namespace mr {
   // forward declarations
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
     struct Vec;

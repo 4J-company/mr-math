@@ -24,6 +24,9 @@ namespace mr {
   template <typename T>
     concept ArithmeticT = std::integral<T> || std::floating_point<T>;
 
+  template <ArithmeticT T, std::size_t N>
+    using SimdImpl = stdx::fixed_size_simd<T, N>;
+
   // fast inverse implementation for floats
   // use 1 / std::sqrt for higher precision
   template <ArithmeticT T> requires(sizeof(T) == sizeof(float))

@@ -1,13 +1,11 @@
 #ifndef __camera_hpp_
 #define __camera_hpp_
 
-#include "def.hpp"
 #include "vec.hpp"
 #include "rot.hpp"
 #include "matr.hpp"
 
 namespace mr {
-
   template <std::floating_point T = float>
     class [[nodiscard]] Camera {
       public:

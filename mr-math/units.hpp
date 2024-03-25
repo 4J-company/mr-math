@@ -1,15 +1,13 @@
 ﻿#ifndef __units_hpp_
 #define __units_hpp_
 
-#include <def.hpp>
+#include "vec.hpp"
 
-namespace mr
-{
+namespace mr {
   // type that has only 'ArithmeticT value' member
   // and supports arithmetics operations
   template <typename T>
-    concept UnitT = requires(T unit)
-    {
+    concept UnitT = requires(T unit) {
       // member check
       typename T::ValueT;
       sizeof(T) == sizeof(typename T::ValueT);

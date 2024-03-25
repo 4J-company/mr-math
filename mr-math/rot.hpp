@@ -1,14 +1,11 @@
 #ifndef __rot_hpp_
 #define __rot_hpp_
 
-#include "def.hpp"
 #include "units.hpp"
-#include "row.hpp"
 #include "vec.hpp"
 #include "matr.hpp"
 
-namespace mr
-{
+namespace mr {
   template <std::floating_point T>
     struct Rotation;
 

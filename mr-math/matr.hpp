@@ -181,11 +181,11 @@ namespace mr
         std::array<RowT, N> res;
         std::for_each(std::execution::par_unseq, io.begin(), io.end(),
           [&tmp, &res](auto i) {
-            auto [a, b] = stdx::split<N, N>(tmp[i]._data);
+            auto [_, b] = stdx::split<N, N>(tmp[i]._data);
             res[i] = stdx::static_simd_cast<SimdImpl<T, N>>(b);
           });
 
-        return {res};
+        return res;
       }
 
       constexpr Matr & inverse() const noexcept {
@@ -311,7 +311,7 @@ namespace std {
           // skip all format specifiers
           return ctx.end();
         }
-  
+
       template<typename FmtContext>
         auto format(const mr::Matr<T, N> &m, FmtContext& ctx) const {
           ostringstream out;
@@ -320,7 +320,7 @@ namespace std {
             out << ' ' << m[i] << ",\n";
           out << ' ' << m[N - 1] << ')';
 
-          return ranges::copy(move(out).str(), ctx.out()).out;
+          return ranges::copy(std::move(out).str(), ctx.out()).out;
         }
     };
 } // namespace std

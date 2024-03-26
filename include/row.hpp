@@ -43,7 +43,7 @@ namespace mr {
 
       friend constexpr DerivedT
       operator*(const ArithmeticT auto x, const DerivedT &lhs) noexcept {
-        return DerivedT{lhs._data * x};
+        return DerivedT{lhs._data * (float)x};
       }
 
       friend constexpr DerivedT &

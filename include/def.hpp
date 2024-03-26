@@ -18,7 +18,18 @@
   #include <format>
 #endif
 
-namespace stdx = std::experimental;
+namespace stdx {
+  using namespace std::experimental;
+  using namespace std::experimental::__proposed;
+}
+
+#if defined(__AVX__)
+#include <immintrin.h>
+#elif defined(__aarch64__)
+#include <arm64_neon.h>
+#elif defined(__arm__)
+#include <arm_neon.h>
+#endif
 
 namespace mr {
   template <typename T>

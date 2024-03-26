@@ -7,8 +7,7 @@
 namespace mr
 {
   template <typename V, size_t N, size_t ...Args>
-    struct Swizzle
-    {
+    struct Swizzle {
       const V &ref;
 
       Swizzle(const V &v) : ref(v) {}
@@ -53,8 +52,7 @@ namespace mr
 
   // base vector (use aliases for full functional)
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
-    struct [[nodiscard]] Vec : public RowOperators<Vec<T, N>>
-    {
+    struct [[nodiscard]] Vec : public RowOperators<Vec<T, N>> {
     public:
       using ValueT = T;
       using RowT = Row<T, N>;
@@ -81,13 +79,28 @@ namespace mr
 
       // frow swizzle constructor
       template <typename V, size_t X, size_t Y> requires (N == 2)
-        Vec(Swizzle<V, N, X, Y> p) : Vec{p.ref.template get<X>(), p.ref.template get<Y>()} {}
+        Vec(Swizzle<V, N, X, Y> p) :
+          Vec {
+            p.ref.template get<X>(),
+            p.ref.template get<Y>()
+          } {}
 
       template <typename V, size_t X, size_t Y, size_t Z> requires (N == 3)
-        Vec(Swizzle<V, N, X, Y, Z> p) : Vec{p.ref.template get<X>(), p.ref.template get<Y>(), p.ref.template get<Z>()} {}
+        Vec(Swizzle<V, N, X, Y, Z> p) :
+          Vec {
+            p.ref.template get<X>(),
+            p.ref.template get<Y>(),
+            p.ref.template get<Z>()
+          } {}
 
       template <typename V, size_t X, size_t Y, size_t Z, size_t W> requires (N == 4)
-        Vec(Swizzle<V, N, X, Y, Z, W> p) : Vec{p.ref.template get<X>(), p.ref.template get<Y>(), p.ref.template get<Z>(), p.ref.template get<W>()} {}
+        Vec(Swizzle<V, N, X, Y, Z, W> p) :
+          Vec {
+            p.ref.template get<X>(),
+            p.ref.template get<Y>(),
+            p.ref.template get<Z>(),
+            p.ref.template get<W>()
+          } {}
 
       // setters
       constexpr void x(T x) noexcept requires (N >= 1) { _set_ind(0, x); }
@@ -110,7 +123,49 @@ namespace mr
       template <size_t I> requires (I < N) constexpr T get() const { return _data[I]; }
 
       // cross product
-      constexpr Vec cross(const Vec &other) const noexcept requires (N == 3) {
+      constexpr Vec cross([[maybe_unused]] const Vec &other) const noexcept requires (N == 3) {
+#if defined(__AVX__)
+        auto as_vector = [](auto vec) {
+          auto tmp2 =
+            stdx::__vector_convert<stdx::fixed_size_simd<float, 8>>(vec,
+              std::index_sequence<vec.size()>{});
+
+          stdx::native_simd<T> tmp = stdx::simd_cast<stdx::native_simd<T>>(tmp2);
+          auto tmp3 = stdx::__as_vector(tmp);
+          return _mm256_castps256_ps128(tmp3);
+        };
+
+        auto this_simd = as_vector(_data._data);
+        auto other_simd = as_vector(other._data._data);
+
+        this_simd = _mm_shuffle_ps(this_simd, this_simd, _MM_SHUFFLE(3, 0, 2, 1));
+        other_simd = _mm_shuffle_ps(other_simd, other_simd, _MM_SHUFFLE(3, 1, 0, 2));
+        auto result_simd = _mm_mul_ps(this_simd, other_simd);
+
+        this_simd = _mm_shuffle_ps(this_simd, this_simd, _MM_SHUFFLE(3, 0, 2, 1));
+        other_simd = _mm_shuffle_ps(other_simd, other_simd, _MM_SHUFFLE(3, 1, 0, 2));
+
+        return {};
+        // return stdx::native_simd<T>(_mm256_castps128_ps256(this_simd + other_simd + result_simd));
+        // return typename RowT::SimdT(this_simd + other_simd + result_simd);
+#elif __arm__ || __aarch64__
+        auto this_simd = stdx::simd_cast<__m256i>(other);
+        auto other_simd = stdx::simd_cast<__m256i>(other);
+
+        float32x2_t this_simd_xy = vget_low_f32(this_simd);
+        float32x2_t other_simd_xy = vget_low_f32(other_simd);
+
+        float32x2_t this_simd_yx = vrev64_f32(this_simd_xy);
+        float32x2_t other_simd_yx = vrev64_f32(other_simd_xy);
+
+        float32x2_t this_simd_zz = vdup_lane_f32(vget_high_f32(this_simd), 0);
+        float32x2_t other_simd_zz = vdup_lane_f32(vget_high_f32(other_simd), 0);
+
+        float32x2_t result_simd = vmulq_f32(vcombine_f32(this_simd_yx, this_simd_xy), vcombine_f32(other_simd_zz, other_simd_yx));
+        result_simd = vmlsq_f32(result_simd , vcombine_f32(this_simd_zz, this_simd_yx), vcombine_f32(other_simd_yx, other_simd_xy));
+        vResult = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(result_simd), g_XMFlipY));
+        return vreinterpretq_f32_u32(vandq_u32(vreinterpretq_u32_f32(result_simd), g_XMMask3));
+#else
         std::array<T, 3> arr {
           _data[1] * other._data[2] - _data[2] * other._data[1],
           _data[2] * other._data[0] - _data[0] * other._data[2],
@@ -120,6 +175,7 @@ namespace mr
         SimdImpl<T, 3> ans;
         ans.copy_from(arr.data(), stdx::element_aligned);
         return {ans};
+#endif
       }
 
       constexpr Vec operator%(const Vec &other) const noexcept requires (N == 3) {

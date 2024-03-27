@@ -270,12 +270,12 @@ namespace mr
         return tmp1 + tmp2 + tmp3;
       }
 
-      friend std::ostream & operator<<(std::ostream &s, const Matr &m) noexcept {
-        std::cout << std::endl;
-        for (size_t i = 0; i < N; i++) {
-          std::cout << m._data[i] << std::endl;
-        }
-        return s;
+      friend std::ostream & operator<<(std::ostream &os, const Matr &m) noexcept {
+        os << "\n(" << m[0] << ",\n";
+          for (size_t i = 1; i < N - 1; i++)
+            os << ' ' << m[i] << ",\n";
+          os << ' ' << m[N - 1] << ')';
+        return os;
       }
 
     private:
@@ -309,17 +309,16 @@ namespace std {
       template<typename ParseContext>
         constexpr auto parse(ParseContext& ctx) {
           // skip all format specifiers
-          return ctx.end();
+          auto it = ctx.begin();
+          while (*it != '}')
+              ++it;
+          return it;
         }
 
       template<typename FmtContext>
         auto format(const mr::Matr<T, N> &m, FmtContext& ctx) const {
           ostringstream out;
-          out << '(' << m[0] << ",\n";
-          for (size_t i = 1; i < N - 1; i++)
-            out << ' ' << m[i] << ",\n";
-          out << ' ' << m[N - 1] << ')';
-
+          out << m;
           return ranges::copy(std::move(out).str(), ctx.out()).out;
         }
     };

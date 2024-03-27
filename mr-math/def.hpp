@@ -40,7 +40,6 @@ namespace mr {
     i = std::bit_cast<unsigned>(y); // evil floating point bit level hacking
     i = 0x5f3759df - (i >> 1);      // what the fuck?
     y = std::bit_cast<float>(i);
-    y = y * (threehalfs - (x2 * y * y)); // 1st iteration
 
     return y;
   }
@@ -57,7 +56,6 @@ namespace mr {
     i = std::bit_cast<unsigned long long>(y); // evil floating point bit level hacking
     i = 0x5fe6f7ced9168800 - (i >> 1);      // what the fuck?
     y = std::bit_cast<double>(i);
-    y = y * (threehalfs - (x2 * y * y)); // 1st iteration
 
     return y;
   }

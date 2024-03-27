@@ -8,9 +8,12 @@ namespace mr {
   // forward declarations
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
     struct Vec;
+  template <ArithmeticT T, std::size_t N> requires (N >= 2)
+    struct Norm;
   template <ArithmeticT T, std::size_t N>
     class Matr;
 
+  // common aliases
   template <ArithmeticT T>
     using Vec2 = Vec<T, 2>;
   template <ArithmeticT T>
@@ -18,7 +21,6 @@ namespace mr {
   template <ArithmeticT T>
     using Vec4 = Vec<T, 4>;
 
-  // common aliases
   using Vec2i = Vec2<int>;
   using Vec3i = Vec3<int>;
   using Vec4i = Vec4<int>;
@@ -42,6 +44,7 @@ namespace mr {
     public:
       using ValueT = T;
       using RowT = Row<T, N>;
+      using NormT = Norm<T, N>;
       static constexpr size_t size = N;
 
       RowT _data;
@@ -106,48 +109,60 @@ namespace mr {
       }
 
       [[nodiscard]] constexpr T inversed_length() const {
-        return finv_sqrt(length2());
+        return fast_sqrt(length2());
       }
 
-      // use normalize_fast for lower precision
+      // normalize methods
       constexpr Vec & normalize() noexcept {
         auto len = length2();
-        if (std::abs(len) <= _epsilon) [[unlikely]] return *this;
-        *this *= finv_sqrt(len);
+        if (len <= _epsilon) [[unlikely]] return *this;
+        *this /= std::sqrt(len);
         return *this;
       };
 
-      // use normalized_fast for lower precision
-      constexpr Vec normalized() const noexcept {
+      constexpr std::optional<NormT> normalized() const noexcept {
         auto len = length2();
-        if (std::abs(len) <= _epsilon) [[unlikely]] return {};
-        return Vec{*this * finv_sqrt(len)};
+        if (len <= _epsilon) [[unlikely]] return std::nullopt;
+        return {{*this / std::sqrt(len)}};
       };
 
-      // use normalize for higher precision
+      constexpr Vec & normalize_unchecked() noexcept {
+        auto len = length2();
+        *this /= std::sqrt(len);
+        return *this;
+      };
+
+      constexpr NormT normalized_unchecked() const noexcept {
+        auto len = length2();
+        return {*this / std::sqrt(len)};
+      };
+
+      // use normalize() for higher precision
       constexpr Vec & normalize_fast() noexcept {
         auto len = length2();
-        if (std::abs(len) <= _epsilon) [[unlikely]] return *this;
-        *this *= ffinv_sqrt(len);
+        if (len <= _epsilon) [[unlikely]] return *this;
+        *this *= fast_rsqrt(len);
         return *this;
       };
 
-      // use normalized for higher precision
-      constexpr Vec normalized_fast() const noexcept {
+      // use normalized() for higher precision
+      constexpr std::optional<NormT> normalized_fast() const noexcept {
         auto len = length2();
-        if (std::abs(len) <= _epsilon) [[unlikely]] return {};
-        return Vec{*this * ffinv_sqrt(len)};
+        if (len <= _epsilon) [[unlikely]] return std::nullopt;
+        return {{*this * fast_rsqrt(len)}};
       };
 
-      constexpr Vec & normalize_fast_unsafe() {
+      // use normalize_unchecked() for higher precision
+      constexpr Vec & normalize_fast_unchecked() {
         auto l = length2();
-        *this *= ffinv_sqrt(l);
+        *this *= fast_rsqrt(l);
         return *this;
       };
 
-      constexpr Vec normalized_fast_unsafe() const {
+      // use normalized_unchecked() for higher precision
+      constexpr NormT normalized_fast_unchecked() const {
         auto l = length2();
-        return Vec{*this * ffinv_sqrt(l)};
+        return {*this * fast_rsqrt(l)};
       };
 
       // dot product
@@ -220,7 +235,6 @@ namespace std
   struct tuple_element<I, mr::Vec<T, N>> {
     using type = T;
   };
-
 }
 #endif
 

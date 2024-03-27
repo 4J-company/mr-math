@@ -4,6 +4,7 @@
 #include "def.hpp"
 #include "vec.hpp"
 #include "rot.hpp"
+#include "norm.hpp"
 #include "matr.hpp"
 #include "units.hpp"
 #include "camera.hpp"

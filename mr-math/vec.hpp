@@ -112,7 +112,7 @@ namespace mr {
       // use normalize_fast for lower precision
       constexpr Vec & normalize() noexcept {
         auto len = length2();
-        if (std::abs(len) <= _epsilon) [[unlikely]] return *this;
+        if (len <= _epsilon) [[unlikely]] return *this;
         *this *= finv_sqrt(len);
         return *this;
       };
@@ -120,14 +120,14 @@ namespace mr {
       // use normalized_fast for lower precision
       constexpr Vec normalized() const noexcept {
         auto len = length2();
-        if (std::abs(len) <= _epsilon) [[unlikely]] return {};
+        if (len <= _epsilon) [[unlikely]] return {};
         return Vec{*this * finv_sqrt(len)};
       };
 
       // use normalize for higher precision
       constexpr Vec & normalize_fast() noexcept {
         auto len = length2();
-        if (std::abs(len) <= _epsilon) [[unlikely]] return *this;
+        if (len <= _epsilon) [[unlikely]] return *this;
         *this *= ffinv_sqrt(len);
         return *this;
       };
@@ -135,7 +135,7 @@ namespace mr {
       // use normalized for higher precision
       constexpr Vec normalized_fast() const noexcept {
         auto len = length2();
-        if (std::abs(len) <= _epsilon) [[unlikely]] return {};
+        if (len <= _epsilon) [[unlikely]] return {};
         return Vec{*this * ffinv_sqrt(len)};
       };
 

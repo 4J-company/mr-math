@@ -9,10 +9,10 @@ mr::Vec3f v2 {0, a, 0};
 mr::Vec3f v3 {0, 0, a};
 
 mr::Matr4f m1 {
-  mr::Matr4f::RowT{a, 2, 3, 4},
-  mr::Matr4f::RowT{a, 3, 4, 5},
-  mr::Matr4f::RowT{a, 4, 5, 6},
-  mr::Matr4f::RowT{a, 5, 6, 7}
+  a, 2, 3, 4,
+  a, 3, 4, 5,
+  a, 4, 5, 6,
+  a, 5, 6, 7
 };
 mr::Matr4f m2 {
   mr::Matr4f::RowT{a, 6, 5, 4},
@@ -97,7 +97,7 @@ BENCHMARK(BM_normalized);
 
 static void BM_normalized_fast(benchmark::State& state) {
   for (auto _ : state) {
-    auto v3 = v1.normalized_fast_unsafe();
+    auto v3 = v1.normalized_fast_unchecked();
     benchmark::DoNotOptimize(v3);
   }
 }

@@ -26,12 +26,16 @@ namespace mr
     public:
       using RowT = Row<T, N>;
 
+      constexpr Matr() noexcept = default;
+
       template <typename... Args>
         requires (std::is_same_v<Args, RowT> && ...) &&
-                 ((sizeof...(Args) == 0) || (sizeof...(Args) == N))
+                 (sizeof...(Args) == N)
         constexpr Matr(Args... args) noexcept {
           _data = std::array<RowT, N>({args...});
         }
+
+      constexpr Matr(std::array<RowT, N> rows) : _data(std::move(rows)) {}
 
       template <typename... Args>
         requires (std::is_convertible_v<Args, T> && ...) &&
@@ -47,9 +51,6 @@ namespace mr
             };
           }
         }
-
-      constexpr Matr(const std::array<RowT, N> &arr) : _data(arr) {}
-      constexpr Matr(std::array<RowT, N> &&arr) : _data(std::move(arr)) {}
 
       // copy semantics
       constexpr Matr(const Matr &) noexcept = default;
@@ -195,19 +196,19 @@ namespace mr
 
       static constexpr Matr4<T> scale(const Vec3<T> &vec) noexcept {
         return Matr4<T> {
-          typename mr::Matr4<T>::RowT(vec.x(), 0, 0, 0),
-          typename mr::Matr4<T>::RowT(0, vec.y(), 0, 0),
-          typename mr::Matr4<T>::RowT(0, 0, vec.z(), 0),
-          typename mr::Matr4<T>::RowT(0, 0, 0, 1)
+          vec.x(),       0,       0, 0,
+                0, vec.y(),       0, 0,
+                0,       0, vec.z(), 0,
+                0,       0,       0, 1
         };
       }
 
       static constexpr Matr4<T> translate(const Vec3<T> &vec) noexcept {
         return Matr4<T> {
-          typename mr::Matr4<T>::RowT(1, 0, 0, 0),
-          typename mr::Matr4<T>::RowT(0, 1, 0, 0),
-          typename mr::Matr4<T>::RowT(0, 0, 1, 0),
-          typename mr::Matr4<T>::RowT(vec.x(), vec.y(), vec.z(), 1)
+                1,       0,       0, 0,
+                0,       1,       0, 0,
+                0,       0,       1, 0,
+          vec.x(), vec.y(), vec.z(), 1
         };
       }
 
@@ -216,10 +217,10 @@ namespace mr
         T si = std::sin(rad._data);
 
         return Matr4<T> {
-          typename mr::Matr4<T>::RowT(1, 0, 0, 0),
-          typename mr::Matr4<T>::RowT(0, co, si, 0),
-          typename mr::Matr4<T>::RowT(0, -si, co, 0),
-          typename mr::Matr4<T>::RowT(0, 0, 0, 1)
+          1,   0,  0, 0,
+          0,  co, si, 0,
+          0, -si, co, 0,
+          0,   0,  0, 1
         };
       }
 
@@ -228,10 +229,10 @@ namespace mr
         T si = std::sin(rad._data);
 
         return Matr4<T> {
-          typename mr::Matr4<T>::RowT(co, 0, -si, 0),
-          typename mr::Matr4<T>::RowT(0, 1, 0, 0),
-          typename mr::Matr4<T>::RowT(si, 0, co, 0),
-          typename mr::Matr4<T>::RowT(0, 0, 0, 1)
+          co, 0, -si, 0,
+           0, 1,   0, 0,
+          si, 0,  co, 0,
+           0, 0,   0, 1
         };
       }
 
@@ -240,31 +241,30 @@ namespace mr
         T si = std::sin(rad._data);
 
         return Matr4<T> {
-          typename mr::Matr4<T>::RowT(co, si, 0, 0),
-          typename mr::Matr4<T>::RowT(-si, co, 0, 0),
-          typename mr::Matr4<T>::RowT(0, 0, 1, 0),
-          typename mr::Matr4<T>::RowT(0, 0, 0, 1)
+           co, si, 0, 0,
+          -si, co, 0, 0,
+            0,  0, 1, 0,
+            0,  0, 0, 1
         };
       }
 
-      static constexpr Matr4<T> rotate(const Radians<T> &rad, const Vec3<T> &vec) noexcept {
+      static constexpr Matr4<T> rotate(const Radians<T> &rad, const Norm<T, N> &n) noexcept {
         T co = std::cos(rad._data);
         T si = std::sin(rad._data);
         T nco = 1 - co;
-        auto v = vec.normalized();
 
-        Matr4<T> tmp1 = scale(v * v * nco + Vec<T, 3>{co});
+        Matr4<T> tmp1 = scale(n * n * nco + Vec<T, 3>{co});
         Matr4<T> tmp2 = Matr4<T> {
-          typename mr::Matr4<T>::RowT(0, v.x() * v.y() * nco, v.x() * v.z() * nco, 0),
-          typename mr::Matr4<T>::RowT(v.x() * v.y() * nco, 0, v.y() * v.z() * nco, 0),
-          typename mr::Matr4<T>::RowT(v.x() * v.z() * nco, v.y() * v.z() * nco, 0, 0),
-          typename mr::Matr4<T>::RowT(0, 0, 0, 0)
+                            0, n.x() * n.y() * nco, n.x() * n.z() * nco, 0,
+          n.x() * n.y() * nco,                   0, n.y() * n.z() * nco, 0,
+          n.x() * n.z() * nco, n.y() * n.z() * nco,                   0, 0,
+                            0,                   0,                   0, 0
         };
         Matr4<T> tmp3 = Matr4<T> {
-          typename mr::Matr4<T>::RowT(0, -v.z() * si, v.y() * si, 0),
-          typename mr::Matr4<T>::RowT(v.z() * si, 0, -v.x() * si, 0),
-          typename mr::Matr4<T>::RowT(-v.y() * si, v.x() * si, 0, 0),
-          typename mr::Matr4<T>::RowT(0, 0, 0, 0)
+                    0, -n.z() * si,  n.y() * si, 0,
+           n.z() * si,           0, -n.x() * si, 0,
+          -n.y() * si,  n.x() * si,           0, 0,
+                    0,           0,           0, 0
         };
 
         return tmp1 + tmp2 + tmp3;

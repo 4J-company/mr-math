@@ -155,9 +155,12 @@ namespace std {
       template<typename ParseContext>
         constexpr auto parse(ParseContext& ctx) {
           // skip all format specifiers
-          return ctx.end();
+          auto it = ctx.begin();
+          while (*it != '}')
+              ++it;
+          return it;
         }
-  
+
       template<typename FmtContext>
         auto format(U u, FmtContext& ctx) const {
           ostringstream out;

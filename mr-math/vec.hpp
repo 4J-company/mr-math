@@ -49,10 +49,10 @@ namespace mr {
 
       RowT _data;
 
-      constexpr Vec() = default;
+      constexpr Vec() noexcept = default;
 
       // from simd constructor
-      constexpr Vec(RowT row) : _data(row._data) {};
+      constexpr Vec(const RowT &row) noexcept : _data(row._data) {};
 
       // from elements constructor
       template <ArithmeticT... Args>
@@ -108,6 +108,7 @@ namespace mr {
         return std::sqrt(length2());
       }
 
+      // use 1 / length() for higher precision
       [[nodiscard]] constexpr T inversed_length() const {
         return fast_sqrt(length2());
       }
@@ -166,17 +167,17 @@ namespace mr {
       };
 
       // dot product
-      [[nodiscard]] constexpr T dot(const Vec<T, N> other) const noexcept {
+      [[nodiscard]] constexpr T dot(const Vec &other) const noexcept {
         return stdx::reduce(_data._data * other._data._data);
       }
 
-      [[nodiscard]] constexpr T operator&(const Vec<T, N> other) const noexcept {
+      [[nodiscard]] constexpr T operator&(const Vec &other) const noexcept {
         return dot(other);
       }
 
       template<ArithmeticT R>
         constexpr Vec operator*(const Matr<R, N> &other) const noexcept {
-          mr::Vec<T, N> tmp {};
+          Vec tmp {};
           for (size_t i = 0; i < N; i++) {
             tmp._data += (other._data[i] * _data[i])._data;
           }
@@ -185,8 +186,8 @@ namespace mr {
 
       template<ArithmeticT R>
         constexpr Vec operator*(const Matr<R, N + 1> &other) noexcept {
-          mr::Vec<T, N + 1> copy = mr::Vec<T, N + 1>(*this);
-          mr::Vec<T, N + 1> tmp {};
+          Vec<T, N + 1> copy = Vec<T, N + 1>(*this);
+          Vec<T, N + 1> tmp {};
 
           for (size_t i = 0; i < N; i++) {
             tmp._data += (other._data[i] * copy._data[i])._data;
@@ -197,7 +198,7 @@ namespace mr {
 
       template<ArithmeticT R>
         constexpr Vec & operator*=(const Matr<R, N> &other) noexcept {
-          mr::Vec<T, N> tmp {};
+          Vec tmp {};
           for (size_t i = 0; i < N; i++) {
             tmp._data += (other._data[i] * _data[i])._data;
           }
@@ -207,14 +208,24 @@ namespace mr {
 
       template<ArithmeticT R>
         constexpr Vec & operator*=(const Matr<R, N + 1> &other) noexcept {
-          mr::Vec<T, N + 1> copy = mr::Vec<T, N + 1>(*this);
-          mr::Vec<T, N + 1> tmp {};
+          Vec<T, N + 1> copy = Vec<T, N + 1>(*this);
+          Vec<T, N + 1> tmp {};
           for (size_t i = 0; i < N; i++) {
             tmp._data += (other._data[i] * copy._data[i])._data;
           }
           tmp._data += other._data[N]._data;
 
-          *this = mr::Vec<T, N>(tmp);
+          *this = Vec<T, N>(tmp);
+          return *this;
+        }
+
+        // reflect from other vector
+        constexpr Vec reflected(const NormT &n) const noexcept {
+          return -(*this - (2 * dot(n) * (Vec)n));
+        }
+
+        constexpr Vec & reflect(const NormT &n) noexcept {
+          *this = reflected(n);
           return *this;
         }
 

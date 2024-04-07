@@ -1,7 +1,7 @@
 #ifndef __Row_hpp_
 #define __Row_hpp_
 
-#include "operators.hpp"
+#include "operators/row.hpp"
 
 namespace mr {
   template <ArithmeticT T, std::size_t N>
@@ -9,7 +9,7 @@ namespace mr {
     public:
       using ValueT = T;
       using SimdT = SimdImpl<T, N>;
-      static constexpr size_t size = N;
+      inline static constexpr std::size_t size = N;
 
       SimdT _data{};
 

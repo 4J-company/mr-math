@@ -4,14 +4,22 @@
 #include "def.hpp"
 #include "row.hpp"
 #include "units.hpp"
+#include "operators/matr.hpp"
 
-namespace mr
-{
+namespace mr {
   // forward declarations
   template <ArithmeticT T, std::size_t N>
-    class Matr;
+    struct Matr;
 
   // common aliases
+  template <ArithmeticT T>
+    using Matr3 = Matr<T, 3>;
+
+  using Matr3f = Matr3<float>;
+  using Matr3d = Matr3<double>;
+  using Matr3i = Matr3<int>;
+  using Matr3u = Matr3<uint32_t>;
+
   template <ArithmeticT T>
     using Matr4 = Matr<T, 4>;
 
@@ -21,10 +29,18 @@ namespace mr
   using Matr4u = Matr4<uint32_t>;
 
   template <ArithmeticT T, std::size_t N>
-    class [[nodiscard]] Matr
-    {
+    struct [[nodiscard]] Matr : MatrOperators<Matr<T, N>> {
+    private:
+      using MatrOperators<Matr<T, N>>::_identity;
+      static constexpr T _epsilon = std::numeric_limits<T>::epsilon();
+
     public:
+      using ValueT = T;
+      inline static constexpr std::size_t size = N;
       using RowT = Row<T, N>;
+
+      inline static const Matr identity = _identity();
+      std::array<RowT, N> _data;
 
       template <typename... Args>
         requires (std::is_same_v<Args, RowT> && ...) &&
@@ -61,60 +77,8 @@ namespace mr
 
       constexpr ~Matr() = default;
 
-      // basic math operations
-      constexpr Matr & operator*=(const Matr &other) noexcept {
-        std::array<RowT, N> tmp {};
-        for (size_t i = 0; i < N; i++) {
-          for (size_t j = 0; j < N; j++) {
-            tmp[j] += other._data[i] * _data[j][i];
-          }
-        }
-        *this = tmp;
-        return *this;
-      }
-
-      constexpr Matr & operator+=(const Matr &other) noexcept {
-        for (int i = 0; i < N; i++) {
-          _data[i] += other._data[i];
-        }
-        return *this;
-      }
-
-      constexpr Matr & operator-=(const Matr &other) noexcept {
-        for (int i = 0; i < N; i++) {
-          _data[i] -= other._data[i];
-        }
-        return *this;
-      }
-
-      constexpr Matr operator*(const Matr &other) const noexcept {
-        std::array<RowT, N> tmp{};
-        for (size_t i = 0; i < N; i++) {
-          for (size_t j = 0; j < N; j++) {
-            tmp[j] += other._data[i] * _data[j][i];
-          }
-        }
-        return {tmp};
-      }
-
-      constexpr Matr operator+(const Matr &other) const noexcept {
-        std::array<RowT, N> tmp;
-        for (size_t i = 0; i < N; i++) {
-          tmp[i] = static_cast<RowT>(_data[i] + other._data[i]);
-        }
-        return {tmp};
-      }
-
-      constexpr Matr operator-(const Matr &other) const noexcept {
-        std::array<RowT, N> tmp;
-        for (size_t i = 0; i < N; i++) {
-          tmp[i] = _data[i] - other._data[i];
-        }
-        return {tmp};
-      }
-
-      // matrix related operations
-      [[nodiscard]] constexpr const RowT & operator[](size_t i) const noexcept {
+      [[nodiscard]] constexpr const RowT &
+      operator[](size_t i) const noexcept {
         return _data[i];
       }
 
@@ -133,11 +97,7 @@ namespace mr
         return det;
       }
 
-      [[nodiscard]] constexpr T operator!() const noexcept {
-        return determinant();
-      }
-
-      constexpr Matr transposed() const noexcept {
+      constexpr Matr<T, N> transposed() const noexcept {
         std::array<RowT, N> tmp1;
         for (size_t i = 0; i < N; i++) {
           tmp1[i] = SimdImpl<T, N>([this, i](auto j){ return _data[j][i]; });
@@ -145,14 +105,14 @@ namespace mr
         return {tmp1};
       }
 
-      constexpr Matr & transpose() noexcept {
+      constexpr Matr<T, N> & transpose() noexcept {
         for (size_t i = 0; i < N; i++) {
           _data[i] = SimdImpl<T, N>([this, i](auto j){ return _data[j][i]; });
         }
         return *this;
       }
 
-      constexpr Matr inversed() const noexcept {
+      constexpr Matr<T, N> inversed() const noexcept {
         constexpr auto io = std::ranges::iota_view{(size_t)0, N};
 
         std::array<Row<T, 2 * N>, N> tmp;
@@ -188,63 +148,9 @@ namespace mr
         return res;
       }
 
-      constexpr Matr & inverse() const noexcept {
+      constexpr Matr<T, N> & inverse() const noexcept {
         *this = inversed();
         return *this;
-      }
-
-      static constexpr Matr4<T> scale(const Vec3<T> &vec) noexcept {
-        return Matr4<T> {
-          typename mr::Matr4<T>::RowT(vec.x(), 0, 0, 0),
-          typename mr::Matr4<T>::RowT(0, vec.y(), 0, 0),
-          typename mr::Matr4<T>::RowT(0, 0, vec.z(), 0),
-          typename mr::Matr4<T>::RowT(0, 0, 0, 1)
-        };
-      }
-
-      static constexpr Matr4<T> translate(const Vec3<T> &vec) noexcept {
-        return Matr4<T> {
-          typename mr::Matr4<T>::RowT(1, 0, 0, 0),
-          typename mr::Matr4<T>::RowT(0, 1, 0, 0),
-          typename mr::Matr4<T>::RowT(0, 0, 1, 0),
-          typename mr::Matr4<T>::RowT(vec.x(), vec.y(), vec.z(), 1)
-        };
-      }
-
-      static constexpr Matr4<T> rotate_x(const Radians<T> &rad) noexcept {
-        T co = std::cos(rad._data);
-        T si = std::sin(rad._data);
-
-        return Matr4<T> {
-          typename mr::Matr4<T>::RowT(1, 0, 0, 0),
-          typename mr::Matr4<T>::RowT(0, co, si, 0),
-          typename mr::Matr4<T>::RowT(0, -si, co, 0),
-          typename mr::Matr4<T>::RowT(0, 0, 0, 1)
-        };
-      }
-
-      static constexpr Matr4<T> rotate_y(const Radians<T> &rad) noexcept {
-        T co = std::cos(rad._data);
-        T si = std::sin(rad._data);
-
-        return Matr4<T> {
-          typename mr::Matr4<T>::RowT(co, 0, -si, 0),
-          typename mr::Matr4<T>::RowT(0, 1, 0, 0),
-          typename mr::Matr4<T>::RowT(si, 0, co, 0),
-          typename mr::Matr4<T>::RowT(0, 0, 0, 1)
-        };
-      }
-
-      static constexpr Matr4<T> rotate_z(const Radians<T> &rad) noexcept {
-        T co = std::cos(rad._data);
-        T si = std::sin(rad._data);
-
-        return Matr4<T> {
-          typename mr::Matr4<T>::RowT(co, si, 0, 0),
-          typename mr::Matr4<T>::RowT(-si, co, 0, 0),
-          typename mr::Matr4<T>::RowT(0, 0, 1, 0),
-          typename mr::Matr4<T>::RowT(0, 0, 0, 1)
-        };
       }
 
       static constexpr Matr4<T> rotate(const Radians<T> &rad, const Vec3<T> &vec) noexcept {
@@ -269,37 +175,237 @@ namespace mr
 
         return tmp1 + tmp2 + tmp3;
       }
-
-      friend std::ostream & operator<<(std::ostream &s, const Matr &m) noexcept {
-        std::cout << std::endl;
-        for (size_t i = 0; i < N; i++) {
-          std::cout << m._data[i] << std::endl;
-        }
-        return s;
-      }
-
-    private:
-      static Matr _identity() {
-        std::array<RowT, N> id;
-        constexpr auto io = std::ranges::iota_view {(size_t)0, N};
-
-        std::transform(std::execution::par_unseq,
-          io.begin(), io.end(), id.begin(),
-          [&io](auto i) -> RowT {
-            return SimdImpl<T, N>([i](auto i2) { return i2 == i ? 1 : 0; });
-          });
-
-        return id;
-      }
-
-    public:
-      inline static const Matr identity = _identity();
-      std::array<RowT, N> _data;
-
-    private:
-      static constexpr T _epsilon = std::numeric_limits<T>::epsilon();
     };
-} // namespace mr
+
+  template <ArithmeticT T, std::size_t N> requires (N == 3 || N == 4)
+    struct ScaleMatr;
+
+  template <ArithmeticT T>
+    struct ScaleMatr<T, 3> : ScaleMatrOperators<ScaleMatr<T, 3>> {
+      using MatrT = Matr3<T>;
+      using VecT = Vec3<T>;
+
+      VecT scale_vector {};
+
+      ScaleMatr(const std::convertible_to<T> auto scale_factor) :
+        scale_vector(scale_factor) {}
+
+      template <std::convertible_to<T> P>
+      operator mr::Matr3<P>() {
+        return Matr3<P> {
+          Matr3<P>::RowT(scale_vector.x(), 0, 0),
+          Matr3<P>::RowT(0, scale_vector.y(), 0),
+          Matr3<P>::RowT(0, 0, scale_vector.z()),
+        };
+      }
+    };
+
+  template <ArithmeticT T>
+    struct ScaleMatr<T, 4> : ScaleMatrOperators<ScaleMatr<T, 4>> {
+      using MatrT = Matr4<T>;
+      using VecT = Vec4<T>;
+
+      // scale vector
+      VecT scale_vector {};
+
+      ScaleMatr(const std::convertible_to<VecT> auto scale_factor) :
+        scale_vector(scale_factor) {}
+
+      template <std::convertible_to<T> P>
+      operator mr::Matr4<P>() {
+        return Matr4<P> {
+          Matr4<P>::RowT(scale_vector.x(), 0, 0, 0),
+          Matr4<P>::RowT(0, scale_vector.y(), 0, 0),
+          Matr4<P>::RowT(0, 0, scale_vector.z(), 0),
+          Matr4<P>::RowT(0, 0, 0, scale_vector.w()),
+        };
+      }
+    };
+
+  template <ArithmeticT T>
+    struct TranslateMatr4 : TranslateMatrOperators<TranslateMatr4<T>> {
+      using MatrT = Matr4<T>;
+      using VecT = Vec4<T>;
+
+      // scale vector
+      VecT translate_vector {};
+
+      TranslateMatr4(const std::convertible_to<VecT> auto translate_factor) :
+        translate_vector(translate_factor) {}
+
+      template <std::convertible_to<T> P>
+      operator mr::Matr4<P>() {
+        return Matr4<P> {
+          Matr4<P>::RowT(1, 0, 0, 0),
+          Matr4<P>::RowT(0, 1, 0, 0),
+          Matr4<P>::RowT(0, 0, 1, 0),
+          translate_vector,
+        };
+      }
+    };
+
+  template <ArithmeticT T, std::size_t N>
+    struct RotateXMatr;
+
+  template <ArithmeticT T>
+    struct RotateXMatr<T, 3> : MatrOperators<RotateXMatr<T, 3>> {
+      using MatrT = Matr4<T>;
+      using RadT = Radians<T>;
+
+      RadT rotate_angle;
+
+      RotateXMatr(RadT rotate_angle) : rotate_angle(rotate_angle) {}
+
+      operator MatrT() {
+        T co = std::cos(rotate_angle._data);
+        T si = std::sin(rotate_angle._data);
+
+        return MatrT {
+          typename MatrT::RowT(1, 0, 0),
+          typename MatrT::RowT(0, co, si),
+          typename MatrT::RowT(0, -si, co),
+        };
+      }
+    };
+
+  template <ArithmeticT T>
+    struct RotateXMatr<T, 4> : MatrOperators<RotateXMatr<T, 4>> {
+      using MatrT = Matr4<T>;
+      using RadT = Radians<T>;
+
+      RadT rotate_angle;
+
+      RotateXMatr(RadT rotate_angle) : rotate_angle(rotate_angle) {}
+
+      operator MatrT() {
+        T co = std::cos(rotate_angle._data);
+        T si = std::sin(rotate_angle._data);
+
+        return Matr4<T> {
+          typename mr::Matr4<T>::RowT(1, 0, 0, 0),
+          typename mr::Matr4<T>::RowT(0, co, si, 0),
+          typename mr::Matr4<T>::RowT(0, -si, co, 0),
+          typename mr::Matr4<T>::RowT(0, 0, 0, 1)
+        };
+      }
+    };
+
+  template <ArithmeticT T, std::size_t N>
+    struct RotateYMatr;
+
+  template <ArithmeticT T>
+    struct RotateYMatr<T, 3> : MatrOperators<RotateYMatr<T, 3>> {
+      using MatrT = Matr3<T>;
+      using RadT = Radians<T>;
+
+      RadT rotate_angle;
+
+      RotateYMatr(RadT rotate_angle) : rotate_angle(rotate_angle) {}
+
+      operator MatrT() {
+        T co = std::cos(rotate_angle._data);
+        T si = std::sin(rotate_angle._data);
+
+        return MatrT {
+          typename MatrT::RowT(co, 0, -si),
+          typename MatrT::RowT(0, 1, 0),
+          typename MatrT::RowT(si, 0, co),
+        };
+      }
+    };
+
+  template <ArithmeticT T>
+    struct RotateYMatr<T, 4> : MatrOperators<RotateYMatr<T, 4>> {
+      using MatrT = Matr4<T>;
+      using RadT = Radians<T>;
+
+      RadT rotate_angle;
+
+      RotateYMatr(RadT rotate_angle) : rotate_angle(rotate_angle) {}
+
+      operator MatrT() {
+        T co = std::cos(rotate_angle._data);
+        T si = std::sin(rotate_angle._data);
+
+        return MatrT {
+          typename MatrT::RowT(co, 0, -si, 0),
+          typename MatrT::RowT(0, 1, 0, 0),
+          typename MatrT::RowT(si, 0, co, 0),
+          typename MatrT::RowT(0, 0, 0, 1)
+        };
+      }
+    };
+
+  template <ArithmeticT T, std::size_t N>
+    struct RotateZMatr;
+
+  template <ArithmeticT T>
+    struct RotateZMatr<T, 3> : MatrOperators<RotateZMatr<T, 3>> {
+      using MatrT = Matr3<T>;
+      using RadT = Radians<T>;
+
+      RadT rotate_angle;
+
+      RotateZMatr(RadT rotate_angle) : rotate_angle(rotate_angle) {}
+
+      operator MatrT() {
+        T co = std::cos(rotate_angle._data);
+        T si = std::sin(rotate_angle._data);
+
+        return MatrT {
+          typename MatrT::RowT(co, si, 0),
+          typename MatrT::RowT(-si, co, 0),
+          typename MatrT::RowT(0, 0, 1),
+        };
+      }
+    };
+
+  template <ArithmeticT T>
+    struct RotateZMatr<T, 4> : MatrOperators<RotateZMatr<T, 4>> {
+      using MatrT = Matr4<T>;
+      using RadT = Radians<T>;
+
+      RadT rotate_angle;
+
+      RotateZMatr(RadT rotate_angle) : rotate_angle(rotate_angle) {}
+
+      operator MatrT() {
+        T co = std::cos(rotate_angle._data);
+        T si = std::sin(rotate_angle._data);
+
+        return MatrT {
+          typename MatrT::RowT(co, si, 0, 0),
+          typename MatrT::RowT(-si, co, 0, 0),
+          typename MatrT::RowT(0, 0, 1, 0),
+          typename MatrT::RowT(0, 0, 0, 1)
+        };
+      }
+    };
+
+  template <typename T>
+      static constexpr Matr4<T> rotate(const Radians<T> &rad, const Vec3<T> &vec) noexcept {
+        T co = std::cos(rad._data);
+        T si = std::sin(rad._data);
+        T nco = 1 - co;
+        auto v = vec.normalized();
+
+        Matr4<T> tmp1 = scale(v * v * nco + Vec<T, 3>{co});
+        Matr4<T> tmp2 = Matr4<T> {
+          typename mr::Matr4<T>::RowT(0, v.x() * v.y() * nco, v.x() * v.z() * nco, 0),
+          typename mr::Matr4<T>::RowT(v.x() * v.y() * nco, 0, v.y() * v.z() * nco, 0),
+          typename mr::Matr4<T>::RowT(v.x() * v.z() * nco, v.y() * v.z() * nco, 0, 0),
+          typename mr::Matr4<T>::RowT(0, 0, 0, 0)
+        };
+        Matr4<T> tmp3 = Matr4<T> {
+          typename mr::Matr4<T>::RowT(0, -v.z() * si, v.y() * si, 0),
+          typename mr::Matr4<T>::RowT(v.z() * si, 0, -v.x() * si, 0),
+          typename mr::Matr4<T>::RowT(-v.y() * si, v.x() * si, 0, 0),
+          typename mr::Matr4<T>::RowT(0, 0, 0, 0)
+        };
+
+        return tmp1 + tmp2 + tmp3;
+      }
+}
 
 #ifdef __cpp_lib_format
 // std::format support

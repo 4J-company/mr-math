@@ -3,13 +3,14 @@
 
 #include "def.hpp"
 #include "row.hpp"
+#include "operators/row.hpp"
 
 namespace mr {
   // forward declarations
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
     struct Vec;
   template <ArithmeticT T, std::size_t N>
-    class Matr;
+    struct Matr;
 
   template <ArithmeticT T>
     using Vec2 = Vec<T, 2>;
@@ -37,12 +38,11 @@ namespace mr {
 
   // base vector (use aliases for full functional)
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
-    struct [[nodiscard]] Vec : public RowOperators<Vec<T, N>>
-    {
+    struct [[nodiscard]] Vec : public RowOperators<Vec<T, N>> {
     public:
       using ValueT = T;
       using RowT = Row<T, N>;
-      static constexpr size_t size = N;
+      inline static constexpr std::size_t size = N;
 
       RowT _data;
 

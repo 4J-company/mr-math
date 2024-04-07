@@ -1,7 +1,7 @@
-#ifndef __Operators_hpp__
-#define __Operators_hpp__
+#ifndef __operators_units_hpp_
+#define __operators_units_hpp_
 
-#include "def.hpp"
+#include "../def.hpp"
 
 namespace mr {
   template <typename DerivedT>
@@ -60,63 +60,6 @@ namespace mr {
         return -rhs._data;
       }
     };
-
-  template <typename DerivedT>
-    struct RowOperators : UnitOperators<DerivedT> {
-      friend constexpr DerivedT
-      operator*(const DerivedT &lhs, const DerivedT &rhs) noexcept {
-        return DerivedT{lhs._data * rhs._data};
-      }
-
-      friend constexpr DerivedT
-      operator/(const DerivedT &lhs, const DerivedT &rhs) noexcept {
-        return DerivedT{lhs._data / rhs._data};
-      }
-
-      friend constexpr DerivedT
-      operator<<(const DerivedT &lhs, const DerivedT &rhs) noexcept {
-        return DerivedT{lhs._data << rhs._data};
-      }
-
-      friend constexpr DerivedT
-      operator>>(const DerivedT &lhs, const DerivedT &rhs) noexcept {
-        return DerivedT{lhs._data >> rhs._data};
-      }
-
-      friend constexpr DerivedT &
-      operator*=(DerivedT &lhs, const DerivedT &rhs) noexcept {
-        lhs._data *= rhs._data;
-        return lhs;
-      }
-
-      friend constexpr DerivedT &
-      operator/=(DerivedT &lhs, const DerivedT &rhs) noexcept {
-        lhs._data /= rhs._data;
-        return lhs;
-      }
-
-      friend constexpr DerivedT &
-      operator<<=(DerivedT &lhs, const DerivedT &rhs) noexcept {
-        lhs._data <<= rhs._data;
-        return lhs;
-      }
-
-      friend constexpr DerivedT &
-      operator>>=(DerivedT &lhs, const DerivedT &rhs) noexcept {
-        lhs._data >>= rhs._data;
-        return lhs;
-      }
-
-      friend std::ostream &
-      operator<<(std::ostream &s, const DerivedT &v) noexcept {
-        s << '(';
-        for (size_t i = 0; i < DerivedT::size - 1; i++) {
-          s << v[i] << ", ";
-        }
-        s << v[DerivedT::size - 1] << ')';
-        return s;
-      }
-    };
 }
 
-#endif // __Operators_hpp__
+#endif // __operators_units_hpp_

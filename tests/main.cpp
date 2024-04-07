@@ -57,7 +57,7 @@ BENCHMARK(BM_camera_rotation);
 
 static void BM_vector_rotation(benchmark::State& state) {
   for (auto _ : state) {
-    auto v3 = v1 * mr::Matr4f::rotate_z(mr::Radiansf(mr::pi));
+    auto v3 = v1 * mr::RotateZMatr<float, 4>(mr::Radiansf(mr::pi));
     benchmark::DoNotOptimize(v3);
   }
 }
@@ -65,7 +65,7 @@ BENCHMARK(BM_vector_rotation);
 
 static void BM_vector_scale(benchmark::State& state) {
   for (auto _ : state) {
-    auto v3 = v1 * mr::Matr4f::scale({1, 2, 3});
+    auto v3 = v1 * mr::ScaleMatr<float, 3>({1, 2, 3});
     benchmark::DoNotOptimize(v3);
   }
 }

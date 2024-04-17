@@ -23,8 +23,9 @@ namespace stdx {
   using namespace std::experimental::__proposed;
 }
 
-#if defined(__AVX__)
+#if defined(__SSE__)
 #include <immintrin.h>
+#include <xmmintrin.h>
 #elif defined(__aarch64__)
 #include <arm64_neon.h>
 #elif defined(__arm__)
@@ -34,6 +35,34 @@ namespace stdx {
 namespace mr {
   template <typename T>
     concept ArithmeticT = std::integral<T> || std::floating_point<T>;
+
+  template <std::size_t ... Is1>
+    inline constexpr auto zero_index_sequence_impl(
+        std::index_sequence<Is1...> const &)
+    -> decltype( std::index_sequence<(Is1, 0)...>{} );
+
+  template <std::size_t S>
+    using zero_index_sequence = decltype(zero_index_sequence_impl(std::make_index_sequence<S>{}));
+
+  template<typename Seq1, typename Seq2>
+    struct concat_sequence;
+
+  template<std::size_t... Ints1, std::size_t... Ints2>
+    struct concat_sequence<std::index_sequence<Ints1...>, std::index_sequence<Ints2...>> {
+      using type = std::index_sequence<Ints1..., Ints2...>;
+    };
+
+  template<typename Seq1, typename Seq2>
+    using concat_sequence_t = typename concat_sequence<Seq1, Seq2>::type;
+
+  template <std::size_t N, std::size_t... Is>
+    requires (sizeof...(Is) < N)
+    using resized_index_sequence =
+      concat_sequence_t<
+        std::index_sequence<Is...>,
+        zero_index_sequence<N - sizeof...(Is)>
+      >;
+
 
   // fast inverse implementation for floats
   // use 1 / std::sqrt for higher precision

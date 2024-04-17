@@ -179,6 +179,51 @@ namespace mr {
           _data = tmp2;
         }
 
+      // fixed_size_simd -> intrinsics
+      [[nodiscard]]
+      constexpr auto to_underlying() const noexcept {
+        auto tmp2 =
+          stdx::__vector_convert<stdx::fixed_size_simd<float, 8>>(_data,
+              std::index_sequence<_data.size()>{});
+
+        stdx::native_simd<T> tmp = stdx::simd_cast<stdx::native_simd<T>>(tmp2);
+        auto tmp3 = stdx::__as_vector(tmp);
+
+        if constexpr (stdx::native_simd<T>::size == 8) {
+#if defined(__SSE__)
+          return _mm256_castps256_ps128(tmp3);
+#elif __arm__ || __aarch64__
+#endif
+        }
+        return tmp3;
+      };
+
+      // intrinsics -> fixed_size_simd
+      constexpr void from_underlying(auto vec) noexcept {
+#if defined(__SSE__)
+#elif __arm__ || __aarch64__
+#endif
+      }
+
+      template <size_t ...Indices>
+        [[nodiscard]] constexpr Row shuffled(std::index_sequence<Indices...>) const noexcept
+        requires (sizeof...(Indices) == size) {
+
+          auto underlying = to_underlying();
+
+#if defined(__SSE__)
+          underlying = _mm_shuffle_ps(underlying, underlying, _MM_SHUFFLE(Indices...));
+#elif __arm__ || __aarch64__
+#endif
+
+          return Row{}.from_underlying(underlying);
+        }
+
+      template <typename ...Args> requires (std::is_same_v<Args, std::size_t> && ...)
+      [[nodiscard]] constexpr Row shuffled(Args... indices) const noexcept {
+        return shuffled<resized_index_sequence<stdx::native_simd<T>::size, indices...>>();
+      }
+
       [[nodiscard]] constexpr T operator[](std::size_t i) const {
         return _data[i];
       }
@@ -210,7 +255,7 @@ namespace std {
           // skip all format specifiers
           return ctx.end();
         }
-  
+
       template<typename FmtContext>
         auto format(const mr::Row<T, N> &r, FmtContext& ctx) const {
           ostringstream out;

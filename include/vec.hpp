@@ -80,27 +80,15 @@ namespace mr
       // frow swizzle constructor
       template <typename V, size_t X, size_t Y> requires (N == 2)
         Vec(Swizzle<V, N, X, Y> p) :
-          Vec {
-            p.ref.template get<X>(),
-            p.ref.template get<Y>()
-          } {}
+          Vec { p.ref.shuffled(X, Y) } {}
 
       template <typename V, size_t X, size_t Y, size_t Z> requires (N == 3)
         Vec(Swizzle<V, N, X, Y, Z> p) :
-          Vec {
-            p.ref.template get<X>(),
-            p.ref.template get<Y>(),
-            p.ref.template get<Z>()
-          } {}
+          Vec { p.ref.shuffled(X, Y, Z) } {}
 
       template <typename V, size_t X, size_t Y, size_t Z, size_t W> requires (N == 4)
         Vec(Swizzle<V, N, X, Y, Z, W> p) :
-          Vec {
-            p.ref.template get<X>(),
-            p.ref.template get<Y>(),
-            p.ref.template get<Z>(),
-            p.ref.template get<W>()
-          } {}
+          Vec { p.ref.shuffled(X, Y, Z, W) } {}
 
       // setters
       constexpr void x(T x) noexcept requires (N >= 1) { _set_ind(0, x); }
@@ -109,10 +97,6 @@ namespace mr
       constexpr void w(T w) noexcept requires (N >= 4) { _set_ind(3, w); }
 
       // getters
-      // [[nodiscard]] constexpr T x() const noexcept requires (N >= 1) { return _data[0]; }
-      // [[nodiscard]] constexpr T y() const noexcept requires (N >= 2) { return _data[1]; }
-      // [[nodiscard]] constexpr T z() const noexcept requires (N >= 3) { return _data[2]; }
-      // [[nodiscard]] constexpr T w() const noexcept requires (N >= 4) { return _data[3]; }
       [[nodiscard]] constexpr Swizzle<Vec, 1, 0> x() const noexcept requires (N >= 1) { return {*this}; }
       [[nodiscard]] constexpr Swizzle<Vec, 1, 1> y() const noexcept requires (N >= 2) { return {*this}; }
       [[nodiscard]] constexpr Swizzle<Vec, 1, 2> z() const noexcept requires (N >= 3) { return {*this}; }
@@ -124,33 +108,19 @@ namespace mr
 
       // cross product
       constexpr Vec cross([[maybe_unused]] const Vec &other) const noexcept requires (N == 3) {
-#if defined(__AVX__)
-        auto as_vector = [](auto vec) {
-          auto tmp2 =
-            stdx::__vector_convert<stdx::fixed_size_simd<float, 8>>(vec,
-              std::index_sequence<vec.size()>{});
+#if defined(__SSE__)
+        RowT this_simd = _data.shuffled(3, 0, 2, 1);
+        RowT other_simd = other._data.shuffled(3, 1, 0, 2);
 
-          stdx::native_simd<T> tmp = stdx::simd_cast<stdx::native_simd<T>>(tmp2);
-          auto tmp3 = stdx::__as_vector(tmp);
-          return _mm256_castps256_ps128(tmp3);
-        };
+        RowT result_simd = this_simd * other_simd;
 
-        auto this_simd = as_vector(_data._data);
-        auto other_simd = as_vector(other._data._data);
+        this_simd = this_simd.shuffled(3, 0, 2, 1);
+        other_simd = other_simd.shuffled(3, 1, 0, 2);
 
-        this_simd = _mm_shuffle_ps(this_simd, this_simd, _MM_SHUFFLE(3, 0, 2, 1));
-        other_simd = _mm_shuffle_ps(other_simd, other_simd, _MM_SHUFFLE(3, 1, 0, 2));
-        auto result_simd = _mm_mul_ps(this_simd, other_simd);
-
-        this_simd = _mm_shuffle_ps(this_simd, this_simd, _MM_SHUFFLE(3, 0, 2, 1));
-        other_simd = _mm_shuffle_ps(other_simd, other_simd, _MM_SHUFFLE(3, 1, 0, 2));
-
-        return {};
-        // return stdx::native_simd<T>(_mm256_castps128_ps256(this_simd + other_simd + result_simd));
-        // return typename RowT::SimdT(this_simd + other_simd + result_simd);
+        return this_simd + other_simd + result_simd;
 #elif __arm__ || __aarch64__
-        auto this_simd = stdx::simd_cast<__m256i>(other);
-        auto other_simd = stdx::simd_cast<__m256i>(other);
+        auto this_simd = _data.to_underlying();
+        auto other_simd = other._data.to_underlying();
 
         float32x2_t this_simd_xy = vget_low_f32(this_simd);
         float32x2_t other_simd_xy = vget_low_f32(other_simd);
@@ -161,8 +131,12 @@ namespace mr
         float32x2_t this_simd_zz = vdup_lane_f32(vget_high_f32(this_simd), 0);
         float32x2_t other_simd_zz = vdup_lane_f32(vget_high_f32(other_simd), 0);
 
-        float32x2_t result_simd = vmulq_f32(vcombine_f32(this_simd_yx, this_simd_xy), vcombine_f32(other_simd_zz, other_simd_yx));
-        result_simd = vmlsq_f32(result_simd , vcombine_f32(this_simd_zz, this_simd_yx), vcombine_f32(other_simd_yx, other_simd_xy));
+        float32x2_t result_simd = vmulq_f32(
+            vcombine_f32(this_simd_yx, this_simd_xy),
+            vcombine_f32(other_simd_zz, other_simd_yx));
+        result_simd = vmlsq_f32(result_simd,
+            vcombine_f32(this_simd_zz, this_simd_yx),
+            vcombine_f32(other_simd_yx, other_simd_xy));
         vResult = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(result_simd), g_XMFlipY));
         return vreinterpretq_f32_u32(vandq_u32(vreinterpretq_u32_f32(result_simd), g_XMMask3));
 #else

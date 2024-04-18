@@ -107,15 +107,15 @@ namespace mr
       template <size_t I> requires (I < N) constexpr T get() const { return _data[I]; }
 
       // cross product
-      constexpr Vec cross([[maybe_unused]] const Vec &other) const noexcept requires (N == 3) {
+      constexpr Vec cross(const Vec &other) const noexcept requires (N == 3) {
 #if defined(__SSE__)
-        RowT this_simd = _data.shuffled(3, 0, 2, 1);
-        RowT other_simd = other._data.shuffled(3, 1, 0, 2);
+        RowT this_simd = _data.template shuffled<3, 0, 2, 1>({});
+        RowT other_simd = other._data.template shuffled<3, 1, 0, 2>({});
 
         RowT result_simd = this_simd * other_simd;
 
-        this_simd = this_simd.shuffled(3, 0, 2, 1);
-        other_simd = other_simd.shuffled(3, 1, 0, 2);
+        this_simd = this_simd.template shuffled<3, 0, 2, 1>({});
+        other_simd = other_simd.template shuffled<3, 1, 0, 2>({});
 
         return this_simd + other_simd + result_simd;
 #elif __arm__ || __aarch64__

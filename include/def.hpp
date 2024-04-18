@@ -23,15 +23,6 @@ namespace stdx {
   using namespace std::experimental::__proposed;
 }
 
-#if defined(__SSE__)
-#include <immintrin.h>
-#include <xmmintrin.h>
-#elif defined(__aarch64__)
-#include <arm64_neon.h>
-#elif defined(__arm__)
-#include <arm_neon.h>
-#endif
-
 namespace mr {
   template <typename T>
     concept ArithmeticT = std::integral<T> || std::floating_point<T>;

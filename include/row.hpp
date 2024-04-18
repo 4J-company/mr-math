@@ -2,6 +2,8 @@
 #define __Row_hpp_
 
 #include "def.hpp"
+#include <experimental/bits/simd.h>
+#include <type_traits>
 
 namespace mr {
   template <typename T, std::size_t N>
@@ -140,6 +142,9 @@ namespace mr {
         _data.copy_from(data, stdx::element_aligned);
       }
 
+      template <typename V> requires (stdx::__is_vectorizable_v<V>)
+        constexpr Row(V *vec) noexcept { from_underlying(vec); }
+
       // from elements constructor
       template <std::convertible_to<T>... Args>
       requires (sizeof...(Args) >= 2) && (sizeof...(Args) <= N)
@@ -182,47 +187,39 @@ namespace mr {
       // fixed_size_simd -> intrinsics
       [[nodiscard]]
       constexpr auto to_underlying() const noexcept {
-        auto tmp2 =
-          stdx::__vector_convert<stdx::fixed_size_simd<float, 8>>(_data,
-              std::index_sequence<_data.size()>{});
-
-        stdx::native_simd<T> tmp = stdx::simd_cast<stdx::native_simd<T>>(tmp2);
-        auto tmp3 = stdx::__as_vector(tmp);
-
-        if constexpr (stdx::native_simd<T>::size == 8) {
-#if defined(__SSE__)
-          return _mm256_castps256_ps128(tmp3);
-#elif __arm__ || __aarch64__
-#endif
-        }
-        return tmp3;
+        return
+          stdx::__as_vector(
+            stdx::static_simd_cast<stdx::native_simd<T>>(
+              stdx::concat(
+                _data,
+                stdx::fixed_size_simd<T, stdx::native_simd<T>::size() - N>{}
+              )
+            )
+          );
       };
 
       // intrinsics -> fixed_size_simd
-      constexpr void from_underlying(auto vec) noexcept {
-#if defined(__SSE__)
-#elif __arm__ || __aarch64__
-#endif
-      }
-
-      template <size_t ...Indices>
-        [[nodiscard]] constexpr Row shuffled(std::index_sequence<Indices...>) const noexcept
-        requires (sizeof...(Indices) == size) {
-
-          auto underlying = to_underlying();
-
-#if defined(__SSE__)
-          underlying = _mm_shuffle_ps(underlying, underlying, _MM_SHUFFLE(Indices...));
-#elif __arm__ || __aarch64__
-#endif
-
-          return Row{}.from_underlying(underlying);
+      template <typename V> requires (stdx::__is_vectorizable_v<V>)
+        constexpr void from_underlying(V *vec) noexcept {
+          // TODO: normal conversion
+          std::memcpy(&_data, vec, N * sizeof(T));
         }
 
-      template <typename ...Args> requires (std::is_same_v<Args, std::size_t> && ...)
-      [[nodiscard]] constexpr Row shuffled(Args... indices) const noexcept {
-        return shuffled<resized_index_sequence<stdx::native_simd<T>::size, indices...>>();
-      }
+      template <size_t ...Indices>
+        requires (std::max({Indices...}) < stdx::native_simd<T>::size())
+        [[nodiscard]] constexpr Row
+        shuffled(std::index_sequence<Indices...>) const noexcept {
+          auto underlying = to_underlying();
+          underlying = __builtin_shufflevector(underlying, underlying, Indices...);
+          return Row(underlying);
+        }
+
+      // template <std::convertible_to<std::size_t> ...Args>
+      // [[nodiscard]] constexpr Row
+      // shuffled(Args... indices) const noexcept
+      // requires (std::max({indices...}) < stdx::native_simd<T>::size()) {
+      //   return shuffled<resized_index_sequence<stdx::native_simd<T>::size(), indices...>>();
+      // }
 
       [[nodiscard]] constexpr T operator[](std::size_t i) const {
         return _data[i];

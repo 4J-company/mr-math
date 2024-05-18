@@ -248,7 +248,7 @@ namespace mr
         };
       }
 
-      static constexpr Matr4<T> rotate(const Radians<T> &rad, const Norm<T, N> &n) noexcept {
+      static constexpr Matr4<T> rotate(const Radians<T> &rad, const Norm<T, 3> &n) noexcept {
         T co = std::cos(rad._data);
         T si = std::sin(rad._data);
         T nco = 1 - co;

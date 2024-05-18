@@ -5,6 +5,8 @@
 #include "vec.hpp"
 
 namespace mr {
+  template <std::floating_point T>
+    struct Rotation;
 
   // common aliases
   template <ArithmeticT T>
@@ -79,6 +81,10 @@ namespace mr {
         return dot(other);
       }
 
+      [[nodiscard]] constexpr VecT operator*(const Norm &other) const noexcept {
+        return _data * other._data;
+      }
+
       // matrix multiplication
       template<ArithmeticT R>
         constexpr VecT operator*(const Matr<R, N> &other) const noexcept {
@@ -111,8 +117,8 @@ namespace mr {
         }
 
       private:
-        // allow VecT::normalize() to return Norm
-        friend VecT;
+        friend class Vec<T, N>;
+        friend class Rotation<T>;
         constexpr Norm(const VecT &v) noexcept : _data(v) {}
 
         VecT _data;

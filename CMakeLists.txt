@@ -25,6 +25,21 @@ endif()
 
 include(cmake/dependencies.cmake)
 
+add_library(${CMAKE_PROJECT_NAME}-lib INTERFACE
+    mr-math/camera.hpp
+    mr-math/def.hpp
+    mr-math/matr.hpp
+    mr-math/norm.hpp
+    mr-math/operators.hpp
+    mr-math/rot.hpp
+    mr-math/row.hpp
+    mr-math/units.hpp
+    mr-math/vec.hpp
+    mr-math/math.hpp
+)
+target_include_directories(${CMAKE_PROJECT_NAME}-lib INTERFACE ${CMAKE_CURRENT_LIST_DIR})
+target_link_libraries(${CMAKE_PROJECT_NAME}-lib INTERFACE Vc)
+
 if (ENABLE_BENCHMARK)
   add_executable(${CMAKE_PROJECT_NAME}-bench "bench/main.cpp")
 
@@ -33,5 +48,5 @@ if (ENABLE_BENCHMARK)
   set_property(TARGET ${CMAKE_PROJECT_NAME}-bench PROPERTY COMPILE_FLAGS "${MY_CXX_FLAGS}")
 
   target_include_directories(${CMAKE_PROJECT_NAME}-bench PRIVATE ${CMAKE_CURRENT_LIST_DIR})
-  target_link_libraries(${CMAKE_PROJECT_NAME}-bench PRIVATE benchmark)
+  target_link_libraries(${CMAKE_PROJECT_NAME}-bench PRIVATE benchmark ${CMAKE_PROJECT_NAME}-lib)
 endif()

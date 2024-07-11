@@ -6,6 +6,12 @@ file(
 )
 include(${CMAKE_CURRENT_BINARY_DIR}/cmake/CPM.cmake)
 
+CPMFindPackage(
+  NAME Vc
+  GITHUB_REPOSITORY VcDevel/Vc
+  GIT_TAG 1.4
+)
+
 if (ENABLE_BENCHMARK)
   CPMFindPackage(
     NAME benchmark

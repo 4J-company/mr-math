@@ -57,6 +57,9 @@ namespace mr {
 
       // cross product
       constexpr VecT cross(const VecT &other) const noexcept requires (N == 3) {
+        return RowT(_data._data.shifted(-1) * other._data._data.shifted(1)
+          - _data._data.shifted(1) * other._data._data.shifted(-1));
+#if 0
         std::array<T, 3> arr {
           _data[1] * other._data[2] - _data[2] * other._data[1],
           _data[2] * other._data[0] - _data[0] * other._data[2],
@@ -66,6 +69,7 @@ namespace mr {
         SimdImpl<T, 3> ans;
         ans.copy_from(arr.data(), stdx::element_aligned);
         return {ans};
+#endif
       }
 
       constexpr VecT operator%(const VecT &other) const noexcept requires (N == 3) {
@@ -74,7 +78,7 @@ namespace mr {
 
       // dot product
       [[nodiscard]] constexpr T dot(const VecT &other) const noexcept {
-        return stdx::reduce(_data._data * other._data._data);
+        return (_data._data * other._data._data).sum();
       }
 
       [[nodiscard]] constexpr T operator&(const VecT &other) const noexcept {

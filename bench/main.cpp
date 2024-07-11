@@ -128,6 +128,7 @@ static void BM_matrix_multiplication(benchmark::State& state) {
 
 BENCHMARK(BM_matrix_multiplication);
 
+#if 0
 static void BM_matrix_inversed(benchmark::State& state) {
   for (auto _ : state) {
     auto m3 = m1.inversed();
@@ -136,6 +137,7 @@ static void BM_matrix_inversed(benchmark::State& state) {
 }
 
 BENCHMARK(BM_matrix_inversed);
+#endif
 
 static void BM_matrix_determinant(benchmark::State& state) {
   for (auto _ : state) {

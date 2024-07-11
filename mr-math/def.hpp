@@ -1,7 +1,6 @@
 #ifndef __def_hpp_
 #define __def_hpp_
 
-#include <experimental/simd>
 #include <type_traits>
 #include <execution>
 #include <algorithm>
@@ -19,7 +18,9 @@
   #include <format>
 #endif
 
-namespace stdx = std::experimental;
+#include "Vc/Vc"
+
+namespace stdx = Vc;
 
 namespace mr {
   template <typename T>

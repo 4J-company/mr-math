@@ -153,6 +153,8 @@ namespace mr
         return *this;
       }
 
+// TODO: implement this using Vc library
+#if 0
       constexpr Matr inversed() const noexcept {
         constexpr auto io = std::ranges::iota_view{(size_t)0, N};
 
@@ -160,7 +162,7 @@ namespace mr
         std::for_each(std::execution::par_unseq, io.begin(), io.end(),
                       [&tmp, this](auto i) {
                         // adding temporary variable here brings performance down 2.5 times (reason unknown)
-                        tmp[i] += stdx::static_simd_cast<SimdImpl<T, 2 * N>>(stdx::concat(_data[i]._data, identity[i]._data));
+                        tmp[i] += stdx::simd_cast<SimdImpl<T, 2 * N>>(stdx::concat(_data[i]._data, identity[i]._data));
                       });
 
         // null bottom triangle
@@ -182,8 +184,8 @@ namespace mr
         std::array<RowT, N> res;
         std::for_each(std::execution::par_unseq, io.begin(), io.end(),
           [&tmp, &res](auto i) {
-            auto [_, b] = stdx::split<N, N>(tmp[i]._data);
-            res[i] = stdx::static_simd_cast<SimdImpl<T, N>>(b);
+            auto [a, b] = stdx::split<N, N>(tmp[i]._data);
+            res[i] = stdx::simd_cast<SimdImpl<T, N>>(b);
           });
 
         return res;
@@ -193,6 +195,7 @@ namespace mr
         *this = inversed();
         return *this;
       }
+#endif
 
       static constexpr Matr4<T> scale(const Vec3<T> &vec) noexcept {
         return Matr4<T> {

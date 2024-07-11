@@ -63,8 +63,11 @@ namespace mr {
       template <ArithmeticT R, std::size_t S>
         constexpr Vec(const Vec<R, S> &v) noexcept : _data(v._data) {}
 
+// TODO: implement this using Vc library
+#if 0
       template <ArithmeticT R, std::size_t S, ArithmeticT ... Args>
         constexpr Vec(const Vec<R, S> &v, Args ... args) noexcept : _data(v, args...) {}
+#endif
 
       // setters
       constexpr void x(T x) noexcept requires (N >= 1) { _set_ind(0, x); }
@@ -84,6 +87,10 @@ namespace mr {
 
       // cross product
       constexpr Vec cross(const Vec &other) const noexcept requires (N == 3) {
+        return RowT(_data._data.shifted(-1) * other._data._data.shifted(1)
+          - _data._data.shifted(1) * other._data._data.shifted(-1));
+
+#if 0
         std::array<T, 3> arr {
           _data[1] * other._data[2] - _data[2] * other._data[1],
           _data[2] * other._data[0] - _data[0] * other._data[2],
@@ -93,6 +100,7 @@ namespace mr {
         SimdImpl<T, 3> ans;
         ans.copy_from(arr.data(), stdx::element_aligned);
         return {ans};
+#endif
       }
 
       constexpr Vec operator%(const Vec &other) const noexcept requires (N == 3) {
@@ -101,7 +109,7 @@ namespace mr {
 
       // length methods
       [[nodiscard]] constexpr T length2() const noexcept {
-        return stdx::reduce(_data._data * _data._data); // sum by default
+        return (_data._data * _data._data).sum();
       }
 
       [[nodiscard]] constexpr T length() const noexcept {
@@ -168,7 +176,7 @@ namespace mr {
 
       // dot product
       [[nodiscard]] constexpr T dot(const Vec &other) const noexcept {
-        return stdx::reduce(_data._data * other._data._data);
+        return (_data._data * other._data._data).sum();
       }
 
       [[nodiscard]] constexpr T operator&(const Vec &other) const noexcept {

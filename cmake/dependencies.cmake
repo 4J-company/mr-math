@@ -8,7 +8,7 @@ include(${CMAKE_CURRENT_BINARY_DIR}/cmake/CPM.cmake)
 
 CPMFindPackage(
   NAME Vc
-  GITHUB_REPOSITORY VcDevel/Vc
+  GITHUB_REPOSITORY 4J-company/Vc
   GIT_TAG 1.4
 )
 

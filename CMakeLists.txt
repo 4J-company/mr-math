@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.27)
 
-set(CMAKE_CXX_COMPILER g++)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_BUILD_TYPE Release)
 
 project(mr-math VERSION 1.0.0)
 

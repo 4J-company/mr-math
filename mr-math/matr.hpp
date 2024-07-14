@@ -296,12 +296,17 @@ namespace mr
       }
 
     public:
-      inline static const Matr identity = _identity();
+      static const Matr identity;
       std::array<RowT, N> _data;
 
     private:
-      static constexpr T _epsilon = std::numeric_limits<T>::epsilon();
+      inline static const T _epsilon = std::numeric_limits<T>::epsilon();
     };
+
+    // this is required to initialize 'Matr::_identity' on MSVC 
+    template <ArithmeticT T, std::size_t N>
+      const Matr<T, N> Matr<T, N>::identity = Matr<T, N>::_identity();
+
 } // namespace mr
 
 #ifdef __cpp_lib_format

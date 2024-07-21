@@ -159,7 +159,7 @@ namespace mr
         constexpr auto io = std::ranges::iota_view{(size_t)0, N};
 
         std::array<Row<T, 2 * N>, N> tmp;
-        std::for_each(std::execution::par_unseq, io.begin(), io.end(),
+        std::for_each(io.begin(), io.end(),
                       [&tmp, this](auto i) {
                         // adding temporary variable here brings performance down 2.5 times (reason unknown)
                         tmp[i] += stdx::simd_cast<SimdImpl<T, 2 * N>>(stdx::concat(_data[i]._data, identity[i]._data));
@@ -182,7 +182,7 @@ namespace mr
         }
 
         std::array<RowT, N> res;
-        std::for_each(std::execution::par_unseq, io.begin(), io.end(),
+        std::for_each(io.begin(), io.end(),
           [&tmp, &res](auto i) {
             auto [a, b] = stdx::split<N, N>(tmp[i]._data);
             res[i] = stdx::simd_cast<SimdImpl<T, N>>(b);
@@ -286,7 +286,7 @@ namespace mr
         std::array<RowT, N> id;
         constexpr auto io = std::ranges::iota_view {(size_t)0, N};
 
-        std::transform(std::execution::par_unseq,
+        std::transform(
           io.begin(), io.end(), id.begin(),
           [&io](auto i) -> RowT {
             return SimdImpl<T, N>([i](auto i2) { return i2 == i ? 1 : 0; });

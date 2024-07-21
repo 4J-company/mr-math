@@ -10,6 +10,8 @@ CPMFindPackage(
   NAME Vc
   GITHUB_REPOSITORY 4J-company/Vc
   GIT_TAG 1.4
+  OPTIONS
+    "USE_CCACHE ON"
 )
 
 if (ENABLE_BENCHMARK)

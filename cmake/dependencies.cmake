@@ -21,6 +21,11 @@ if (ENABLE_BENCHMARK)
   )
 endif()
 
+if(benchmark_ADDED)
+  # enable c++11 to avoid compilation errors
+  set_target_properties(benchmark PROPERTIES CXX_STANDARD 11)
+endif()
+
 if (ENABLE_TESTING)
   CPMFindPackage(
     NAME googletest

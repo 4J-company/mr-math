@@ -52,6 +52,8 @@ if (ENABLE_BENCHMARK)
 endif()
 
 if (ENABLE_TESTING)
+  include(CTest)
+
   add_executable(${CMAKE_PROJECT_NAME}-tests "tests/main.cpp")
 
   set_property(TARGET ${CMAKE_PROJECT_NAME}-tests PROPERTY CXX_STANDARD 23)
@@ -60,4 +62,6 @@ if (ENABLE_TESTING)
 
   target_include_directories(${CMAKE_PROJECT_NAME}-tests PRIVATE ${CMAKE_CURRENT_LIST_DIR})
   target_link_libraries(${CMAKE_PROJECT_NAME}-tests PRIVATE gtest_main ${CMAKE_PROJECT_NAME}-lib)
+
+  add_test(NAME ${CMAKE_PROJECT_NAME}-tests COMMAND ${CMAKE_PROJECT_NAME}-tests)
 endif()

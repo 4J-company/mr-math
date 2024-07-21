@@ -16,25 +16,25 @@ if (ENABLE_BENCHMARK)
   CPMFindPackage(
     NAME benchmark
     GITHUB_REPOSITORY google/benchmark
-    VERSION 1.5.2
-    OPTIONS "BENCHMARK_ENABLE_TESTING Off"
+    GIT_TAG main
+    OPTIONS
+      "BENCHMARK_ENABLE_TESTING OFF"
   )
 endif()
 
-if(benchmark_ADDED)
-  # enable c++11 to avoid compilation errors
-  set_target_properties(benchmark PROPERTIES CXX_STANDARD 11)
+if (benchmark_ADDED)
+  # patch benchmark target
+  set_target_properties(benchmark PROPERTIES CXX_STANDARD 17)
 endif()
 
 if (ENABLE_TESTING)
   CPMFindPackage(
     NAME googletest
     GITHUB_REPOSITORY google/googletest
-    VERSION 1.14.0
+    GIT_TAG main
+    OPTIONS
+      "INSTALL_GTEST OFF"
+      "gtest_force_shared_crt ON"
   )
 endif()
 
-if(googletest_ADDED)
-  # enable c++11 to avoid compilation errors
-  set_target_properties(googletest PROPERTIES CXX_STANDARD 11)
-endif()

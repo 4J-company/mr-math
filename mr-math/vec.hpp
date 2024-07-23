@@ -87,8 +87,8 @@ namespace mr {
 
       // cross product
       constexpr Vec cross(const Vec &other) const noexcept requires (N == 3) {
-        return RowT(_data._data.shifted(-1) * other._data._data.shifted(1)
-          - _data._data.shifted(1) * other._data._data.shifted(-1));
+        return RowT(_data._data.rotated(1) * other._data._data.rotated(-1)
+          - _data._data.rotated(-1) * other._data._data.rotated(1));
 
 #if 0
         std::array<T, 3> arr {
@@ -118,7 +118,7 @@ namespace mr {
 
       // use 1 / length() for higher precision
       [[nodiscard]] constexpr T inversed_length() const {
-        return fast_sqrt(length2());
+        return fast_rsqrt(length2());
       }
 
       // normalize methods
@@ -235,6 +235,14 @@ namespace mr {
         constexpr Vec & reflect(const NormT &n) noexcept {
           *this = reflected(n);
           return *this;
+        }
+
+        constexpr bool operator==(const Vec &other) const noexcept {
+          return _data == other._data;
+        }
+
+        constexpr bool equal(const Vec &other) const noexcept {
+          return _data.equal(other._data);
         }
 
       private:

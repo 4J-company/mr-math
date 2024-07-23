@@ -120,6 +120,14 @@ namespace mr {
           return os;
         }
 
+        constexpr bool operator==(const Norm &other) const noexcept {
+          return _data == other._data;
+        }
+
+        constexpr bool equal(const Norm &other) const noexcept {
+          return _data.equal(other._data);
+        }
+
       private:
         friend class Vec<T, N>;
         friend class Rotation<T>;

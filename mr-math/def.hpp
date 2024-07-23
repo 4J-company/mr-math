@@ -29,6 +29,11 @@ namespace mr {
   template <ArithmeticT T, std::size_t N>
     using SimdImpl = stdx::fixed_size_simd<T, N>;
 
+  template <ArithmeticT T>
+    constexpr bool equal(T a, T b, T epsilon = 0.0001) {
+      return std::abs(a - b) < epsilon;
+    }
+
   // fast 1 / sqrt implementation for floats
   // use 1 / std::sqrt() for higher precision
   constexpr float fast_rsqrt(float number) {

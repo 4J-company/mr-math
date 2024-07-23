@@ -76,6 +76,18 @@ namespace mr {
         return _data[i];
       }
 
+      constexpr bool operator==(const Row &other) const noexcept {
+        return stdx::all_of(_data == other._data);
+      }
+
+      constexpr bool equal(const Row &other) const noexcept {
+        for (size_t i = 0; i < N; i++) {
+          if (!mr::equal(_data[i], other._data[i]))
+            return false;
+        }
+        return true;
+      }
+
     protected:
       template <ArithmeticT... Args>
         requires (sizeof...(Args) >= 1) && (sizeof...(Args) <= N)

@@ -21,6 +21,34 @@ TEST_F(Vector3DTest, Subtraction) {
   EXPECT_EQ(result.z(), -3.0);
 }
 
+TEST_F(Vector3DTest, DotProduct) {
+  auto result = v1.dot(v2);
+  EXPECT_EQ(result, 32.0);
+}
+
+TEST_F(Vector3DTest, CrossProduct) {
+  auto result1 = v1.cross(v2);
+  mr::Vec3f expected{-3, 6, -3};
+  EXPECT_EQ(result1, expected);
+
+  auto result2 = v2.cross(v1);
+  EXPECT_EQ(result2, -expected);
+}
+
+TEST_F(Vector3DTest, Length) {
+  EXPECT_NEAR(v1.length(), std::sqrt(14.0f), 0.0001);
+  EXPECT_NEAR(v1.length2(), 14.0f, 0.0001);
+  EXPECT_NEAR(v1.inversed_length(), 1 / std::sqrt(14.0f), 0.01);
+}
+
+TEST_F(Vector3DTest, Normalize) {
+  auto norm = v1.normalized_unchecked();
+  EXPECT_TRUE(norm.equal({0.267261, 0.534522, 0.801784}));
+
+  auto null = mr::Vec3f{0, 0, 0}.normalized();
+  EXPECT_FALSE(null.has_value());
+}
+
 class MatrixTest : public ::testing::Test {
 protected:
   mr::Matr4f m1 {

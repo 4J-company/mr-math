@@ -23,9 +23,13 @@ if (NOT MSVC)
   endif()
 endif()
 
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 include(cmake/dependencies.cmake)
 
-add_library(${CMAKE_PROJECT_NAME}-lib INTERFACE
+set(MR_MATH_LIB ${CMAKE_PROJECT_NAME}-lib)
+add_library(${MR_MATH_LIB} INTERFACE
     mr-math/camera.hpp
     mr-math/def.hpp
     mr-math/matr.hpp
@@ -37,31 +41,29 @@ add_library(${CMAKE_PROJECT_NAME}-lib INTERFACE
     mr-math/vec.hpp
     mr-math/math.hpp
 )
-target_include_directories(${CMAKE_PROJECT_NAME}-lib INTERFACE ${CMAKE_CURRENT_LIST_DIR})
-target_link_libraries(${CMAKE_PROJECT_NAME}-lib INTERFACE Vc)
+target_include_directories(${MR_MATH_LIB} INTERFACE ${CMAKE_CURRENT_LIST_DIR})
+target_link_libraries(${MR_MATH_LIB} INTERFACE Vc)
 
 if (ENABLE_BENCHMARK)
-  add_executable(${CMAKE_PROJECT_NAME}-bench "bench/main.cpp")
+  set(MR_MATH_BENCH ${CMAKE_PROJECT_NAME}-bench)
+  add_executable(${MR_MATH_BENCH} "bench/main.cpp")
 
-  set_property(TARGET ${CMAKE_PROJECT_NAME}-bench PROPERTY CXX_STANDARD 23)
-  set_property(TARGET ${CMAKE_PROJECT_NAME}-bench PROPERTY CXX_STANDARD_REQUIRED 23)
-  set_property(TARGET ${CMAKE_PROJECT_NAME}-bench PROPERTY COMPILE_FLAGS "${MY_CXX_FLAGS}")
+  set_property(TARGET ${MR_MATH_BENCH} PROPERTY COMPILE_FLAGS "${MY_CXX_FLAGS}")
 
-  target_include_directories(${CMAKE_PROJECT_NAME}-bench PRIVATE ${CMAKE_CURRENT_LIST_DIR})
-  target_link_libraries(${CMAKE_PROJECT_NAME}-bench PRIVATE benchmark ${CMAKE_PROJECT_NAME}-lib)
+  target_include_directories(${MR_MATH_BENCH} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
+  target_link_libraries(${MR_MATH_BENCH} PRIVATE benchmark ${MR_MATH_LIB})
 endif()
 
 if (ENABLE_TESTING)
   include(CTest)
 
-  add_executable(${CMAKE_PROJECT_NAME}-tests "tests/main.cpp")
+  set(MR_MATH_TEST ${CMAKE_PROJECT_NAME}-tests)
+  add_executable(${MR_MATH_TEST} "tests/main.cpp")
 
-  set_property(TARGET ${CMAKE_PROJECT_NAME}-tests PROPERTY CXX_STANDARD 23)
-  set_property(TARGET ${CMAKE_PROJECT_NAME}-tests PROPERTY CXX_STANDARD_REQUIRED 23)
-  set_property(TARGET ${CMAKE_PROJECT_NAME}-tests PROPERTY COMPILE_FLAGS "${MY_CXX_FLAGS}")
+  set_property(TARGET ${MR_MATH_TEST} PROPERTY COMPILE_FLAGS "${MY_CXX_FLAGS}")
 
-  target_include_directories(${CMAKE_PROJECT_NAME}-tests PRIVATE ${CMAKE_CURRENT_LIST_DIR})
-  target_link_libraries(${CMAKE_PROJECT_NAME}-tests PRIVATE gtest_main ${CMAKE_PROJECT_NAME}-lib)
+  target_include_directories(${MR_MATH_TEST} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
+  target_link_libraries(${MR_MATH_TEST} PRIVATE gtest_main ${MR_MATH_LIB})
 
-  add_test(NAME ${CMAKE_PROJECT_NAME}-tests COMMAND ${CMAKE_PROJECT_NAME}-tests)
+  add_test(NAME ${MR_MATH_TEST} COMMAND ${MR_MATH_TEST})
 endif()

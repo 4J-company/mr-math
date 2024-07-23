@@ -55,7 +55,7 @@ if (ENABLE_BENCHMARK)
 endif()
 
 if (ENABLE_TESTING)
-  include(CTest)
+  include(GoogleTest)
 
   set(MR_MATH_TEST ${CMAKE_PROJECT_NAME}-tests)
   add_executable(${MR_MATH_TEST} "tests/main.cpp")
@@ -65,5 +65,5 @@ if (ENABLE_TESTING)
   target_include_directories(${MR_MATH_TEST} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
   target_link_libraries(${MR_MATH_TEST} PRIVATE gtest_main ${MR_MATH_LIB})
 
-  add_test(NAME ${MR_MATH_TEST} COMMAND ${MR_MATH_TEST})
+  gtest_discover_tests(${MR_MATH_TEST})
 endif()

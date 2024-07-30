@@ -38,6 +38,7 @@ add_library(${MR-MATH-LIB} INTERFACE
     mr-math/units.hpp
     mr-math/vec.hpp
     mr-math/math.hpp
+    mr-math/bound_box.hpp
 )
 target_include_directories(${MR-MATH-LIB} INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(${MR-MATH-LIB} INTERFACE Vc)

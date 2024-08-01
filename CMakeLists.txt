@@ -19,8 +19,7 @@ option(MR_MATH_PRESET_PROFILING "Whether profiling flags are enabled"           
 
 include(cmake/dependencies.cmake)
 
-set(MR_MATH_LIB ${CMAKE_PROJECT_NAME}-lib)
-add_library(${MR_MATH_LIB} INTERFACE
+add_library(${MR_MATH_LIB_NAME} INTERFACE
     include/mr-math/camera.hpp
     include/mr-math/def.hpp
     include/mr-math/matr.hpp
@@ -32,9 +31,9 @@ add_library(${MR_MATH_LIB} INTERFACE
     include/mr-math/vec.hpp
     include/mr-math/math.hpp
 )
-target_include_directories(${MR_MATH_LIB} INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
-target_link_libraries(${MR_MATH_LIB} INTERFACE Vc)
-target_compile_features(${MR_MATH_LIB} INTERFACE cxx_std_23)
+target_include_directories(${MR_MATH_LIB_NAME} INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+target_link_libraries(${MR_MATH_LIB_NAME} INTERFACE Vc)
+target_compile_features(${MR_MATH_LIB_NAME} INTERFACE cxx_std_23)
 
 if (MR_MATH_ENABLE_BENCHMARK)
   add_executable(${MR_MATH_BENCH_NAME} "bench/main.cpp")
@@ -57,6 +56,6 @@ endif()
 if (MR_MATH_ENABLE_TESTING)
   include(GoogleTest)
   add_executable(${MR_MATH_TESTS_NAME} "tests/main.cpp")
-  target_link_libraries(${MR_MATH_TESTS_NAME} PRIVATE gtest_main ${MR_MATH_LIB})
+  target_link_libraries(${MR_MATH_TESTS_NAME} PRIVATE gtest_main ${MR_MATH_LIB_NAME})
   gtest_discover_tests(${MR_MATH_TESTS_NAME})
 endif()

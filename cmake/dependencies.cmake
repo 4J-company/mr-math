@@ -14,7 +14,7 @@ CPMFindPackage(
     "USE_CCACHE ON"
 )
 
-if (ENABLE_BENCHMARK)
+if (MR_MATH_ENABLE_BENCHMARK)
   CPMFindPackage(
     NAME benchmark
     GITHUB_REPOSITORY google/benchmark
@@ -29,7 +29,7 @@ if (benchmark_ADDED)
   set_target_properties(benchmark PROPERTIES CXX_STANDARD 17)
 endif()
 
-if (ENABLE_TESTING)
+if (MR_MATH_ENABLE_TESTING)
   CPMFindPackage(
     NAME googletest
     GITHUB_REPOSITORY google/googletest

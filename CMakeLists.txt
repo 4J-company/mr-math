@@ -21,16 +21,16 @@ include(cmake/dependencies.cmake)
 
 set(MR_MATH_LIB ${CMAKE_PROJECT_NAME}-lib)
 add_library(${MR_MATH_LIB} INTERFACE
-    mr-math/camera.hpp
-    mr-math/def.hpp
-    mr-math/matr.hpp
-    mr-math/norm.hpp
-    mr-math/operators.hpp
-    mr-math/rot.hpp
-    mr-math/row.hpp
-    mr-math/units.hpp
-    mr-math/vec.hpp
-    mr-math/math.hpp
+    include/mr-math/camera.hpp
+    include/mr-math/def.hpp
+    include/mr-math/matr.hpp
+    include/mr-math/norm.hpp
+    include/mr-math/operators.hpp
+    include/mr-math/rot.hpp
+    include/mr-math/row.hpp
+    include/mr-math/units.hpp
+    include/mr-math/vec.hpp
+    include/mr-math/math.hpp
 )
 target_include_directories(${MR_MATH_LIB} INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 target_link_libraries(${MR_MATH_LIB} INTERFACE Vc)

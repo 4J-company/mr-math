@@ -80,9 +80,9 @@ namespace mr {
         return stdx::all_of(_data == other._data);
       }
 
-      constexpr bool equal(const Row &other) const noexcept {
+      constexpr bool equal(const Row &other, ValueT eps = epsilon<ValueT>()) const noexcept {
         for (size_t i = 0; i < N; i++) {
-          if (!mr::equal(_data[i], other._data[i]))
+          if (!mr::equal(_data[i], other._data[i], eps))
             return false;
         }
         return true;
@@ -97,15 +97,6 @@ namespace mr {
           // std::array<T, N> arr {static_cast<T>(args)...};
           // _data.copy_from(arr.data(), stdx::element_aligned);
         }
-
-      constexpr void _set_ind(std::size_t ind, T value) noexcept {
-        _data[ind] = value;
-
-        // std::array<T, N> arr;
-        // _data.copy_to(arr.data(), stdx::element_aligned);
-        // arr[ind] = value;
-        // _data.copy_from(arr.data(), stdx::element_aligned);
-      }
     };
 } // namespace mr
 

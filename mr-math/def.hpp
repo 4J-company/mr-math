@@ -29,9 +29,23 @@ namespace mr {
   template <ArithmeticT T, std::size_t N>
     using SimdImpl = stdx::fixed_size_simd<T, N>;
 
+  template<ArithmeticT T>
+    constexpr T epsilon() {
+      return std::numeric_limits<T>::epsilon();
+    }
+
   template <ArithmeticT T>
     constexpr bool equal(T a, T b, T epsilon = 0.0001) {
       return std::abs(a - b) < epsilon;
+    }
+
+  template <typename T>
+    requires requires (T a, T b) {
+      a.equal(b, 0.1);
+      typename T::ValueT;
+    }
+    constexpr bool equal(const T &a, const T &b, typename T::ValueT eps = epsilon<typename T::ValueT>()) {
+      return a.equal(b, eps);
     }
 
   // fast 1 / sqrt implementation for floats

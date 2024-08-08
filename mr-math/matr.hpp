@@ -24,6 +24,7 @@ namespace mr
     class [[nodiscard]] Matr
     {
     public:
+      using ValueT = T;
       using RowT = Row<T, N>;
 
       constexpr Matr() noexcept = default;
@@ -271,6 +272,24 @@ namespace mr
         };
 
         return tmp1 + tmp2 + tmp3;
+      }
+
+      constexpr bool operator==(const Matr &other) const noexcept {
+        for (size_t i = 0; i < N; i++) {
+          if (_data[i] != other._data[i]) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      constexpr bool equal(const Matr &other, ValueT eps = epsilon<ValueT>()) const noexcept {
+        for (size_t i = 0; i < N; i++) {
+          if (not _data[i].equal(other._data[i], eps)) {
+            return false;
+          }
+        }
+        return true;
       }
 
       friend std::ostream & operator<<(std::ostream &os, const Matr &m) noexcept {

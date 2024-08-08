@@ -241,8 +241,8 @@ namespace mr {
           return _data == other._data;
         }
 
-        constexpr bool equal(const Vec &other) const noexcept {
-          return _data.equal(other._data);
+        constexpr bool equal(const Vec &other, ValueT eps = epsilon<ValueT>()) const noexcept {
+          return _data.equal(other._data, eps);
         }
 
       private:

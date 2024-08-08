@@ -34,6 +34,7 @@ namespace mr {
 
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
     struct [[nodiscard]] Norm {
+      using ValueT = T;
       using VecT = Vec<T, N>;
 
       // from elements constructor
@@ -124,8 +125,8 @@ namespace mr {
           return _data == other._data;
         }
 
-        constexpr bool equal(const Norm &other) const noexcept {
-          return _data.equal(other._data);
+        constexpr bool equal(const Norm &other, ValueT eps = epsilon<ValueT>()) const noexcept {
+          return _data.equal(other._data, eps);
         }
 
       private:

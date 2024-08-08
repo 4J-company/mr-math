@@ -120,6 +120,10 @@ namespace mr
         return _data[i];
       }
 
+      [[nodiscard]] constexpr RowT & operator[](size_t i) noexcept {
+        return _data[i];
+      }
+
       [[nodiscard]] constexpr T determinant() const noexcept {
         std::array<RowT, N> tmp = _data;
         T det = 1;
@@ -140,17 +144,15 @@ namespace mr
       }
 
       constexpr Matr transposed() const noexcept {
-        std::array<RowT, N> tmp1;
+        Matr transposed;
         for (size_t i = 0; i < N; i++) {
-          tmp1[i] = SimdImpl<T, N>([this, i](auto j){ return _data[j][i]; });
+          transposed[i] = SimdImpl<T, N>([this, i](size_t j) { return _data[j][i]; });
         }
-        return {tmp1};
+        return transposed;
       }
 
       constexpr Matr & transpose() noexcept {
-        for (size_t i = 0; i < N; i++) {
-          _data[i] = SimdImpl<T, N>([this, i](auto j){ return _data[j][i]; });
-        }
+        *this = transposed();
         return *this;
       }
 
@@ -191,12 +193,17 @@ namespace mr
 
         return res;
       }
+#else
+      // dummy
+      constexpr Matr inversed() const noexcept {
+        return {};
+      }
+#endif
 
-      constexpr Matr & inverse() const noexcept {
+      constexpr Matr & inverse() noexcept {
         *this = inversed();
         return *this;
       }
-#endif
 
       static constexpr Matr4<T> scale(const Vec3<T> &vec) noexcept {
         return Matr4<T> {

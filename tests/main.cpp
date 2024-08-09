@@ -29,16 +29,12 @@ TEST_F(Vector3DTest, Equality) {
 
 TEST_F(Vector3DTest, Addition) {
   mr::Vec3f result = v1 + v2;
-  EXPECT_EQ(result.x(), 5.0);
-  EXPECT_EQ(result.y(), 7.0);
-  EXPECT_EQ(result.z(), 9.0);
+  EXPECT_EQ(result, mr::Vec3f(5, 7, 9));
 }
 
 TEST_F(Vector3DTest, Subtraction) {
   mr::Vec3f result = v1 - v2;
-  EXPECT_EQ(result.x(), -3.0);
-  EXPECT_EQ(result.y(), -3.0);
-  EXPECT_EQ(result.z(), -3.0);
+  EXPECT_EQ(result, mr::Vec3f(-3));
 }
 
 TEST_F(Vector3DTest, DotProduct) {
@@ -62,10 +58,17 @@ TEST_F(Vector3DTest, Length) {
 }
 
 TEST_F(Vector3DTest, Normalize) {
-  auto norm = v1.normalized_unchecked();
-  EXPECT_TRUE(norm.equal({0.267261, 0.534522, 0.801784}));
+  mr::Vec3f expected{0.267261, 0.534522, 0.801784};
+  EXPECT_TRUE(mr::equal(v1.normalized_unchecked(), expected, 0.000001));
+  auto copy = v1;
+  EXPECT_TRUE(mr::equal(copy.normalize_unchecked(), expected, 0.000001));
 
-  auto null = mr::Vec3f{0, 0, 0}.normalized();
+  EXPECT_TRUE(mr::equal(v1.normalized_fast_unchecked(), expected, 0.1));
+  EXPECT_TRUE(mr::equal(copy.normalize_fast_unchecked(), expected, 0.1));
+
+  auto zero_v = mr::Vec3f{0};
+  EXPECT_EQ(zero_v.normalize(), zero_v);
+  auto null = zero_v.normalized();
   EXPECT_FALSE(null.has_value());
 }
 
@@ -146,9 +149,10 @@ TEST_F(MatrixTest, Transposition) {
     3, 7, 11, 15,
     4, 8, 12, 16
   };
-
   EXPECT_EQ(m1.transposed(), expected);
-  EXPECT_EQ(m1.transpose(), expected);
+
+  mr::Matr4f copy = m1;
+  EXPECT_EQ(copy.transpose(), expected);
 }
 
 TEST_F(MatrixTest, Determinant) {
@@ -175,7 +179,8 @@ TEST_F(MatrixTest, Inversion) {
      1/199.,   -1/199., 119/15920.,   -1/199.,
      1/199.,   -1/199.,    -1/199., 97/20298.
   };
-
   EXPECT_EQ(magic_m.inversed(), expected);
-  EXPECT_EQ(magic_m.inverse(), expected);
+
+  mr::Matr4f copy = magic_m;
+  EXPECT_EQ(copy.inverse(), expected);
 }

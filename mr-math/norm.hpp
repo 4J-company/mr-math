@@ -124,15 +124,23 @@ namespace mr {
         constexpr bool operator==(const Norm &other) const noexcept {
           return _data == other._data;
         }
+        constexpr bool operator==(const VecT &other) const noexcept {
+          return _data == other;
+        }
 
         constexpr bool equal(const Norm &other, ValueT eps = epsilon<ValueT>()) const noexcept {
           return _data.equal(other._data, eps);
+        }
+        constexpr bool equal(const VecT &other, ValueT eps = epsilon<ValueT>()) const noexcept {
+          return _data.equal(other, eps);
         }
 
       private:
         friend class Vec<T, N>;
         friend class Rotation<T>;
-        constexpr Norm(const VecT &v) noexcept : _data(v) {}
+        constexpr Norm(const VecT &v) noexcept : _data(v) {
+          assert(mr::equal(v.length(), 1, 0.1f));
+        }
 
         VecT _data;
     };

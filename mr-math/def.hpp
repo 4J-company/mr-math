@@ -34,17 +34,19 @@ namespace mr {
       return std::numeric_limits<T>::epsilon();
     }
 
-  template <ArithmeticT T>
-    constexpr bool equal(T a, T b, T epsilon = 0.0001) {
+  template <ArithmeticT T, ArithmeticT U>
+    constexpr bool equal(T a, U b, T epsilon = 0.0001) {
       return std::abs(a - b) < epsilon;
     }
 
-  template <typename T>
-    requires requires (T a, T b) {
+  template <typename T, typename U>
+    requires requires (T a, U b) {
       a.equal(b, 0.1);
       typename T::ValueT;
+      typename U::ValueT;
+      requires std::same_as<typename T::ValueT, typename U::ValueT>;
     }
-    constexpr bool equal(const T &a, const T &b, typename T::ValueT eps = epsilon<typename T::ValueT>()) {
+    constexpr bool equal(const T &a, const U &b, typename T::ValueT eps = epsilon<typename T::ValueT>()) {
       return a.equal(b, eps);
     }
 

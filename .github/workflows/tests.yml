@@ -86,4 +86,4 @@ jobs:
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
     - name: Run tests
-      run: ctest --test-dir build
+      run: ${{ steps.strings.outputs.build-output-dir }}/mr-math-tests

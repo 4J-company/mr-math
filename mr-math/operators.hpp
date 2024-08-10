@@ -57,7 +57,7 @@ namespace mr {
 
       friend constexpr DerivedT
       operator-(const DerivedT &rhs) noexcept {
-        return -rhs._data;
+        return DerivedT{-rhs._data};
       }
     };
 

@@ -97,6 +97,16 @@ namespace mr {
           // std::array<T, N> arr {static_cast<T>(args)...};
           // _data.copy_from(arr.data(), stdx::element_aligned);
         }
+
+    public:
+      constexpr void _set_ind(std::size_t ind, T value) noexcept {
+        _data[ind] = value;
+
+        // std::array<T, N> arr;
+        // _data.copy_to(arr.data(), stdx::element_aligned);
+        // arr[ind] = value;
+        // _data.copy_from(arr.data(), stdx::element_aligned);
+      }
     };
 } // namespace mr
 

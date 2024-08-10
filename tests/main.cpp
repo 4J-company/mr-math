@@ -1,6 +1,8 @@
 #include "gtest/gtest.h"
 #include "mr-math/math.hpp"
 
+using namespace mr::literals;
+
 class Vector3DTest : public ::testing::Test {
 protected:
   mr::Vec3f v1{1.0, 2.0, 3.0};
@@ -14,6 +16,13 @@ TEST_F(Vector3DTest, Getters) {
   EXPECT_EQ(v1[0], 1.0);
   EXPECT_EQ(v1[1], 2.0);
   EXPECT_EQ(v1[2], 3.0);
+}
+
+TEST_F(Vector3DTest, Setters) {
+  mr::Vec3f v{0, 0, 3};
+  v.x(1);
+  v.set(1, 2);
+  EXPECT_EQ(v, mr::Vec3f(1, 2, 3));
 }
 
 TEST_F(Vector3DTest, Equality) {
@@ -51,6 +60,10 @@ TEST_F(Vector3DTest, CrossProduct) {
   EXPECT_EQ(result2, -expected);
 }
 
+TEST_F(Vector3DTest, ComponentsProduct) {
+  EXPECT_EQ(v1 * v2, mr::Vec3f(4, 10, 18));
+}
+
 TEST_F(Vector3DTest, Length) {
   EXPECT_NEAR(v1.length(), std::sqrt(14.0f), 0.0001);
   EXPECT_NEAR(v1.length2(), 14.0f, 0.0001);
@@ -70,6 +83,12 @@ TEST_F(Vector3DTest, Normalize) {
   EXPECT_EQ(zero_v.normalize(), zero_v);
   auto null = zero_v.normalized();
   EXPECT_FALSE(null.has_value());
+}
+
+TEST_F(Vector3DTest, Abs) {
+  mr::Vec3f v{-30, 47, -80};
+  EXPECT_EQ(v.absed(), mr::Vec3f(30, 47, 80));
+  EXPECT_EQ(v.abs(), mr::Vec3f(30, 47, 80));
 }
 
 class MatrixTest : public ::testing::Test {
@@ -183,4 +202,44 @@ TEST_F(MatrixTest, Inversion) {
 
   mr::Matr4f copy = magic_m;
   EXPECT_EQ(copy.inverse(), expected);
+}
+
+TEST_F(MatrixTest, Identity) {
+  mr::Matr4f expected {
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1
+  };
+  EXPECT_EQ(mr::Matr4f::identity(), expected);
+}
+
+TEST_F(MatrixTest, ScaleVector) {
+  EXPECT_EQ(mr::Vec3f(1, -1, 0) * mr::Matr4f::scale({30, 47, 80}), mr::Vec3f(30, -47, 0));
+}
+
+TEST_F(MatrixTest, TranslateVector) {
+  EXPECT_EQ(mr::Vec3f(0, 0, 22) * mr::Matr4f::translate({30, 47, 80}), mr::Vec3f(30, 47, 102));
+}
+
+TEST_F(MatrixTest, RotateBasis) {
+  mr::axis::x = {1, 0, 0};
+  mr::axis::y = {0, 1, 0};
+  mr::axis::z = {0, 0, 1};
+  EXPECT_TRUE(mr::equal(mr::axis::x * mr::Matr4f::rotate_y(-90_deg), mr::axis::z));
+  EXPECT_TRUE(mr::equal(mr::axis::y * mr::Matr4f::rotate_z(-90_deg), mr::axis::x));
+  EXPECT_TRUE(mr::equal(mr::axis::z * mr::Matr4f::rotate_x(-90_deg), mr::axis::y));
+
+  mr::axis::x = {1, 0, 0};
+  mr::axis::y = {0, 1, 0};
+  mr::axis::z = {0, 0, -1};
+  EXPECT_TRUE(mr::equal(mr::axis::x * mr::Matr4f::rotate_y(90_deg), mr::axis::z));
+  EXPECT_TRUE(mr::equal(mr::axis::y * mr::Matr4f::rotate_z(90_deg), mr::axis::x));
+  EXPECT_TRUE(mr::equal(mr::axis::z * mr::Matr4f::rotate_x(90_deg), mr::axis::y));
+}
+
+TEST_F(MatrixTest, RotateVector) {
+  mr::Vec3f v{30, 47, 80};
+  mr::Vec3f expected{38.340427, 81.678845, 36.980571};
+  EXPECT_TRUE(mr::equal(v * mr::Matr4f::rotate({1, 1, 1}, 102_deg), expected, 0.0001));
 }

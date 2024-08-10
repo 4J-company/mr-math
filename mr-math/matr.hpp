@@ -124,23 +124,20 @@ namespace mr
         return _data[i];
       }
 
+      // TODO: fix (or remove as it's neved used)
       [[nodiscard]] constexpr T determinant() const noexcept {
         std::array<RowT, N> tmp = _data;
         T det = 1;
 
         tmp[N - 1] /= tmp[N - 1][N - 1];
-        for (size_t i = 1; i < N; i++) {
-          det *= tmp[i - 1][i - 1];
-          tmp[i - 1] /= std::abs(tmp[i - 1][i - 1]) <= _epsilon ? static_cast<T>(1) : tmp[i - 1][i - 1];
-          for (size_t j = i; j < N; j++) {
-            tmp[i] -= tmp[i - 1] * tmp[j][i - 1];
+        for (size_t i = 0; i < N - 1; i++) {
+          det *= tmp[i][i];
+          tmp[i] /= mr::equal(tmp[i][i], 0) ? static_cast<T>(1) : tmp[i][i];
+          for (size_t j = i + 1; j < N; j++) {
+            tmp[i + 1] -= tmp[i] * tmp[j][i];
           }
         }
         return det;
-      }
-
-      [[nodiscard]] constexpr T operator!() const noexcept {
-        return determinant();
       }
 
       constexpr Matr transposed() const noexcept {
@@ -205,6 +202,10 @@ namespace mr
         return *this;
       }
 
+      static constexpr Matr identity() noexcept {
+        return _identity;
+      }
+
       static constexpr Matr4<T> scale(const Vec3<T> &vec) noexcept {
         return Matr4<T> {
           vec.x(),       0,       0, 0,
@@ -224,8 +225,9 @@ namespace mr
       }
 
       static constexpr Matr4<T> rotate_x(const Radians<T> &rad) noexcept {
-        T co = std::cos(rad._data);
-        T si = std::sin(rad._data);
+        const T dir_factor = axis::x.x();
+        const T co = std::cos(rad._data);
+        const T si = std::sin(rad._data) * dir_factor;
 
         return Matr4<T> {
           1,   0,  0, 0,
@@ -236,8 +238,9 @@ namespace mr
       }
 
       static constexpr Matr4<T> rotate_y(const Radians<T> &rad) noexcept {
-        T co = std::cos(rad._data);
-        T si = std::sin(rad._data);
+        const T dir_factor = axis::y.y();
+        const T co = std::cos(rad._data);
+        const T si = std::sin(rad._data) * dir_factor;
 
         return Matr4<T> {
           co, 0, -si, 0,
@@ -248,8 +251,9 @@ namespace mr
       }
 
       static constexpr Matr4<T> rotate_z(const Radians<T> &rad) noexcept {
-        T co = std::cos(rad._data);
-        T si = std::sin(rad._data);
+        const T dir_factor = axis::z.z();
+        const T co = std::cos(rad._data);
+        const T si = std::sin(rad._data) * dir_factor;
 
         return Matr4<T> {
            co, si, 0, 0,
@@ -259,7 +263,7 @@ namespace mr
         };
       }
 
-      static constexpr Matr4<T> rotate(const Radians<T> &rad, const Norm<T, 3> &n) noexcept {
+      static constexpr Matr4<T> rotate(const Norm<T, 3> &n, const Radians<T> &rad) noexcept {
         T co = std::cos(rad._data);
         T si = std::sin(rad._data);
         T nco = 1 - co;
@@ -308,30 +312,30 @@ namespace mr
       }
 
     private:
-      static Matr _identity() {
+      static Matr get_identity() {
         std::array<RowT, N> id;
         constexpr auto io = std::ranges::iota_view {(size_t)0, N};
 
         std::transform(
           io.begin(), io.end(), id.begin(),
-          [&io](auto i) -> RowT {
-            return SimdImpl<T, N>([i](auto i2) { return i2 == i ? 1 : 0; });
+          [&io](size_t i) -> RowT {
+            return SimdImpl<T, N>([i](size_t j) { return j == i ? 1 : 0; });
           });
 
         return id;
       }
 
     public:
-      static const Matr identity;
       std::array<RowT, N> _data;
 
     private:
+      static const Matr _identity;
       inline static const T _epsilon = std::numeric_limits<T>::epsilon();
     };
 
     // this is required to initialize 'Matr::_identity' on MSVC 
     template <ArithmeticT T, std::size_t N>
-      const Matr<T, N> Matr<T, N>::identity = Matr<T, N>::_identity();
+      const Matr<T, N> Matr<T, N>::_identity = Matr<T, N>::get_identity();
 
 } // namespace mr
 

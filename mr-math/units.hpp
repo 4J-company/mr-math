@@ -59,7 +59,7 @@ namespace mr {
 
       // conversation operators
       template <typename U>
-        explicit constexpr operator Degrees<U>() const noexcept {
+        constexpr operator Degrees<U>() const noexcept {
           return Degrees<U>{static_cast<U>(_data) *
             std::numbers::inv_pi_v<U> * static_cast<U>(180.)};
         }
@@ -89,7 +89,7 @@ namespace mr {
 
       // conversation operators
       template <typename U>
-        explicit constexpr operator Radians<U>() const noexcept {
+        constexpr operator Radians<U>() const noexcept {
           return Radians<U>{static_cast<U>(_data) / static_cast<U>(180.) * std::numbers::pi_v<U>};
         }
 

@@ -40,3 +40,4 @@ if (MR_MATH_ENABLE_TESTING)
   )
 endif()
 
+CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")

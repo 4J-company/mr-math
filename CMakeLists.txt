@@ -31,7 +31,10 @@ add_library(${MR_MATH_LIB_NAME} INTERFACE
     include/mr-math/vec.hpp
     include/mr-math/math.hpp
 )
-target_include_directories(${MR_MATH_LIB_NAME} INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+target_include_directories(${MR_MATH_LIB_NAME} INTERFACE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
 target_link_libraries(${MR_MATH_LIB_NAME} INTERFACE Vc)
 target_compile_features(${MR_MATH_LIB_NAME} INTERFACE cxx_std_23)
 
@@ -59,3 +62,17 @@ if (MR_MATH_ENABLE_TESTING)
   target_link_libraries(${MR_MATH_TESTS_NAME} PRIVATE gtest_main ${MR_MATH_LIB_NAME})
   gtest_discover_tests(${MR_MATH_TESTS_NAME})
 endif()
+
+packageProject(
+  NAME ${MR_MATH_LIB_NAME}
+  VERSION ${PROJECT_VERSION}
+  BINARY_DIR ${PROJECT_BINARY_DIR}
+  INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include
+  INCLUDE_DESTINATION include/${PROJECT_NAME}-${PROJECT_VERSION}
+  INCLUDE_HEADER_PATTERN "*.hpp"
+  DEPENDENCIES "Vc 1.4"
+  NAMESPACE mr
+  COMPATIBILITY AnyNewerVersion # supported values: `AnyNewerVersion|SameMajorVersion|SameMinorVersion|ExactVersion`
+  ARCH_INDEPENDENT YES
+  CPACK NO
+)

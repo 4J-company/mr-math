@@ -224,10 +224,18 @@ namespace mr
         };
       }
 
-      static constexpr Matr4<T> rotate_x(const Radians<T> &rad) noexcept {
-        const T dir_factor = axis::x.x();
-        const T co = std::cos(rad._data);
-        const T si = std::sin(rad._data) * dir_factor;
+      static constexpr Matr4<T> rotate_x(const Radians<T> &rad) noexcept {;
+        T co = std::cos(rad._data);
+        T si = std::sin(rad._data);
+
+        if (axis::x.x() < 0) {
+          return Matr4<T> {
+            1,  0,   0, 0,
+            0, co, -si, 0,
+            0, si,  co, 0,
+            0,  0,   0, 1
+          };
+        }
 
         return Matr4<T> {
           1,   0,  0, 0,
@@ -238,9 +246,16 @@ namespace mr
       }
 
       static constexpr Matr4<T> rotate_y(const Radians<T> &rad) noexcept {
-        const T dir_factor = axis::y.y();
-        const T co = std::cos(rad._data);
-        const T si = std::sin(rad._data) * dir_factor;
+        T co = std::cos(rad._data);
+        T si = std::sin(rad._data);
+        if (axis::y.y() < 0) {
+          return Matr4<T> {
+             co, 0, si, 0,
+              0, 1,  0, 0,
+            -si, 0, co, 0,
+              0, 0,  0, 1
+          };
+        }
 
         return Matr4<T> {
           co, 0, -si, 0,
@@ -251,9 +266,19 @@ namespace mr
       }
 
       static constexpr Matr4<T> rotate_z(const Radians<T> &rad) noexcept {
-        const T dir_factor = axis::z.z();
-        const T co = std::cos(rad._data);
-        const T si = std::sin(rad._data) * dir_factor;
+        T co = std::cos(rad._data);
+        T si = std::sin(rad._data);
+
+        // this is required for passing a test with our basis (z = {0, 0, -1})
+        // TODO: consider possibility of swapping axes (maybe we should change these matrices when basis is set or just use quaternions)
+        if (axis::z.z() < 0) {
+          return Matr4<T> {
+            co, -si, 0, 0,
+            si,  co, 0, 0,
+             0,   0, 1, 0,
+             0,   0, 0, 1
+          };
+        }
 
         return Matr4<T> {
            co, si, 0, 0,

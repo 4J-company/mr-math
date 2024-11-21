@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1732198886872,
+  "lastUpdate": 1732202284122,
   "repoUrl": "https://github.com/4J-company/mr-math",
   "entries": {
     "Benchmark": [
@@ -5488,6 +5488,120 @@ window.BENCHMARK_DATA = {
             "value": 2.4773397020465504,
             "unit": "ns/iter",
             "extra": "iterations: 282246024\ncpu: 2.477245489913439 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "73912760+cone-forest@users.noreply.github.com",
+            "name": "Michael Tsukanov (MT6)",
+            "username": "cone-forest"
+          },
+          "committer": {
+            "email": "tsukanovWOW@ya.ru",
+            "name": "Michael Tsukanov",
+            "username": "cone-forest"
+          },
+          "distinct": true,
+          "id": "193e194539e1d6198c40a7a38bbe1f2ea1ceb401",
+          "message": "Fix path to tests executable on Windows",
+          "timestamp": "2024-11-21T18:16:11+03:00",
+          "tree_id": "d629897e0f35cf33af09610c042c7d116a89ccd4",
+          "url": "https://github.com/4J-company/mr-math/commit/193e194539e1d6198c40a7a38bbe1f2ea1ceb401"
+        },
+        "date": 1732202283226,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_camera_perspective",
+            "value": 37.289774164959134,
+            "unit": "ns/iter",
+            "extra": "iterations: 18744611\ncpu: 37.2881538592612 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_camera_ortholinear",
+            "value": 31.22789232063749,
+            "unit": "ns/iter",
+            "extra": "iterations: 22418149\ncpu: 31.22642449204883 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_camera_frustum",
+            "value": 30.252731090637944,
+            "unit": "ns/iter",
+            "extra": "iterations: 23114026\ncpu: 30.25079642118598 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_camera_rotation",
+            "value": 66.52019740835046,
+            "unit": "ns/iter",
+            "extra": "iterations: 10522959\ncpu: 66.51634478477015 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_vector_rotation",
+            "value": 0.9320117816119272,
+            "unit": "ns/iter",
+            "extra": "iterations: 753110189\ncpu: 0.9319633783363942 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_vector_scale",
+            "value": 0.8032598015612917,
+            "unit": "ns/iter",
+            "extra": "iterations: 872985716\ncpu: 0.8032281653048267 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_vector_const_multiplication",
+            "value": 0.6377263132992655,
+            "unit": "ns/iter",
+            "extra": "iterations: 1130424011\ncpu: 0.6377162515880068 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_vector_matrix_multiplication",
+            "value": 1.2327784971899916,
+            "unit": "ns/iter",
+            "extra": "iterations: 565138862\ncpu: 1.2327449337575371 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_normalized",
+            "value": 4.699207675743878,
+            "unit": "ns/iter",
+            "extra": "iterations: 148955051\ncpu: 4.698733452147247 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_normalized_fast",
+            "value": 1.3271128140918211,
+            "unit": "ns/iter",
+            "extra": "iterations: 527494979\ncpu: 1.3271266265455774 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_dot",
+            "value": 0.9319266084156512,
+            "unit": "ns/iter",
+            "extra": "iterations: 752269085\ncpu: 0.9318731155886858 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_cross",
+            "value": 1.8590346080298588,
+            "unit": "ns/iter",
+            "extra": "iterations: 377002825\ncpu: 1.858922956346548 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_matrix_multiplication",
+            "value": 3.3055716551353322,
+            "unit": "ns/iter",
+            "extra": "iterations: 211939625\ncpu: 3.3053298126766064 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_matrix_determinant",
+            "value": 5.5232354515765865,
+            "unit": "ns/iter",
+            "extra": "iterations: 126617466\ncpu: 5.522928266468393 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_matrix_transposed",
+            "value": 2.4775904306629752,
+            "unit": "ns/iter",
+            "extra": "iterations: 282310133\ncpu: 2.477481681466958 ns\nthreads: 1"
           }
         ]
       }

@@ -24,6 +24,7 @@ namespace mr
     class [[nodiscard]] Matr
     {
     public:
+      using ValueT = T;
       using RowT = Row<T, N>;
 
       constexpr Matr() noexcept = default;
@@ -119,37 +120,36 @@ namespace mr
         return _data[i];
       }
 
+      [[nodiscard]] constexpr RowT & operator[](size_t i) noexcept {
+        return _data[i];
+      }
+
+      // TODO: fix (or remove as it's neved used)
       [[nodiscard]] constexpr T determinant() const noexcept {
         std::array<RowT, N> tmp = _data;
         T det = 1;
 
         tmp[N - 1] /= tmp[N - 1][N - 1];
-        for (size_t i = 1; i < N; i++) {
-          det *= tmp[i - 1][i - 1];
-          tmp[i - 1] /= std::abs(tmp[i - 1][i - 1]) <= _epsilon ? static_cast<T>(1) : tmp[i - 1][i - 1];
-          for (size_t j = i; j < N; j++) {
-            tmp[i] -= tmp[i - 1] * tmp[j][i - 1];
+        for (size_t i = 0; i < N - 1; i++) {
+          det *= tmp[i][i];
+          tmp[i] /= mr::equal(tmp[i][i], 0) ? static_cast<T>(1) : tmp[i][i];
+          for (size_t j = i + 1; j < N; j++) {
+            tmp[i + 1] -= tmp[i] * tmp[j][i];
           }
         }
         return det;
       }
 
-      [[nodiscard]] constexpr T operator!() const noexcept {
-        return determinant();
-      }
-
       constexpr Matr transposed() const noexcept {
-        std::array<RowT, N> tmp1;
+        Matr transposed;
         for (size_t i = 0; i < N; i++) {
-          tmp1[i] = SimdImpl<T, N>([this, i](auto j){ return _data[j][i]; });
+          transposed[i] = SimdImpl<T, N>([this, i](size_t j) { return _data[j][i]; });
         }
-        return {tmp1};
+        return transposed;
       }
 
       constexpr Matr & transpose() noexcept {
-        for (size_t i = 0; i < N; i++) {
-          _data[i] = SimdImpl<T, N>([this, i](auto j){ return _data[j][i]; });
-        }
+        *this = transposed();
         return *this;
       }
 
@@ -190,12 +190,21 @@ namespace mr
 
         return res;
       }
+#else
+      // dummy
+      constexpr Matr inversed() const noexcept {
+        return {};
+      }
+#endif
 
-      constexpr Matr & inverse() const noexcept {
+      constexpr Matr & inverse() noexcept {
         *this = inversed();
         return *this;
       }
-#endif
+
+      static constexpr Matr identity() noexcept {
+        return _identity;
+      }
 
       static constexpr Matr4<T> scale(const Vec3<T> &vec) noexcept {
         return Matr4<T> {
@@ -215,9 +224,18 @@ namespace mr
         };
       }
 
-      static constexpr Matr4<T> rotate_x(const Radians<T> &rad) noexcept {
+      static constexpr Matr4<T> rotate_x(const Radians<T> &rad) noexcept {;
         T co = std::cos(rad._data);
         T si = std::sin(rad._data);
+
+        if (axis::x.x() < 0) {
+          return Matr4<T> {
+            1,  0,   0, 0,
+            0, co, -si, 0,
+            0, si,  co, 0,
+            0,  0,   0, 1
+          };
+        }
 
         return Matr4<T> {
           1,   0,  0, 0,
@@ -230,6 +248,14 @@ namespace mr
       static constexpr Matr4<T> rotate_y(const Radians<T> &rad) noexcept {
         T co = std::cos(rad._data);
         T si = std::sin(rad._data);
+        if (axis::y.y() < 0) {
+          return Matr4<T> {
+             co, 0, si, 0,
+              0, 1,  0, 0,
+            -si, 0, co, 0,
+              0, 0,  0, 1
+          };
+        }
 
         return Matr4<T> {
           co, 0, -si, 0,
@@ -243,6 +269,17 @@ namespace mr
         T co = std::cos(rad._data);
         T si = std::sin(rad._data);
 
+        // this is required for passing a test with our basis (z = {0, 0, -1})
+        // TODO: consider possibility of swapping axes (maybe we should change these matrices when basis is set or just use quaternions)
+        if (axis::z.z() < 0) {
+          return Matr4<T> {
+            co, -si, 0, 0,
+            si,  co, 0, 0,
+             0,   0, 1, 0,
+             0,   0, 0, 1
+          };
+        }
+
         return Matr4<T> {
            co, si, 0, 0,
           -si, co, 0, 0,
@@ -251,7 +288,7 @@ namespace mr
         };
       }
 
-      static constexpr Matr4<T> rotate(const Radians<T> &rad, const Norm<T, 3> &n) noexcept {
+      static constexpr Matr4<T> rotate(const Norm<T, 3> &n, const Radians<T> &rad) noexcept {
         T co = std::cos(rad._data);
         T si = std::sin(rad._data);
         T nco = 1 - co;
@@ -273,6 +310,24 @@ namespace mr
         return tmp1 + tmp2 + tmp3;
       }
 
+      constexpr bool operator==(const Matr &other) const noexcept {
+        for (size_t i = 0; i < N; i++) {
+          if (_data[i] != other._data[i]) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      constexpr bool equal(const Matr &other, ValueT eps = epsilon<ValueT>()) const noexcept {
+        for (size_t i = 0; i < N; i++) {
+          if (not _data[i].equal(other._data[i], eps)) {
+            return false;
+          }
+        }
+        return true;
+      }
+
       friend std::ostream & operator<<(std::ostream &os, const Matr &m) noexcept {
         os << "\n(" << m[0] << ",\n";
           for (size_t i = 1; i < N - 1; i++)
@@ -282,30 +337,30 @@ namespace mr
       }
 
     private:
-      static Matr _identity() {
+      static Matr get_identity() {
         std::array<RowT, N> id;
         constexpr auto io = std::ranges::iota_view {(size_t)0, N};
 
         std::transform(
           io.begin(), io.end(), id.begin(),
-          [&io](auto i) -> RowT {
-            return SimdImpl<T, N>([i](auto i2) { return i2 == i ? 1 : 0; });
+          [&io](size_t i) -> RowT {
+            return SimdImpl<T, N>([i](size_t j) { return j == i ? 1 : 0; });
           });
 
         return id;
       }
 
     public:
-      static const Matr identity;
       std::array<RowT, N> _data;
 
     private:
+      static const Matr _identity;
       inline static const T _epsilon = std::numeric_limits<T>::epsilon();
     };
 
     // this is required to initialize 'Matr::_identity' on MSVC 
     template <ArithmeticT T, std::size_t N>
-      const Matr<T, N> Matr<T, N>::identity = Matr<T, N>::_identity();
+      const Matr<T, N> Matr<T, N>::_identity = Matr<T, N>::get_identity();
 
 } // namespace mr
 

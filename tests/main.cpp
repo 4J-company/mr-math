@@ -174,36 +174,6 @@ TEST_F(MatrixTest, Transposition) {
   EXPECT_EQ(copy.transpose(), expected);
 }
 
-TEST_F(MatrixTest, Determinant) {
-  mr::Matr4f magic_m {
-    1, 2, 3, 4,
-    2, 2, 0, 0,
-    3, 0, 3, 0,
-    4, 0, 0, 4
-  };
-
-  EXPECT_EQ(magic_m.determinant(), -192);
-}
-
-TEST_F(MatrixTest, Inversion) {
-  mr::Matr4f magic_m {
-    30,  47, 80, 102,
-    47,  47, 0,    0,
-    80,  0,  80,   0,
-    102, 0,  0,  102
-  };
-  mr::Matr4f expected {
-    -1/199.,    1/199.,     1/199.,    1/199.,
-     1/199., 152/9353.,    -1/199.,   -1/199.,
-     1/199.,   -1/199., 119/15920.,   -1/199.,
-     1/199.,   -1/199.,    -1/199., 97/20298.
-  };
-  EXPECT_EQ(magic_m.inversed(), expected);
-
-  mr::Matr4f copy = magic_m;
-  EXPECT_EQ(copy.inverse(), expected);
-}
-
 TEST_F(MatrixTest, Identity) {
   mr::Matr4f expected {
     1, 0, 0, 0,

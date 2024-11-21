@@ -57,7 +57,7 @@ jobs:
         -DCMAKE_CXX_COMPILER=clang++
         -DCMAKE_C_COMPILER=clang
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -DENABLE_TESTING=ON
+        -DMR_MATH_ENABLE_TESTING=ON
         -S ${{ github.workspace }}
 
     - name: Configure CMake (GCC)
@@ -68,7 +68,7 @@ jobs:
         -DCMAKE_CXX_COMPILER=g++
         -DCMAKE_C_COMPILER=gcc
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -DENABLE_TESTING=ON
+        -DMR_MATH_ENABLE_TESTING=ON
         -S ${{ github.workspace }}
 
     - name: Configure CMake (MSVC)
@@ -79,11 +79,16 @@ jobs:
         -DCMAKE_CXX_COMPILER=cl
         -DCMAKE_C_COMPILER=cl
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -DENABLE_TESTING=ON
+        -DMR_MATH_ENABLE_TESTING=ON
         -S ${{ github.workspace }}
 
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
     - name: Run tests
-      run: ctest --test-dir build
+      if: ${{ matrix.os != 'windows-latest' }}
+      run: ${{ steps.strings.outputs.build-output-dir }}/mr-math-tests
+
+    - name: Run tests (Windows)
+      if: ${{ matrix.os == 'windows-latest' }}
+      run: iex "${{ steps.strings.outputs.build-output-dir }}/mr-math-tests.exe".Replace('/', '\')

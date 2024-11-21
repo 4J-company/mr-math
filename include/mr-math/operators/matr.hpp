@@ -2,7 +2,7 @@
 #define __operators_matr_hpp_
 
 #include "../def.hpp"
-#include "mr-math/vec.hpp"
+#include "../vec.hpp"
 
 namespace mr {
   template <typename DerivedT>
@@ -76,7 +76,7 @@ namespace mr {
         return s;
       }
 
-    private:
+    protected:
       static DerivedT _identity() {
         std::array<typename DerivedT::RowT, N> id;
         constexpr auto io = std::ranges::iota_view {(size_t)0, N};

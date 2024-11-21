@@ -1,7 +1,7 @@
 ![mr. Math](./mr-math-logo.png) 
-### Lightweight and high-performance linear algebra library for 3d graphics
+# Lightweight and high-performance linear algebra library for 3d graphics
 
-### Comparison
+## Comparison
 | Library      | Matrix Multiplication (ns) | Vector normalization (ns) | Scalar triple products (ns) |
 |--------------|----------------------------|---------------------------|-----------------------------|
 | mr. Math     |              4             |             2             |            6.5              |
@@ -10,50 +10,78 @@
 | cglm         |            6.2             |          14.6             |            2.2              |
 | lin          |            5.7             |           3.3             |            2.3              |
 
-### Usage
-#### Vectors
-Initialization
+## Usage
+### Vectors
+Initialization:
+- aliases:
 ```cpp
-// alias for mr::Vec<float, 3>
-mr::Vec3f v1 {1, 0, 0};
-mr::Vec3f v2 {0, 1, 0};
+// mr::Vec3f == mr::Vec3<float> == mr::Vec<float, 3>
+mr::Vec2i vi; // T == int
+mr::Vec3u vu; // T == unsigned int
+mr::Vec4d vd; // T == double
 ```
-Operations
+- constructors:
 ```cpp
-// cross product
-std::cout << v1.cross(v2) << std::endl; // output: (0, 0, 1)
-// alternative
-std::cout << v1 % v2 << std::endl; // output: (0, 0, 1)
+mr::Vec3f v1;                    // (0, 0, 0)
+mr::Vec3f v2 {30};               // (30, 30, 30)
+mr::Vec3f v3 {30, 47};           // (30, 47, 0)
+mr::Vec3f v4 {30, 47.0, 102.0f}; // (30, 47, 102); convert each argument
+mr::Vec3f v5 = mr::axis::x;
+```
+Operations:
+- cross product:
+```cpp
+mr::Vec3f x = mr::axis::x; // (1, 0, 0)
+mr::Vec3f y = mr::axis::y; // (0, 1, 0)
 
-// dot product
-std::cout << v1.dot(v2) << std::endl; // output: (0, 0, 1)
-// alternative
-std::cout << v1 & v2 << std::endl; // output: 0
+mr::Vec3f z1 = x.cross(y); // (0, 0, 1)
+mr::Vec3f z2 = x % y;      // (0, 0, 1); shortcut
+```
+- dot product:
+```cpp
+mr::Vec3f v1 {1, 2, 3};
+mr::Vec3f v2 {0, -1, 2};
 
-// returns normalized copy
-mr::Vec3f v3 {2, 0, 0};
-mr::Vec3f v4 = v3.normalized();
-std::cout << v3 << " " << v4 << std::endl; // output: (2, 0, 0) (1, 0, 0)
+float d1 = v1.dot(v2); // 4
+float d2 = v1 & v2;    // 4; shortcut
+```
+- arithmetic operations:
+```cpp
+mr::Vec3f v1 {1, 2, 3};
+mr::Vec3f v2 {0, -1, 2};
 
-// normalizes in place, returns mutable reference
-mr::Vec3f v3 {2, 0, 0};
-mr::Vec3f v4 = v3.normalize();
-std::cout << v3 << " " << v4 << std::endl; // output: (1, 0, 0) (1, 0, 0)
+mr::Vec3f v3 = v1 + v2; // (1, 1, 5)
+mr::Vec3f v4 = v1 * v2; // (0, -2, 6); element-wise multiplication
+mr::Vec3f v5 = -v1;     // (-1, -2, -3)
+mr::Vec3f v6 = 3 * v1;  // (3, 6, 9) - or v1 * 3
+```
+- normalization:
+```cpp
+mr::Vec3f v {2, 0, 0};
+mr::Norm3f n {2, 0, 0}; // normalize at compile time 
 
-mr::Vec3f v5 {3, 4, 0};
-// calculates length (slowest)
-float l = v5.length();
-std::cout << l << std::endl; // output: 5
+std::optional<mr::Norm3f> on = v.normalized(); // does not change v; returns std::nullopt if v.length2() near to zero
+mr::Vec3f &rv = v.normalize();                 // change v
+```
+&emsp;&emsp; You can add '_fast' when less precision is acceptable and/or '_unchecked' when you are sure that vector's length greater than 0.
+- get vector's modulus/magnitude/length/norm:
+```cpp
+mr::Vec3f v {3, 4, 0};
 
-// calculates squared length (fastest)
-float l = v5.length2();
-std::cout << l << std::endl; // output: 25
+float l1 = v.length();          // 5
+float l2 = v.length2();         // 25; faster than v.length()
+float l3 = v.inversed_length(); // 1/5; faster but less precise than 1 / v.length()
+```
+Access components:
+```cpp
+mr::Vec3f v {30, 47, 102};
 
-// structured binding
-mr::Vec3f v6 {30, 47, 102};
-auto [x, y, _] = v6;
+float x1 = v.x();      // 30
+float x2 = v[1];       // 47
+float x3 = v.get<2>(); // 102
+auto [x, y, z] = v;    // 30, 47, 80
 
-// etc (+ - [0..N-1])
+v.z(80) // set component
 ```
 
 #### Matrices

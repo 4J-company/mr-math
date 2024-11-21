@@ -20,9 +20,12 @@ namespace mr {
 
       constexpr Row(const T data) : _data(data) {}
 
+// TODO: implement this usign Vc library
+#if 0
       constexpr Row(const T *data) {
         _data.copy_from(data, stdx::element_aligned);
       }
+#endif
 
       // from elements constructor
       template <ArithmeticT... Args>
@@ -33,8 +36,10 @@ namespace mr {
 
       // copy constructor from different row type
       template <ArithmeticT R, std::size_t S>
-        requires std::is_convertible_v<R, T>
         constexpr Row(const Row<R, S> &rhs) noexcept {
+          _data = stdx::simd_cast<decltype(_data)>(rhs._data);
+
+#if 0
           // size conversion
           std::array<R, std::max(S, N)> tmp1;
           rhs._data.copy_to(tmp1.data(), stdx::element_aligned);
@@ -44,8 +49,11 @@ namespace mr {
 
           // type conversion
           _data = tmp2;
+#endif
         }
 
+// TODO: implement this usign Vc library
+#if 0
       template <ArithmeticT R, std::size_t S, ArithmeticT ... Args>
         requires (sizeof...(Args) + S == N)
         constexpr Row(const Row<R, S> &rhs, Args ... args) noexcept {
@@ -62,24 +70,42 @@ namespace mr {
           // type conversion
           _data = tmp2;
         }
+#endif
 
       [[nodiscard]] constexpr T operator[](std::size_t i) const {
         return _data[i];
+      }
+
+      constexpr bool operator==(const Row &other) const noexcept {
+        return stdx::all_of(_data == other._data);
+      }
+
+      constexpr bool equal(const Row &other, ValueT eps = epsilon<ValueT>()) const noexcept {
+        for (size_t i = 0; i < N; i++) {
+          if (!mr::equal(_data[i], other._data[i], eps))
+            return false;
+        }
+        return true;
       }
 
     protected:
       template <ArithmeticT... Args>
         requires (sizeof...(Args) >= 1) && (sizeof...(Args) <= N)
         constexpr void _set(Args... args) noexcept {
-          std::array<T, N> arr {static_cast<T>(args)...};
-          _data.copy_from(arr.data(), stdx::element_aligned);
+          _data = {static_cast<T>(args)...};
+
+          // std::array<T, N> arr {static_cast<T>(args)...};
+          // _data.copy_from(arr.data(), stdx::element_aligned);
         }
 
+    public:
       constexpr void _set_ind(std::size_t ind, T value) noexcept {
-        std::array<T, N> arr;
-        _data.copy_to(arr.data(), stdx::element_aligned);
-        arr[ind] = value;
-        _data.copy_from(arr.data(), stdx::element_aligned);
+        _data[ind] = value;
+
+        // std::array<T, N> arr;
+        // _data.copy_to(arr.data(), stdx::element_aligned);
+        // arr[ind] = value;
+        // _data.copy_from(arr.data(), stdx::element_aligned);
       }
     };
 } // namespace mr
@@ -92,9 +118,12 @@ namespace std {
       template<typename ParseContext>
         constexpr auto parse(ParseContext& ctx) {
           // skip all format specifiers
-          return ctx.end();
+          auto it = ctx.begin();
+          while (*it != '}')
+              ++it;
+          return it;
         }
-  
+
       template<typename FmtContext>
         auto format(const mr::Row<T, N> &r, FmtContext& ctx) const {
           ostringstream out;

@@ -4,32 +4,32 @@
 #include "def.hpp"
 #include "row.hpp"
 #include "units.hpp"
-#include "operators/matr.hpp"
+#include "operators/operators.hpp"
 
-namespace mr {
+namespace mr
+{
   // forward declarations
   template <ArithmeticT T, std::size_t N>
     struct Matr;
 
   // common aliases
   template <ArithmeticT T>
-    using Matr3 = Matr<T, 3>;
-
-  using Matr3f = Matr3<float>;
-  using Matr3d = Matr3<double>;
-  using Matr3i = Matr3<int>;
-  using Matr3u = Matr3<uint32_t>;
-
-  template <ArithmeticT T>
     using Matr4 = Matr<T, 4>;
+  template <ArithmeticT T>
+    using Matr3 = Matr<T, 3>;
 
   using Matr4f = Matr4<float>;
   using Matr4d = Matr4<double>;
   using Matr4i = Matr4<int>;
   using Matr4u = Matr4<uint32_t>;
 
+  using Matr3f = Matr3<float>;
+  using Matr3d = Matr3<double>;
+  using Matr3i = Matr3<int>;
+  using Matr3u = Matr3<uint32_t>;
+
   template <ArithmeticT T, std::size_t N>
-    struct [[nodiscard]] Matr : MatrOperators<Matr<T, N>> {
+    struct [[nodiscard]] Matr : public MatrOperators<Matr<T, N>> {
     private:
       using MatrOperators<Matr<T, N>>::_identity;
       static constexpr T _epsilon = std::numeric_limits<T>::epsilon();
@@ -48,6 +48,7 @@ namespace mr {
         constexpr Matr(Args... args) noexcept {
           _data = std::array<RowT, N>({args...});
         }
+
 
       template <typename... Args>
         requires (std::is_convertible_v<Args, T> && ...) &&
@@ -87,32 +88,32 @@ namespace mr {
         T det = 1;
 
         tmp[N - 1] /= tmp[N - 1][N - 1];
-        for (size_t i = 1; i < N; i++) {
-          det *= tmp[i - 1][i - 1];
-          tmp[i - 1] /= std::abs(tmp[i - 1][i - 1]) <= _epsilon ? static_cast<T>(1) : tmp[i - 1][i - 1];
-          for (size_t j = i; j < N; j++) {
-            tmp[i] -= tmp[i - 1] * tmp[j][i - 1];
+        for (size_t i = 0; i < N - 1; i++) {
+          det *= tmp[i][i];
+          tmp[i] /= mr::equal(tmp[i][i], 0) ? static_cast<T>(1) : tmp[i][i];
+          for (size_t j = i + 1; j < N; j++) {
+            tmp[i + 1] -= tmp[i] * tmp[j][i];
           }
         }
         return det;
       }
 
-      constexpr Matr<T, N> transposed() const noexcept {
-        std::array<RowT, N> tmp1;
+      constexpr Matr transposed() const noexcept {
+        Matr transposed;
         for (size_t i = 0; i < N; i++) {
-          tmp1[i] = SimdImpl<T, N>([this, i](auto j){ return _data[j][i]; });
+          transposed[i] = SimdImpl<T, N>([this, i](size_t j) { return _data[j][i]; });
         }
-        return {tmp1};
+        return transposed;
       }
 
-      constexpr Matr<T, N> & transpose() noexcept {
-        for (size_t i = 0; i < N; i++) {
-          _data[i] = SimdImpl<T, N>([this, i](auto j){ return _data[j][i]; });
-        }
+      constexpr Matr & transpose() noexcept {
+        *this = transposed();
         return *this;
       }
 
-      constexpr Matr<T, N> inversed() const noexcept {
+// TODO: implement this using Vc library
+#if 0
+      constexpr Matr inversed() const noexcept {
         constexpr auto io = std::ranges::iota_view{(size_t)0, N};
 
         std::array<Row<T, 2 * N>, N> tmp;
@@ -147,8 +148,14 @@ namespace mr {
 
         return res;
       }
+#else
+      // dummy
+      constexpr Matr inversed() const noexcept {
+        return {};
+      }
+#endif
 
-      constexpr Matr<T, N> & inverse() const noexcept {
+      constexpr Matr & inverse() noexcept {
         *this = inversed();
         return *this;
       }
@@ -415,17 +422,16 @@ namespace std {
       template<typename ParseContext>
         constexpr auto parse(ParseContext& ctx) {
           // skip all format specifiers
-          return ctx.end();
+          auto it = ctx.begin();
+          while (*it != '}')
+              ++it;
+          return it;
         }
 
       template<typename FmtContext>
         auto format(const mr::Matr<T, N> &m, FmtContext& ctx) const {
           ostringstream out;
-          out << '(' << m[0] << ",\n";
-          for (size_t i = 1; i < N - 1; i++)
-            out << ' ' << m[i] << ",\n";
-          out << ' ' << m[N - 1] << ')';
-
+          out << m;
           return ranges::copy(std::move(out).str(), ctx.out()).out;
         }
     };

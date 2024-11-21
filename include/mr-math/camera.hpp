@@ -131,10 +131,10 @@ namespace mr {
           const auto right = _rotation.right();
           const auto up = _rotation.up();
           _perspective = mr::Matr4<T>{
-            typename mr::Matr4<T>::RowT{right.x(), up.x(), direction.x(), 0},
-            typename mr::Matr4<T>::RowT{right.y(), up.y(), direction.y(), 0},
-            typename mr::Matr4<T>::RowT{right.z(), up.z(), direction.z(), 0},
-            typename mr::Matr4<T>::RowT{-(_position & right), -(_position & up), (_position & direction), 1}
+                       right.x(),            up.x(),           direction.x(), 0,
+                       right.y(),            up.y(),           direction.y(), 0,
+                       right.z(),            up.z(),           direction.z(), 0,
+            -(_position & right), -(_position & up), (_position & direction), 1
           };
           _perspective_calculated = true;
           return _perspective;
@@ -151,10 +151,10 @@ namespace mr {
           const T f = _projection.far;         // far
 
           _projection.orthographic = mr::Matr4<T>{
-            typename mr::Matr4<T>::RowT(2 / (r - l), 0, 0, 0),
-            typename mr::Matr4<T>::RowT(0, 2 / (t - b), 0, 0),
-            typename mr::Matr4<T>::RowT(0, 0, 2 / (n - f), 0),
-            typename mr::Matr4<T>::RowT((r + l) / (l - r), (t + b) / (b - t), (f + n) / (n - f), 1)
+                  2 / (r - l),                 0,                 0, 0,
+                            0,       2 / (t - b),                 0, 0,
+                            0,                 0,       2 / (n - f), 0,
+            (r + l) / (l - r), (t + b) / (b - t), (f + n) / (n - f), 1
           };
           _projection.orthographic_calculated = true;
           return _projection.orthographic;
@@ -171,10 +171,10 @@ namespace mr {
           const T f = _projection.far;         // far
 
           _projection.frustum = mr::Matr4<T>{
-            typename mr::Matr4<T>::RowT(2 * n / (r - l), 0, 0, 0),
-            typename mr::Matr4<T>::RowT(0, 2 * n / (t - b), 0, 0),
-            typename mr::Matr4<T>::RowT((r + l) / (r - l), (t + b) / (t - b), (f + n) / (n - f), -1),
-            typename mr::Matr4<T>::RowT(0, 0, 2 * n * f / (n - f), 0)
+              2 * n / (r - l),                 0,                   0,  0,
+                            0,   2 * n / (t - b),                   0,  0,
+            (r + l) / (r - l), (t + b) / (t - b),   (f + n) / (n - f), -1,
+                            0,                 0, 2 * n * f / (n - f),  0
           };
           _projection.frustum_calculated = true;
           return _projection.frustum;

@@ -1,0 +1,94 @@
+name: Tests
+
+on:
+  push:
+    branches: [ "master", "core/*" ]
+  pull_request:
+    branches: [ "master", "core/*" ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        os: [ubuntu-24.04, windows-latest, macos-latest]
+        build_type: [Release, Debug]
+        c_compiler: [gcc, clang, cl]
+        exclude:
+          - os: windows-latest
+            c_compiler: gcc
+          - os: windows-latest
+            c_compiler: clang
+          - os: ubuntu-24.04
+            c_compiler: cl
+          - os: macos-latest
+            c_compiler: cl
+          - os: macos-latest
+            c_compiler: gcc
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+    - name: Set up cache
+      id: cache-cpm
+      uses: actions/cache@v2
+      with:
+        path: ~/cpm-cache
+        key: ${{ runner.os }}-cpm-${{ hashFiles('**/') }}
+        restore-keys: |
+          ${{ runner.os }}-cpm-a
+
+    - name: Configure CMake (Clang)
+      if: ${{ matrix.c_compiler == 'clang' }}
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCPM_SOURCE_CACHE=~/cpm-cache
+        -DCMAKE_CXX_COMPILER=clang++
+        -DCMAKE_C_COMPILER=clang
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DMR_MATH_ENABLE_TESTING=ON
+        -S ${{ github.workspace }}
+
+    - name: Configure CMake (GCC)
+      if: ${{ matrix.c_compiler == 'gcc' }}
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCPM_SOURCE_CACHE=~/cpm-cache
+        -DCMAKE_CXX_COMPILER=g++
+        -DCMAKE_C_COMPILER=gcc
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DMR_MATH_ENABLE_TESTING=ON
+        -S ${{ github.workspace }}
+
+    - name: Configure CMake (MSVC)
+      if: ${{ matrix.c_compiler == 'cl' }}
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCPM_SOURCE_CACHE=~/cpm-cache
+        -DCMAKE_CXX_COMPILER=cl
+        -DCMAKE_C_COMPILER=cl
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DMR_MATH_ENABLE_TESTING=ON
+        -S ${{ github.workspace }}
+
+    - name: Build
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+
+    - name: Run tests
+      if: ${{ matrix.os != 'windows-latest' }}
+      run: ${{ steps.strings.outputs.build-output-dir }}/mr-math-tests
+
+    - name: Run tests (Windows)
+      if: ${{ matrix.os == 'windows-latest' }}
+      run: iex "${{ steps.strings.outputs.build-output-dir }}/${{ matrix.build_type }}/mr-math-tests.exe".Replace('/', '\')

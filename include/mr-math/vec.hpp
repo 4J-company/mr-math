@@ -3,15 +3,17 @@
 
 #include "def.hpp"
 #include "row.hpp"
-#include "operators/row.hpp"
 
 namespace mr {
   // forward declarations
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
     struct Vec;
+  template <ArithmeticT T, std::size_t N> requires (N >= 2)
+    struct Norm;
   template <ArithmeticT T, std::size_t N>
     struct Matr;
 
+  // common aliases
   template <ArithmeticT T>
     using Vec2 = Vec<T, 2>;
   template <ArithmeticT T>
@@ -19,7 +21,6 @@ namespace mr {
   template <ArithmeticT T>
     using Vec4 = Vec<T, 4>;
 
-  // common aliases
   using Vec2i = Vec2<int>;
   using Vec3i = Vec3<int>;
   using Vec4i = Vec4<int>;
@@ -38,18 +39,21 @@ namespace mr {
 
   // base vector (use aliases for full functional)
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
-    struct [[nodiscard]] Vec : public RowOperators<Vec<T, N>> {
+    struct [[nodiscard]] Vec : public RowOperators<Vec<T, N>>
+    {
     public:
       using ValueT = T;
       using RowT = Row<T, N>;
-      inline static constexpr std::size_t size = N;
+      using NormT = Norm<T, N>;
+      using SimdT = SimdImpl<T, N>;
+      inline static constexpr size_t size = N;
 
       RowT _data;
 
-      constexpr Vec() = default;
+      constexpr Vec() noexcept = default;
 
       // from simd constructor
-      constexpr Vec(RowT row) : _data(row._data) {};
+      constexpr Vec(const RowT &row) noexcept : _data(row._data) {};
 
       // from elements constructor
       template <ArithmeticT... Args>
@@ -60,14 +64,18 @@ namespace mr {
       template <ArithmeticT R, std::size_t S>
         constexpr Vec(const Vec<R, S> &v) noexcept : _data(v._data) {}
 
+// TODO: implement this using Vc library
+#if 0
       template <ArithmeticT R, std::size_t S, ArithmeticT ... Args>
         constexpr Vec(const Vec<R, S> &v, Args ... args) noexcept : _data(v, args...) {}
+#endif
 
       // setters
-      constexpr void x(T x) noexcept requires (N >= 1) { _set_ind(0, x); }
-      constexpr void y(T y) noexcept requires (N >= 2) { _set_ind(1, y); }
-      constexpr void z(T z) noexcept requires (N >= 3) { _set_ind(2, z); }
-      constexpr void w(T w) noexcept requires (N >= 4) { _set_ind(3, w); }
+      constexpr void set(size_t i, T value) noexcept { _data._set_ind(i, value); } // for some reason `T & RowT::operator[]` doesn't compile (maybe I'm just stupid)
+      constexpr void x(T x) noexcept requires (N >= 1) { set(0, x); }
+      constexpr void y(T y) noexcept requires (N >= 2) { set(1, y); }
+      constexpr void z(T z) noexcept requires (N >= 3) { set(2, z); }
+      constexpr void w(T w) noexcept requires (N >= 4) { set(3, w); }
 
       // getters
       [[nodiscard]] constexpr T x() const noexcept requires (N >= 1) { return _data[0]; }
@@ -81,6 +89,10 @@ namespace mr {
 
       // cross product
       constexpr Vec cross(const Vec &other) const noexcept requires (N == 3) {
+        return RowT(_data._data.rotated(1) * other._data._data.rotated(-1)
+          - _data._data.rotated(-1) * other._data._data.rotated(1));
+
+#if 0
         std::array<T, 3> arr {
           _data[1] * other._data[2] - _data[2] * other._data[1],
           _data[2] * other._data[0] - _data[0] * other._data[2],
@@ -90,6 +102,7 @@ namespace mr {
         SimdImpl<T, 3> ans;
         ans.copy_from(arr.data(), stdx::element_aligned);
         return {ans};
+#endif
       }
 
       constexpr Vec operator%(const Vec &other) const noexcept requires (N == 3) {
@@ -98,80 +111,93 @@ namespace mr {
 
       // length methods
       [[nodiscard]] constexpr T length2() const noexcept {
-        return stdx::reduce(_data._data * _data._data); // sum by default
+        return (_data._data * _data._data).sum();
       }
 
       [[nodiscard]] constexpr T length() const noexcept {
         return std::sqrt(length2());
       }
 
+      // use 1 / length() for higher precision
       [[nodiscard]] constexpr T inversed_length() const {
-        return finv_sqrt(length2());
+        return fast_rsqrt(length2());
       }
 
       // use normalize_fast for lower precision
       constexpr Vec & normalize() noexcept {
         auto len = length2();
         if (len <= _epsilon) [[unlikely]] return *this;
-        *this *= finv_sqrt(len);
+        *this *= fast_rsqrt(len);
         return *this;
       };
 
-      // use normalized_fast for lower precision
-      constexpr Vec normalized() const noexcept {
+      constexpr std::optional<NormT> normalized() const noexcept {
         auto len = length2();
-        if (len <= _epsilon) [[unlikely]] return {};
-        return Vec{*this * finv_sqrt(len)};
+        if (len <= _epsilon) [[unlikely]] return std::nullopt;
+        return {{*this / std::sqrt(len)}};
       };
 
-      // use normalize for higher precision
+      constexpr Vec & normalize_unchecked() noexcept {
+        auto len = length2();
+        *this /= std::sqrt(len);
+        return *this;
+      };
+
+      constexpr NormT normalized_unchecked() const noexcept {
+        auto len = length2();
+        return {*this / std::sqrt(len)};
+      };
+
+      // use normalize() for higher precision
       constexpr Vec & normalize_fast() noexcept {
         auto len = length2();
         if (len <= _epsilon) [[unlikely]] return *this;
-        *this *= ffinv_sqrt(len);
+        *this *= fast_rsqrt(len);
         return *this;
       };
 
-      // use normalized for higher precision
-      constexpr Vec normalized_fast() const noexcept {
+      // use normalized() for higher precision
+      constexpr std::optional<NormT> normalized_fast() const noexcept {
         auto len = length2();
-        if (len <= _epsilon) [[unlikely]] return {};
-        return Vec{*this * ffinv_sqrt(len)};
+        if (len <= _epsilon) [[unlikely]] return std::nullopt;
+        return {{*this * fast_rsqrt(len)}};
       };
 
-      constexpr Vec & normalize_fast_unsafe() {
+      // use normalize_unchecked() for higher precision
+      constexpr Vec & normalize_fast_unchecked() {
         auto l = length2();
-        *this *= ffinv_sqrt(l);
+        *this *= fast_rsqrt(l);
         return *this;
       };
 
-      constexpr Vec normalized_fast_unsafe() const {
+      // use normalized_unchecked() for higher precision
+      constexpr NormT normalized_fast_unchecked() const {
         auto l = length2();
-        return Vec{*this * ffinv_sqrt(l)};
+        return {*this * fast_rsqrt(l)};
       };
 
       // dot product
-      [[nodiscard]] constexpr T dot(const Vec<T, N> other) const noexcept {
-        return stdx::reduce(_data._data * other._data._data);
+      [[nodiscard]] constexpr T dot(const Vec &other) const noexcept {
+        return (_data._data * other._data._data).sum();
       }
 
-      [[nodiscard]] constexpr T operator&(const Vec<T, N> other) const noexcept {
+      [[nodiscard]] constexpr T operator&(const Vec &other) const noexcept {
         return dot(other);
       }
 
       template<ArithmeticT R>
         constexpr Vec operator*(const Matr<R, N> &other) const noexcept {
-          mr::Vec<T, N> tmp {};
+          Vec res {};
           for (size_t i = 0; i < N; i++) {
-            tmp._data += (other._data[i] * _data[i])._data;
+            res._data += (other._data[i] * _data[i])._data;
           }
-          return tmp;
+          return res;
         }
 
       template<ArithmeticT R>
         constexpr Vec operator*(const Matr<R, N + 1> &other) noexcept {
-          mr::Vec<T, N + 1> copy = mr::Vec<T, N + 1>(*this);
-          mr::Vec<T, N + 1> tmp {};
+          Vec<T, N + 1> copy = Vec<T, N + 1>(*this);
+          Vec<T, N + 1> tmp {};
 
           for (size_t i = 0; i < N; i++) {
             tmp._data += (other._data[i] * copy._data[i])._data;
@@ -182,7 +208,7 @@ namespace mr {
 
       template<ArithmeticT R>
         constexpr Vec & operator*=(const Matr<R, N> &other) noexcept {
-          mr::Vec<T, N> tmp {};
+          Vec tmp {};
           for (size_t i = 0; i < N; i++) {
             tmp._data += (other._data[i] * _data[i])._data;
           }
@@ -192,15 +218,43 @@ namespace mr {
 
       template<ArithmeticT R>
         constexpr Vec & operator*=(const Matr<R, N + 1> &other) noexcept {
-          mr::Vec<T, N + 1> copy = mr::Vec<T, N + 1>(*this);
-          mr::Vec<T, N + 1> tmp {};
+          Vec<T, N + 1> copy = Vec<T, N + 1>(*this);
+          Vec<T, N + 1> tmp {};
           for (size_t i = 0; i < N; i++) {
             tmp._data += (other._data[i] * copy._data[i])._data;
           }
           tmp._data += other._data[N]._data;
 
-          *this = mr::Vec<T, N>(tmp);
+          *this = Vec<T, N>(tmp);
           return *this;
+        }
+
+        // reflect from other vector
+        constexpr Vec reflected(const NormT &n) const noexcept {
+          return -(*this - (2 * dot(n) * (Vec)n));
+        }
+
+        constexpr Vec & reflect(const NormT &n) noexcept {
+          *this = reflected(n);
+          return *this;
+        }
+
+        constexpr Vec & abs() noexcept {
+          stdx::where(_data._data < 0) | _data._data = -_data._data;
+          return *this;
+        }
+
+        constexpr Vec absed() const noexcept {
+          Vec copy = *this;
+          return copy.abs();
+        }
+
+        constexpr bool operator==(const Vec &other) const noexcept {
+          return _data == other._data;
+        }
+
+        constexpr bool equal(const Vec &other, ValueT eps = epsilon<ValueT>()) const noexcept {
+          return _data.equal(other._data, eps);
         }
 
       private:
@@ -220,7 +274,6 @@ namespace std
   struct tuple_element<I, mr::Vec<T, N>> {
     using type = T;
   };
-
 }
 #endif
 

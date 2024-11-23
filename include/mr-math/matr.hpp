@@ -426,17 +426,17 @@ inline namespace math
             return lhs;
           }
 
-          friend constexpr ScaleMatr operator*(const ScaleMatr &lhs, const ScaleMatr &rhs) noexcept {
+          friend inline constexpr ScaleMatr operator*(const ScaleMatr &lhs, const ScaleMatr &rhs) noexcept {
             ScaleMatr res = lhs;
             lhs._data *= rhs._data;
             return res;
           }
-          friend constexpr ScaleMatr & operator*=(ScaleMatr &lhs, const ScaleMatr &rhs) noexcept {
+          friend inline constexpr ScaleMatr & operator*=(ScaleMatr &lhs, const ScaleMatr &rhs) noexcept {
             lhs._data *= rhs._data;
             return lhs;
           }
 
-          friend constexpr Vec<T, N> operator*(const Vec<T, N> &lhs, const ScaleMatr &rhs) noexcept {
+          friend inline constexpr Vec<T, N> operator*(const Vec<T, N> &lhs, const ScaleMatr &rhs) noexcept {
             Vec<T, N> res = lhs * rhs._data;
             return res;
           }
@@ -474,41 +474,46 @@ inline namespace math
             return TranslateMatr(-_data);
           }
 
-          friend constexpr TranslateMatr operator*(const TranslateMatr &lhs, const TranslateMatr &rhs) noexcept {
+          friend inline constexpr TranslateMatr operator*(const TranslateMatr &lhs, const TranslateMatr &rhs) noexcept {
             TranslateMatr res = lhs;
             res._data += rhs._data;
             return res;
           }
-          friend constexpr TranslateMatr & operator*=(TranslateMatr &lhs, const TranslateMatr &rhs) noexcept {
+          friend inline constexpr TranslateMatr & operator*=(TranslateMatr &lhs, const TranslateMatr &rhs) noexcept {
             lhs._data += rhs._data;
             return lhs;
           }
 
-          friend constexpr Matr<T, N> operator*(const Matr<T, N> &lhs, const TranslateMatr &rhs) noexcept {
+          friend inline constexpr Matr<T, N> operator*(const Matr<T, N> &lhs, const TranslateMatr &rhs) noexcept {
             Matr<T, N> res = lhs;
             res[N - 1] += rhs._data;
             return res;
           }
-          friend constexpr Matr<T, N> & operator*=(Matr<T, N> &lhs, const TranslateMatr &rhs) noexcept {
+          friend inline constexpr Matr<T, N> & operator*=(Matr<T, N> &lhs, const TranslateMatr &rhs) noexcept {
+            lhs[N - 1] += rhs._data;
+            return lhs;
+          }
+
+          friend inline constexpr Matr<T, N> & operator*(const Matr<T, N> &lhs, const TranslateMatr &rhs) noexcept {
             lhs = lhs * rhs;
             return lhs;
           }
 
-          friend constexpr Vec<T, N> operator*(const Vec<T, N> &lhs, const TranslateMatr &rhs) noexcept {
+          friend inline constexpr Vec<T, N> operator*(const Vec<T, N> &lhs, const TranslateMatr &rhs) noexcept {
             Vec<T, N> res = lhs + rhs._data;
             return res;
           }
-          friend constexpr Vec<T, N> & operator*=(Vec<T, N> &lhs, const TranslateMatr &rhs) noexcept {
+          friend inline constexpr Vec<T, N> & operator*=(Vec<T, N> &lhs, const TranslateMatr &rhs) noexcept {
             lhs += rhs._data;
             return lhs;
           }
 
-          friend constexpr TranslateMatr operator*(const TranslateMatr &lhs, const ScaleMatr<T, N> &rhs) noexcept {
+          friend inline constexpr TranslateMatr operator*(const TranslateMatr &lhs, const ScaleMatr<T, N> &rhs) noexcept {
             TranslateMatr res = lhs;
             res._data *= rhs._data;
             return res;
           }
-          friend constexpr TranslateMatr & operator*=(TranslateMatr &lhs, const ScaleMatr<T, N> &rhs) noexcept {
+          friend inline constexpr TranslateMatr & operator*=(TranslateMatr &lhs, const ScaleMatr<T, N> &rhs) noexcept {
             lhs._data *= rhs._data;
             return lhs;
           }

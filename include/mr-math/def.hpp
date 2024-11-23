@@ -54,10 +54,8 @@ namespace mr {
   // use 1 / std::sqrt() for higher precision
   constexpr float fast_rsqrt(float number) {
     unsigned i;
-    float x2, y;
-    const float threehalfs = 1.5F;
+    float y;
 
-    x2 = number * 0.5F;
     y = number;
     i = std::bit_cast<unsigned>(y); // evil floating point bit level hacking
     i = 0x5f3759df - (i >> 1);      // what the fuck?
@@ -70,10 +68,8 @@ namespace mr {
   // use 1 / std::sqrt() for higher precision
   constexpr double fast_rsqrt(double number) {
     unsigned long long i;
-    double x2, y;
-    const double threehalfs = 1.5F;
+    double y;
 
-    x2 = number * 0.5F;
     y = number;
     i = std::bit_cast<unsigned long long>(y); // evil floating point bit level hacking
     i = 0x5fe6f7ced9168800 - (i >> 1);      // what the fuck?

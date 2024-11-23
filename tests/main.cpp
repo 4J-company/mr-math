@@ -213,3 +213,15 @@ TEST_F(MatrixTest, RotateVector) {
   mr::Vec3f expected{38.340427, 81.678845, 36.980571};
   EXPECT_TRUE(mr::equal(v * mr::Matr4f::rotate({1, 1, 1}, 102_deg), expected, 0.0001));
 }
+
+class QuaternionTest : public ::testing::Test {
+protected:
+  mr::Quat<float> q1 {mr::Degreesf(90), 1, 0, 0};
+};
+
+TEST_F(QuaternionTest, RotateMatrix) {
+  mr::Vec3f v {0, 1, 0};
+  mr::Vec3f expected {0, 0, 1};
+  EXPECT_TRUE(mr::equal(v * q1, expected));
+}
+

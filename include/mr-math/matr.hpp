@@ -9,7 +9,7 @@ namespace mr
 {
   // forward declarations
   template <ArithmeticT T, std::size_t N>
-    class Matr;
+    struct Matr;
 
   // common aliases
   template <ArithmeticT T>
@@ -21,7 +21,7 @@ namespace mr
   using Matr4u = Matr4<uint32_t>;
 
   template <ArithmeticT T, std::size_t N>
-    class [[nodiscard]] Matr
+    struct [[nodiscard]] Matr
     {
     public:
       using ValueT = T;

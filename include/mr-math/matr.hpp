@@ -379,7 +379,7 @@ namespace mr
       inline static const T _epsilon = std::numeric_limits<T>::epsilon();
     };
 
-    // this is required to initialize 'Matr::_identity' on MSVC 
+    // this is required to initialize 'Matr::_identity' on MSVC
     template <ArithmeticT T, std::size_t N>
       const Matr<T, N> Matr<T, N>::_identity = Matr<T, N>::get_identity();
 
@@ -389,46 +389,46 @@ namespace mr
           mr::Vec<T, N> _data = 1;
 
         public:
-          inline constexpr ScaleMatr() = default;
-          inline constexpr ScaleMatr(mr::Vec<T, N> scale) : _data(scale) { }
+          constexpr ScaleMatr() = default;
+          constexpr ScaleMatr(mr::Vec<T, N> scale) : _data(scale) { }
 
-          inline constexpr ScaleMatr &inverse() noexcept {
+          constexpr ScaleMatr &inverse() noexcept {
             _data = 1 / _data;
             return *this;
           }
-          inline constexpr ScaleMatr inversed() const noexcept {
+          constexpr ScaleMatr inversed() const noexcept {
             return ScaleMatr(1 / _data);
           }
 
-          friend inline constexpr Matr<T, N> operator*(const Matr<T, N> &lhs, const ScaleMatr &rhs) noexcept {
+          friend constexpr Matr<T, N> operator*(const Matr<T, N> &lhs, const ScaleMatr &rhs) noexcept {
             Matr<T, N> res = lhs;
             for (size_t i = 0; i < N; i++) {
               res[i] *= rhs._data[i];
             }
             return res;
           }
-          friend inline constexpr Matr<T, N> & operator*=(Matr<T, N> &lhs, const ScaleMatr &rhs) noexcept {
+          friend constexpr Matr<T, N> & operator*=(Matr<T, N> &lhs, const ScaleMatr &rhs) noexcept {
             for (size_t i = 0; i < N; i++) {
               lhs[i] *= rhs._data[i];
             }
             return lhs;
           }
 
-          friend inline constexpr ScaleMatr operator*(const ScaleMatr &lhs, const ScaleMatr &rhs) noexcept {
+          friend constexpr ScaleMatr operator*(const ScaleMatr &lhs, const ScaleMatr &rhs) noexcept {
             ScaleMatr res = lhs;
             lhs._data *= rhs._data;
             return res;
           }
-          friend inline constexpr ScaleMatr & operator*=(ScaleMatr &lhs, const ScaleMatr &rhs) noexcept {
+          friend constexpr ScaleMatr & operator*=(ScaleMatr &lhs, const ScaleMatr &rhs) noexcept {
             lhs._data *= rhs._data;
             return lhs;
           }
 
-          friend inline constexpr Vec<T, N> operator*(const Vec<T, N> &lhs, const ScaleMatr &rhs) noexcept {
+          friend constexpr Vec<T, N> operator*(const Vec<T, N> &lhs, const ScaleMatr &rhs) noexcept {
             Vec<T, N> res = lhs * rhs._data;
             return res;
           }
-          friend inline constexpr Vec<T, N> & operator*=(Vec<T, N> &lhs, const ScaleMatr &rhs) noexcept {
+          friend constexpr Vec<T, N> & operator*=(Vec<T, N> &lhs, const ScaleMatr &rhs) noexcept {
             lhs *= rhs._data;
             return lhs;
           }
@@ -445,8 +445,8 @@ namespace mr
           mr::Vec<T, N> _data {};
 
         public:
-          inline constexpr TranslateMatr() = default;
-          inline constexpr TranslateMatr(mr::Vec<T, N> translate) : _data(translate) { }
+          constexpr TranslateMatr() = default;
+          constexpr TranslateMatr(mr::Vec<T, N> translate) : _data(translate) { }
 
           operator Matr<T, N>() {
             Matr<T, N> res = Matr<T, N>::identity();
@@ -454,49 +454,49 @@ namespace mr
             return res;
           }
 
-          inline constexpr TranslateMatr &inverse() noexcept {
+          constexpr TranslateMatr &inverse() noexcept {
             _data = -_data;
             return *this;
           }
-          inline constexpr TranslateMatr inversed() const noexcept {
+          constexpr TranslateMatr inversed() const noexcept {
             return TranslateMatr(-_data);
           }
 
-          friend inline constexpr TranslateMatr operator*(const TranslateMatr &lhs, const TranslateMatr &rhs) noexcept {
+          friend constexpr TranslateMatr operator*(const TranslateMatr &lhs, const TranslateMatr &rhs) noexcept {
             TranslateMatr res = lhs;
             res._data += rhs._data;
             return res;
           }
-          friend inline constexpr TranslateMatr & operator*=(TranslateMatr &lhs, const TranslateMatr &rhs) noexcept {
+          friend constexpr TranslateMatr & operator*=(TranslateMatr &lhs, const TranslateMatr &rhs) noexcept {
             lhs._data += rhs._data;
             return lhs;
           }
 
-          friend inline constexpr Matr<T, N> operator*(const Matr<T, N> &lhs, const TranslateMatr &rhs) noexcept {
+          friend constexpr Matr<T, N> operator*(const Matr<T, N> &lhs, const TranslateMatr &rhs) noexcept {
             Matr<T, N> res = lhs;
             res[N - 1] += rhs._data;
             return res;
           }
-          friend inline constexpr Matr<T, N> & operator*=(Matr<T, N> &lhs, const TranslateMatr &rhs) noexcept {
+          friend constexpr Matr<T, N> & operator*=(Matr<T, N> &lhs, const TranslateMatr &rhs) noexcept {
             lhs = lhs * rhs;
             return lhs;
           }
 
-          friend inline constexpr Vec<T, N> operator*(const Vec<T, N> &lhs, const TranslateMatr &rhs) noexcept {
+          friend constexpr Vec<T, N> operator*(const Vec<T, N> &lhs, const TranslateMatr &rhs) noexcept {
             Vec<T, N> res = lhs + rhs._data;
             return res;
           }
-          friend inline constexpr Vec<T, N> & operator*=(Vec<T, N> &lhs, const TranslateMatr &rhs) noexcept {
+          friend constexpr Vec<T, N> & operator*=(Vec<T, N> &lhs, const TranslateMatr &rhs) noexcept {
             lhs += rhs._data;
             return lhs;
           }
 
-          friend inline constexpr TranslateMatr operator*(const TranslateMatr &lhs, const ScaleMatr<T, N> &rhs) noexcept {
+          friend constexpr TranslateMatr operator*(const TranslateMatr &lhs, const ScaleMatr<T, N> &rhs) noexcept {
             TranslateMatr res = lhs;
             res._data *= rhs._data;
             return res;
           }
-          friend inline constexpr TranslateMatr & operator*=(TranslateMatr &lhs, const ScaleMatr<T, N> &rhs) noexcept {
+          friend constexpr TranslateMatr & operator*=(TranslateMatr &lhs, const ScaleMatr<T, N> &rhs) noexcept {
             lhs._data *= rhs._data;
             return lhs;
           }

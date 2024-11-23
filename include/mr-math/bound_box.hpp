@@ -6,7 +6,7 @@
 
 namespace mr {
   template <ArithmeticT T>
-    class AABB;
+    struct AABB;
 
   using AABBf = AABB<float>;
   using AABBd = AABB<double>;
@@ -14,7 +14,7 @@ namespace mr {
   using AABBu = AABB<uint32_t>;
 
   template <ArithmeticT T>
-    class AABB {
+    struct AABB {
     public:
       using VecT = Vec3<T>;
 

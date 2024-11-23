@@ -136,8 +136,8 @@ namespace mr {
         }
 
       private:
-        friend class Vec<T, N>;
-        friend class Rotation<T>;
+        friend struct Vec<T, N>;
+        friend struct Rotation<T>;
         constexpr Norm(const VecT &v) noexcept : _data(v) {
           assert(mr::equal(v.length(), 1, 0.1f));
         }

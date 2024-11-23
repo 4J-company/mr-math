@@ -414,6 +414,16 @@ namespace mr
             return lhs;
           }
 
+          friend inline constexpr ScaleMatr operator*(const ScaleMatr &lhs, const ScaleMatr &rhs) noexcept {
+            ScaleMatr res = lhs;
+            lhs._data *= rhs._data;
+            return res;
+          }
+          friend inline constexpr ScaleMatr & operator*=(ScaleMatr &lhs, const ScaleMatr &rhs) noexcept {
+            lhs._data *= rhs._data;
+            return lhs;
+          }
+
           friend inline constexpr Vec<T, N> operator*(const Vec<T, N> &lhs, const ScaleMatr &rhs) noexcept {
             Vec<T, N> res = lhs * rhs._data;
             return res;
@@ -452,12 +462,22 @@ namespace mr
             return TranslateMatr(-_data);
           }
 
+          friend inline constexpr TranslateMatr operator*(const TranslateMatr &lhs, const TranslateMatr &rhs) noexcept {
+            TranslateMatr res = lhs;
+            res._data += rhs._data;
+            return res;
+          }
+          friend inline constexpr TranslateMatr & operator*=(TranslateMatr &lhs, const TranslateMatr &rhs) noexcept {
+            lhs._data += rhs._data;
+            return lhs;
+          }
+
           friend inline constexpr Matr<T, N> operator*(const Matr<T, N> &lhs, const TranslateMatr &rhs) noexcept {
             Matr<T, N> res = lhs;
             res[N - 1] += rhs._data;
             return res;
           }
-          friend inline constexpr TranslateMatr & operator*=(Matr<T, N> &lhs, const TranslateMatr &rhs) noexcept {
+          friend inline constexpr Matr<T, N> & operator*=(Matr<T, N> &lhs, const TranslateMatr &rhs) noexcept {
             lhs[N - 1] += rhs._data;
             return lhs;
           }
@@ -470,7 +490,27 @@ namespace mr
             lhs += rhs._data;
             return lhs;
           }
+
+          friend inline constexpr TranslateMatr operator*(const TranslateMatr &lhs, const ScaleMatr<T, N> &rhs) noexcept {
+            TranslateMatr res = lhs;
+            res._data *= rhs._data;
+            return res;
+          }
+          friend inline constexpr TranslateMatr & operator*=(TranslateMatr &lhs, const ScaleMatr<T, N> &rhs) noexcept {
+            lhs._data *= rhs._data;
+            return lhs;
+          }
       };
+
+    template <typename T, std::size_t N>
+      constexpr ScaleMatr<T, N> scale(mr::Vec<T, N> v) noexcept {
+        return ScaleMatr<T, N>(v);
+      }
+
+    template <typename T, std::size_t N>
+      constexpr ScaleMatr<T, N> translate(mr::Vec<T, N> v) noexcept {
+        return TranslateMatr<T, N>(v);
+      }
 } // namespace mr
 
 #ifdef __cpp_lib_format

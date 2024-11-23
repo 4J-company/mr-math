@@ -185,11 +185,11 @@ TEST_F(MatrixTest, Identity) {
 }
 
 TEST_F(MatrixTest, ScaleVector) {
-  EXPECT_EQ(mr::Vec3f(1, -1, 0) * mr::Matr4f::scale({30, 47, 80}), mr::Vec3f(30, -47, 0));
+  EXPECT_EQ(mr::Vec3f(1, -1, 0) * mr::ScaleMatr3f({30, 47, 80}), mr::Vec3f(30, -47, 0));
 }
 
 TEST_F(MatrixTest, TranslateVector) {
-  EXPECT_EQ(mr::Vec3f(0, 0, 22) * mr::Matr4f::translate({30, 47, 80}), mr::Vec3f(30, 47, 102));
+  EXPECT_EQ(mr::Vec3f(0, 0, 22) * mr::TranslateMatr3f({30, 47, 80}), mr::Vec3f(30, 47, 102));
 }
 
 TEST_F(MatrixTest, RotateBasis) {

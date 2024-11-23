@@ -14,6 +14,7 @@ inline namespace math
   // forward declarations
   template <ArithmeticT T, std::size_t N>
     struct Matr;
+
   template <ArithmeticT T, std::size_t N>
     struct ScaleMatr;
   template <ArithmeticT T, std::size_t N>
@@ -317,6 +318,29 @@ inline namespace math
             0,  0, 1, 0,
             0,  0, 0, 1
         };
+      }
+
+      static constexpr Matr4<T> rotate(const Norm<T, 3> &n, const Radians<T> &rad) noexcept {
+        T co = std::cos(rad._data);
+        T si = std::sin(rad._data);
+        T nco = 1 - co;
+
+        Vec<T, 3> tmp0 {n * n * nco + Vec<T, 3>{co}};
+        Matr4<T> tmp1 = ScaleMatr<T, 4>({tmp0.x(), tmp0.y(), tmp0.z(), 1});
+        Matr4<T> tmp2 = Matr4<T> {
+                            0, n.x() * n.y() * nco, n.x() * n.z() * nco, 0,
+          n.x() * n.y() * nco,                   0, n.y() * n.z() * nco, 0,
+          n.x() * n.z() * nco, n.y() * n.z() * nco,                   0, 0,
+                            0,                   0,                   0, 0
+        };
+        Matr4<T> tmp3 = Matr4<T> {
+                    0, -n.z() * si,  n.y() * si, 0,
+           n.z() * si,           0, -n.x() * si, 0,
+          -n.y() * si,  n.x() * si,           0, 0,
+                    0,           0,           0, 0
+        };
+
+        return tmp1 + tmp2 + tmp3;
       }
 
       constexpr bool operator==(const Matr &other) const noexcept {

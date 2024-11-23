@@ -478,7 +478,7 @@ namespace mr
             return res;
           }
           friend inline constexpr Matr<T, N> & operator*=(Matr<T, N> &lhs, const TranslateMatr &rhs) noexcept {
-            lhs[N - 1] += rhs._data;
+            lhs = lhs * rhs;
             return lhs;
           }
 

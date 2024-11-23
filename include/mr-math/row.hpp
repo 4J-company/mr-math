@@ -4,8 +4,13 @@
 #include "operators.hpp"
 
 namespace mr {
+  template <ArithmeticT T>
+    struct Quat;
+
   template <ArithmeticT T, std::size_t N>
     struct Row : RowOperators<Row<T, N>> {
+      friend struct Quat<T>;
+
     public:
       using ValueT = T;
       using SimdT = SimdImpl<T, N>;

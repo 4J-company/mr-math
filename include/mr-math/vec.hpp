@@ -12,6 +12,8 @@ namespace mr {
     struct Norm;
   template <ArithmeticT T, std::size_t N>
     struct Matr;
+  template <ArithmeticT T>
+    struct Quat;
 
   // common aliases
   template <ArithmeticT T>
@@ -39,8 +41,9 @@ namespace mr {
 
   // base vector (use aliases for full functional)
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
-    struct [[nodiscard]] Vec : public RowOperators<Vec<T, N>>
-    {
+    struct [[nodiscard]] Vec : public RowOperators<Vec<T, N>> {
+      friend struct Quat<T>;
+
     public:
       using ValueT = T;
       using RowT = Row<T, N>;

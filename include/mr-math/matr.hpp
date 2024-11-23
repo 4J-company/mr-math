@@ -314,6 +314,7 @@ namespace mr
         T nco = 1 - co;
 
         Vec<T, 3> tmp0 {n * n * nco + Vec<T, 3>{co}};
+        // TODO: implement using Vec4(Vec3, T) constructor
         Matr4<T> tmp1 = ScaleMatr<T, 4>({tmp0.x(), tmp0.y(), tmp0.z(), 1});
         Matr4<T> tmp2 = Matr4<T> {
                             0, n.x() * n.y() * nco, n.x() * n.z() * nco, 0,

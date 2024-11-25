@@ -25,20 +25,38 @@ namespace mr {
       [[nodiscard]] constexpr T x() const noexcept { return _vec.x(); }
       [[nodiscard]] constexpr T y() const noexcept { return _vec.y(); }
       [[nodiscard]] constexpr T z() const noexcept { return _vec.z(); }
-      [[nodiscard]] constexpr T w() const noexcept { return _angle; }
+      [[nodiscard]] constexpr T w() const noexcept { return _angle._data; }
 
       explicit constexpr operator Vec4<T>() const noexcept {
-        return {_angle, _vec.x(), _vec.y(), _vec.z()};
+        return Vec4<T>{_angle._data, _vec.x(), _vec.y(), _vec.z()};
       }
+
+      // normalize methods
+      constexpr Quat & normalize() noexcept {
+        auto len = _vec.length2() + w() * w();
+        if (len <= mr::Vec3<T>::_epsilon) [[unlikely]] return *this;
+        _vec /= std::sqrt(len);
+        _angle /= std::sqrt(len);
+        return *this;
+      };
+
+      constexpr std::optional<Quat> normalized() const noexcept {
+        auto len = _vec.length2() + w() * w();
+        if (len <= mr::Vec3<T>::_epsilon) [[unlikely]] return std::nullopt;
+        auto res = *this;
+        res._vec /= sqrt(len);
+        res._angle /= sqrt(len);
+        return res;
+      };
 
       friend constexpr Quat
       operator+(const Quat &lhs, const Quat &rhs) noexcept {
-        return Quat{lhs._angle + rhs._angle, lhs._vec + rhs._vec};
+        return Quat{mr::Radiansf(lhs.w() + rhs.w()), lhs.vec() + rhs.vec()};
       }
 
       friend constexpr Quat
       operator-(const Quat &lhs, const Quat &rhs) noexcept {
-        return Quat{lhs._angle - rhs._angle, lhs._vec - rhs._vec};
+        return Quat{mr::Radiansf(lhs.w() - rhs.w()), lhs.vec() - rhs.vec()};
       }
 
       friend constexpr Quat &
@@ -55,8 +73,8 @@ namespace mr {
 
       friend constexpr Quat operator*(const Quat &lhs, const Quat &rhs) noexcept {
         return {
-          lhs[0] * rhs[0] - lhs & rhs,
-          lhs._angle * rhs + rhs._angle * lhs + lhs % rhs
+          mr::Radiansf(lhs.w() * rhs.w() - lhs.vec().dot(rhs.vec())),
+          lhs.w() * rhs.vec() + rhs.w() * lhs.vec() + lhs.vec() % rhs.vec()
         };
       }
       friend constexpr Quat & operator*=(Quat &lhs, const Quat &rhs) noexcept {
@@ -65,9 +83,9 @@ namespace mr {
       }
 
         friend constexpr Vec<T, 3> operator*(const Vec<T, 3> &lhs, const Quat &rhs) noexcept {
-          auto vq = rhs._vec * std::cos(rhs._angle._data / 2);
+          auto vq = rhs.vec() * std::cos(rhs.w() / 2);
           auto t = vq % lhs;
-          auto u = std::sin(rhs._angle._data / 2) * t + vq % t;
+          auto u = std::sin(rhs.w() / 2) * t + vq % t;
 
           return {lhs + u + u};
         }

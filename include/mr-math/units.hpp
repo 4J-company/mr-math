@@ -49,7 +49,7 @@ namespace mr {
     public:
       using ValueT = T;
 
-      T _data;
+      T _data {};
 
       constexpr Radians() noexcept {};
       explicit constexpr Radians(T x) noexcept : _data(x) {};
@@ -79,7 +79,7 @@ namespace mr {
     public:
       using ValueT = T;
 
-      T _data;
+      T _data {};
 
       explicit constexpr Degrees(T x) noexcept : _data(x) {};
 

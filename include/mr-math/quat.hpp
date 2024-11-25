@@ -20,6 +20,13 @@ namespace mr {
       constexpr Quat(Radians<T> a, Vec3<T> v) noexcept : _angle(a), _vec(v) {}
       constexpr Quat(Radians<T> a, T x, T y, T z) noexcept : _angle(a), _vec(x, y, z) {}
 
+      // getters
+      [[nodiscard]] constexpr Vec3<T> vec() const noexcept { return _vec; }
+      [[nodiscard]] constexpr T x() const noexcept { return _vec.x(); }
+      [[nodiscard]] constexpr T y() const noexcept { return _vec.y(); }
+      [[nodiscard]] constexpr T z() const noexcept { return _vec.z(); }
+      [[nodiscard]] constexpr T w() const noexcept { return _angle; }
+
       explicit constexpr operator Vec4<T>() const noexcept {
         return {_angle, _vec.x(), _vec.y(), _vec.z()};
       }

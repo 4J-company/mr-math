@@ -20,35 +20,35 @@ namespace mr {
       constexpr Quat(Radians<T> a, Vec3<T> v) noexcept : _angle(a), _vec(v) {}
       constexpr Quat(Radians<T> a, T x, T y, T z) noexcept : _angle(a), _vec(x, y, z) {}
 
-      constexpr operator Vec4<T>() const noexcept {
-        return _vec;
+      explicit constexpr operator Vec4<T>() const noexcept {
+        return {_angle, _vec.x(), _vec.y(), _vec.z()};
       }
 
       friend constexpr Quat
       operator+(const Quat &lhs, const Quat &rhs) noexcept {
-        return Quat{lhs._vec + rhs._vec};
+        return Quat{lhs._angle + rhs._angle, lhs._vec + rhs._vec};
       }
 
       friend constexpr Quat
       operator-(const Quat &lhs, const Quat &rhs) noexcept {
-        return Quat{lhs._vec - rhs._vec};
+        return Quat{lhs._angle - rhs._angle, lhs._vec - rhs._vec};
       }
 
       friend constexpr Quat &
       operator+=(Quat &lhs, const Quat &rhs) noexcept {
-        lhs._vec += rhs._vec;
+        lhs = lhs + rhs;
         return lhs;
       }
 
       friend constexpr Quat &
       operator-=(Quat &lhs, const Quat &rhs) noexcept {
-        lhs._vec -= rhs._vec;
+        lhs = lhs - rhs;
         return lhs;
       }
 
       friend constexpr Quat operator*(const Quat &lhs, const Quat &rhs) noexcept {
         return {
-          2 * lhs[0] * rhs[0] - lhs & rhs,
+          lhs[0] * rhs[0] - lhs & rhs,
           lhs._angle * rhs + rhs._angle * lhs + lhs % rhs
         };
       }

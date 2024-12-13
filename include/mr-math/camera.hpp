@@ -6,18 +6,33 @@
 #include "matr.hpp"
 
 namespace mr {
+  using namespace mr::literals;
+
   template <std::floating_point T = float>
     struct [[nodiscard]] Camera {
       public:
         struct Projection {
           friend struct Camera;
         public:
-          T distance = 0.1f;
+          T distance = 0.001f;
           T far = (1 << 10);
-          T size = 0.1;
 
-          T height = size;
-          T width = size;
+          T width = 0.16;
+          T height = 0.09;
+
+          inline constexpr Projection(mr::Radiansf fov = mr::Radiansf(90_deg),
+                                      float aspect_ratio = 16.f / 9.f) noexcept
+              : width(2 * distance * std::tan(fov._data / 2))
+              , height(width * aspect_ratio) { }
+
+          inline constexpr Projection(Projection &&) noexcept = default;
+          inline constexpr Projection & operator=(Projection &&) noexcept = default;
+          inline constexpr Projection(const Projection &) noexcept = default;
+          inline constexpr Projection & operator=(const Projection &) noexcept = default;
+
+          inline constexpr void resize(float aspect_ratio) {
+            height = width * aspect_ratio;
+          }
 
         private:
           // cached frustum matrix
@@ -39,17 +54,47 @@ namespace mr {
               (direction % up).normalized()) {}
 
         // copy semantics
-        constexpr Camera(const Camera &other) noexcept = default;
-        constexpr Camera & operator=(const Camera &other) noexcept = default;
+        constexpr Camera(const Camera &other) noexcept {
+          _position   = other._position;
+          _rotation   = other._rotation;
+          _projection = other._projection;
+
+          _perspective_calculated = false;
+        }
+
+        constexpr Camera &operator=(const Camera &other) noexcept {
+          _position   = other._position;
+          _rotation   = other._rotation;
+          _projection = other._projection;
+
+          _perspective_calculated = false;
+          return *this;
+        }
 
         // move semantics
-        constexpr Camera(Camera &&other) noexcept = default;
-        constexpr Camera & operator=(Camera &&other) noexcept = default;
+        constexpr Camera(Camera &&other) noexcept {
+          _position   = std::move(other._position);
+          _rotation   = std::move(other._rotation);
+          _projection = std::move(other._projection);
+
+          _perspective_calculated = false;
+        }
+
+        constexpr Camera &operator=(Camera &&other) noexcept {
+          _position   = std::move(other._position);
+          _rotation   = std::move(other._rotation);
+          _projection = std::move(other._projection);
+
+          _perspective_calculated = false;
+          return *this;
+        }
 
         // position delta
         constexpr Camera & operator+=(Vec3<T> position_delta) noexcept {
           _perspective_calculated = false;
           _position += position_delta;
+
+          return *this;
         }
 
         // angle in radians
@@ -86,12 +131,20 @@ namespace mr {
         }
 
         constexpr Vec3<T> direction() const noexcept {
-          return _rotation[0];
+          return _rotation.direction();
         }
 
         constexpr void direction(Vec3<T> dir) noexcept {
           _perspective_calculated = false;
           _rotation[0] = dir;
+        }
+
+        constexpr Vec3<T> right() const noexcept {
+          return _rotation.right();
+        }
+
+        constexpr Vec3<T> up() const noexcept {
+          return _rotation.up();
         }
 
         constexpr Projection & projection() noexcept {
@@ -127,14 +180,14 @@ namespace mr {
         constexpr Matr4<T> calculate_perspective() const noexcept {
           std::lock_guard lg(_perspective_mutex);
 
-          const auto direction = _rotation.direction();
+          const auto direction = -_rotation.direction();
           const auto right = _rotation.right();
           const auto up = _rotation.up();
           _perspective = mr::Matr4<T>{
                        right.x(),            up.x(),           direction.x(), 0,
                        right.y(),            up.y(),           direction.y(), 0,
                        right.z(),            up.z(),           direction.z(), 0,
-            -(_position & right), -(_position & up), (_position & direction), 1
+            -(_position & right), -(_position & up), -(_position & direction), 1
           };
           _perspective_calculated = true;
           return _perspective;

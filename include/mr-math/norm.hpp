@@ -44,9 +44,14 @@ namespace mr {
           _data.normalize();
         }
 
-       constexpr operator VecT() const noexcept { return _data; }
 
-       // getters
+      constexpr Norm(UncheckedTag, const VecT &v) noexcept : _data(v) {
+          assert(mr::equal(v.length(), 1, 0.1f));
+        }
+
+      constexpr operator VecT() const noexcept { return _data; }
+
+      // getters
       [[nodiscard]] constexpr T x() const noexcept requires (N >= 1) { return _data[0]; }
       [[nodiscard]] constexpr T y() const noexcept requires (N >= 2) { return _data[1]; }
       [[nodiscard]] constexpr T z() const noexcept requires (N >= 3) { return _data[2]; }
@@ -138,9 +143,7 @@ namespace mr {
       private:
         friend struct Vec<T, N>;
         friend struct Rotation<T>;
-        constexpr Norm(const VecT &v) noexcept : _data(v) {
-          assert(mr::equal(v.length(), 1, 0.1f));
-        }
+        constexpr Norm(const VecT &v) noexcept : Norm(unchecked, v) {}
 
         VecT _data;
     };

@@ -135,20 +135,20 @@ namespace mr {
           _position = pos;
         }
 
-        constexpr VecT direction() const noexcept {
+        constexpr NormT direction() const noexcept {
           return _rotation.direction();
         }
 
-        constexpr void direction(VecT dir) noexcept {
+        constexpr void direction(NormT dir) noexcept {
           _perspective_calculated = false;
-          _rotation[0] = dir;
+          _rotation.direction(dir);
         }
 
-        constexpr VecT right() const noexcept {
+        constexpr NormT right() const noexcept {
           return _rotation.right();
         }
 
-        constexpr VecT up() const noexcept {
+        constexpr NormT up() const noexcept {
           return _rotation.up();
         }
 

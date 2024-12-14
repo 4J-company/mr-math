@@ -4,6 +4,7 @@
 #include "units.hpp"
 #include "vec.hpp"
 #include "matr.hpp"
+#include "norm.hpp"
 
 namespace mr {
   template <std::floating_point T>
@@ -47,6 +48,7 @@ namespace mr {
         using ValueT = T;
         using MatrT = Matr<T, 4>;
         using RowT = typename MatrT::RowT;
+        using NormT = Norm3<T>;
         using VecT = Vec3<T>;
 
         // default constructor
@@ -93,17 +95,22 @@ namespace mr {
           return *this;
         }
 
+        // setters
+        constexpr void direction(NormT dir) noexcept {
+          _data[0] = dir._data;
+        }
+
         // getters
-        constexpr VecT direction() const noexcept {
-          return VecT(_data[0]);
+        constexpr NormT direction() const noexcept {
+          return {unchecked, VecT{_data[0]}};
         }
 
-        constexpr VecT right() const noexcept {
-          return VecT(_data[1]);
+        constexpr NormT right() const noexcept {
+          return {unchecked, VecT{_data[1]}};
         }
 
-        constexpr VecT up() const noexcept {
-          return VecT(_data[2]);
+        constexpr NormT up() const noexcept {
+          return {unchecked, VecT{_data[2]}};
         }
 
       private:

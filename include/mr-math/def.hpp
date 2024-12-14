@@ -66,6 +66,8 @@ namespace mr {
     // what the fuck?
     return std::bit_cast<double>(0x5fe6f7ced9168800 - (std::bit_cast<unsigned long long>(number) >> 1));
   }
+
+  struct UncheckedTag {} unchecked;
 } // namespace mr
 
 #endif // __def_hpp_

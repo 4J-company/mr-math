@@ -224,3 +224,5 @@ TEST_F(MatrixTest, RotateVector) {
   mr::Vec3f expected{38.340427, 81.678845, 36.980571};
   EXPECT_TRUE(mr::equal(v * mr::Matr4f::rotate({1, 1, 1}, 102_deg), expected, 0.0001));
 }
+
+// TODO: camera tests

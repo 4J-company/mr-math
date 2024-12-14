@@ -126,6 +126,10 @@ namespace mr {
           return os;
         }
 
+        constexpr friend Norm operator-(const Norm &n) noexcept {
+          return {unchecked, -n._data};
+        }
+
         constexpr bool operator==(const Norm &other) const noexcept {
           return _data == other._data;
         }

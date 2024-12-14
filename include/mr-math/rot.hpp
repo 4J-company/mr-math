@@ -44,17 +44,19 @@ namespace mr {
   template <std::floating_point T>
     struct [[nodiscard]] Rotation {
       public:
-        using MatrT = mr::Matr<T, 4>;
+        using ValueT = T;
+        using MatrT = Matr<T, 4>;
         using RowT = typename MatrT::RowT;
+        using VecT = Vec3<T>;
 
         // default constructor
         constexpr Rotation() noexcept = default;
 
         // 3 vector constructor
         constexpr Rotation(
-            const Vec3<T> &direction,
-            const Vec3<T> &right,
-            const Vec3<T> &up) noexcept
+            const VecT &direction,
+            const VecT &right,
+            const VecT &up) noexcept
           : _data (
                 RowT(direction, 0), // direction
                 RowT(right, 0),     // right
@@ -72,36 +74,36 @@ namespace mr {
 
         // angle in radians
         constexpr Rotation & operator+=(Pitch<T> angle_rad) noexcept {
-          _data *= Matr4<T>::rotate({right()}, angle_rad);
+          _data *= MatrT::rotate({right()}, angle_rad);
 
           return *this;
         }
 
         // angle in radians
         constexpr Rotation & operator+=(Yaw<T> angle_rad) noexcept {
-          _data *= Matr4<T>::rotate({up()}, angle_rad);
+          _data *= MatrT::rotate({up()}, angle_rad);
 
           return *this;
         }
 
         // angle in radians
         constexpr Rotation & operator+=(Roll<T> angle_rad) noexcept {
-          _data *= Matr4<T>::rotate({direction()}, angle_rad);
+          _data *= MatrT::rotate({direction()}, angle_rad);
 
           return *this;
         }
 
         // getters
-        constexpr Vec3<T> direction() const noexcept {
-          return Vec3<T>(_data[0]);
+        constexpr VecT direction() const noexcept {
+          return VecT(_data[0]);
         }
 
-        constexpr Vec3<T> right() const noexcept {
-          return Vec3<T>(_data[1]);
+        constexpr VecT right() const noexcept {
+          return VecT(_data[1]);
         }
 
-        constexpr Vec3<T> up() const noexcept {
-          return Vec3<T>(_data[2]);
+        constexpr VecT up() const noexcept {
+          return VecT(_data[2]);
         }
 
       private:

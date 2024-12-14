@@ -11,6 +11,11 @@ namespace mr {
   template <std::floating_point T = float>
     struct [[nodiscard]] Camera {
       public:
+        using ValueT = T;
+        using VecT = Vec3<T>;
+        using NormT = Norm3<T>;
+        using MatrT = Matr4<T>;
+
         struct Projection {
           friend struct Camera;
         public:
@@ -37,16 +42,16 @@ namespace mr {
         private:
           // cached frustum matrix
           mutable bool frustum_calculated = false;
-          mutable Matr4<T> frustum;
+          mutable MatrT frustum;
 
           // cached orthographics matrix
           mutable bool orthographic_calculated = false;
-          mutable Matr4<T> orthographic;
+          mutable MatrT orthographic;
         };
 
         constexpr Camera() = default;
-        constexpr Camera(Vec3<T> position) : _position(position) {}
-        constexpr Camera(Vec3<T> position, Vec3<T> direction, Vec3<T> up = {0, 1, 0}) :
+        constexpr Camera(VecT position) : _position(position) {}
+        constexpr Camera(VecT position, VecT direction, VecT up = {0, 1, 0}) :
           _position(position),
           _rotation(
               direction.normalized(),
@@ -90,7 +95,7 @@ namespace mr {
         }
 
         // position delta
-        constexpr Camera & operator+=(Vec3<T> position_delta) noexcept {
+        constexpr Camera & operator+=(VecT position_delta) noexcept {
           _perspective_calculated = false;
           _position += position_delta;
 
@@ -121,29 +126,29 @@ namespace mr {
           return *this;
         }
 
-        constexpr Vec3<T> position() const noexcept {
+        constexpr VecT position() const noexcept {
           return _position;
         }
 
-        constexpr void position(Vec3<T> pos) noexcept {
+        constexpr void position(VecT pos) noexcept {
           _perspective_calculated = false;
           _position = pos;
         }
 
-        constexpr Vec3<T> direction() const noexcept {
+        constexpr VecT direction() const noexcept {
           return _rotation.direction();
         }
 
-        constexpr void direction(Vec3<T> dir) noexcept {
+        constexpr void direction(VecT dir) noexcept {
           _perspective_calculated = false;
           _rotation[0] = dir;
         }
 
-        constexpr Vec3<T> right() const noexcept {
+        constexpr VecT right() const noexcept {
           return _rotation.right();
         }
 
-        constexpr Vec3<T> up() const noexcept {
+        constexpr VecT up() const noexcept {
           return _rotation.up();
         }
 
@@ -156,34 +161,34 @@ namespace mr {
           return _projection;
         }
 
-        constexpr Matr4<T> perspective() const noexcept {
+        constexpr MatrT perspective() const noexcept {
           if (_perspective_calculated) [[likely]] {
             return _perspective;
           }
           return calculate_perspective();
         }
 
-        constexpr Matr4<T> orthographic() const noexcept {
+        constexpr MatrT orthographic() const noexcept {
           if (_projection.orthographic_calculated) [[likely]] {
             return _projection.orthographic;
           }
           return calculate_orthographic();
         }
 
-        constexpr Matr4<T> frustum() const noexcept {
+        constexpr MatrT frustum() const noexcept {
           if (_projection.frustum_calculated) [[likely]] {
             return _projection.frustum;
           }
           return calculate_frustum();
         }
 
-        constexpr Matr4<T> calculate_perspective() const noexcept {
+        constexpr MatrT calculate_perspective() const noexcept {
           std::lock_guard lg(_perspective_mutex);
 
           const auto direction = -_rotation.direction();
           const auto right = _rotation.right();
           const auto up = _rotation.up();
-          _perspective = mr::Matr4<T>{
+          _perspective = MatrT{
                        right.x(),            up.x(),           direction.x(), 0,
                        right.y(),            up.y(),           direction.y(), 0,
                        right.z(),            up.z(),           direction.z(), 0,
@@ -193,7 +198,7 @@ namespace mr {
           return _perspective;
         }
 
-        constexpr Matr4<T> calculate_orthographic() const noexcept {
+        constexpr MatrT calculate_orthographic() const noexcept {
           std::lock_guard lg(_perspective_mutex);
 
           const T l = -_projection.height / 2; // left
@@ -203,7 +208,7 @@ namespace mr {
           const T n = _projection.distance;    // near
           const T f = _projection.far;         // far
 
-          _projection.orthographic = mr::Matr4<T>{
+          _projection.orthographic = MatrT {
                   2 / (r - l),                 0,                 0, 0,
                             0,       2 / (t - b),                 0, 0,
                             0,                 0,       2 / (n - f), 0,
@@ -213,7 +218,7 @@ namespace mr {
           return _projection.orthographic;
         }
 
-        constexpr Matr4<T> calculate_frustum() const noexcept {
+        constexpr MatrT calculate_frustum() const noexcept {
           std::lock_guard lg(_perspective_mutex);
 
           const T l = -_projection.height / 2; // left
@@ -223,7 +228,7 @@ namespace mr {
           const T n = _projection.distance;    // near
           const T f = _projection.far;         // far
 
-          _projection.frustum = mr::Matr4<T>{
+          _projection.frustum = MatrT{
               2 * n / (r - l),                 0,                   0,  0,
                             0,   2 * n / (t - b),                   0,  0,
             (r + l) / (r - l), (t + b) / (t - b),   (f + n) / (n - f), -1,
@@ -234,13 +239,13 @@ namespace mr {
         }
 
       private:
-        Vec3<T> _position;
+        VecT _position;
         Rotation<T> _rotation;
         Projection _projection;
 
         mutable std::mutex _perspective_mutex;
         mutable std::atomic_bool _perspective_calculated = false;
-        mutable Matr4<T> _perspective;
+        mutable MatrT _perspective;
     };
 }
 

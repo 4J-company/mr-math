@@ -251,14 +251,13 @@ namespace mr {
           return *this;
         }
 
-        constexpr Vec & abs() noexcept {
-          stdx::where(_data._data < 0) | _data._data = -_data._data;
-          return *this;
+        constexpr Vec absed() const noexcept {
+          return {stdx::abs(_data._data)};
         }
 
-        constexpr Vec absed() const noexcept {
-          Vec copy = *this;
-          return copy.abs();
+        constexpr Vec & abs() noexcept {
+          *this = absed();
+          return *this;
         }
 
         constexpr bool operator==(const Vec &other) const noexcept {

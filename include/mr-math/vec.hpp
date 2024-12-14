@@ -60,6 +60,18 @@ namespace mr {
       requires (sizeof...(Args) >= 2) && (sizeof...(Args) <= N)
         constexpr Vec(Args... args) : _data(args...) {}
 
+      // from span constructor
+      // TODO: implement using Vc
+      template <ArithmeticT R>
+        constexpr Vec(std::span<const R, N> span) noexcept {
+          static_assert(span.size() == std::dynamic_extent || span.size() == N);
+          assert(span.size() == N);
+
+          for (size_t i = 0; i < N; i++) {
+            _data._set_ind(i, span[i]);
+          }
+        }
+
       // conversion constructor
       template <ArithmeticT R, std::size_t S>
         constexpr Vec(const Vec<R, S> &v) noexcept : _data(v._data) {}

@@ -13,6 +13,7 @@
 #include <atomic>
 #include <mutex>
 #include <cmath>
+#include <span>
 #include <bit>
 #ifdef __cpp_lib_format
   #include <format>

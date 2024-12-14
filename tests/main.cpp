@@ -1,3 +1,5 @@
+#include <array>
+
 #include "gtest/gtest.h"
 #include "mr-math/math.hpp"
 
@@ -8,6 +10,15 @@ protected:
   mr::Vec3f v1{1.0, 2.0, 3.0};
   mr::Vec3f v2{4.0, 5.0, 6.0};
 };
+
+TEST_F(Vector3DTest, Constructors) {
+  EXPECT_EQ(mr::Vec3f(), mr::Vec3f(0, 0, 0));
+  EXPECT_EQ(mr::Vec3f(1), mr::Vec3f(1, 1, 1));
+  EXPECT_EQ(mr::Vec3f(mr::Vec2f(1, 2)), mr::Vec3f(1, 2, 0));
+  // TODO: EXPECT_EQ(mr::Vec3f(mr::Vec2f(1, 2), 3), mr::Vec3f(1, 2, 3));
+  EXPECT_EQ(mr::Vec3f(mr::Vec4f(1, 2, 3, 4)), mr::Vec3f(1, 2, 3));
+  EXPECT_EQ(mr::Vec3f(std::span<const int, 3>{{1, 2, 3}}), mr::Vec3f(1, 2, 3));
+}
 
 TEST_F(Vector3DTest, Getters) {
   EXPECT_EQ(v1.x(), 1.0);

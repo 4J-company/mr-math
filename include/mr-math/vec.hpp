@@ -62,12 +62,10 @@ namespace mr {
 
       // from span constructor
       // TODO: implement using Vc
-      template <ArithmeticT R>
-        constexpr Vec(std::span<const R, N> span) noexcept {
-          static_assert(span.size() == std::dynamic_extent || span.size() == N);
-          assert(span.size() == N);
-
-          for (size_t i = 0; i < N; i++) {
+      template <ArithmeticT U, size_t M>
+        constexpr Vec(std::span<const U, M> span) noexcept {
+          const size_t len = std::min(N, M);
+          for (size_t i = 0; i < len; i++) {
             _data._set_ind(i, span[i]);
           }
         }

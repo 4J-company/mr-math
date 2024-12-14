@@ -17,7 +17,11 @@ TEST_F(Vector3DTest, Constructors) {
   EXPECT_EQ(mr::Vec3f(mr::Vec2f(1, 2)), mr::Vec3f(1, 2, 0));
   // TODO: EXPECT_EQ(mr::Vec3f(mr::Vec2f(1, 2), 3), mr::Vec3f(1, 2, 3));
   EXPECT_EQ(mr::Vec3f(mr::Vec4f(1, 2, 3, 4)), mr::Vec3f(1, 2, 3));
+
+  EXPECT_EQ(mr::Vec3f(std::span<const int, 2>{{1, 2}}), mr::Vec3f(1, 2, 0));
   EXPECT_EQ(mr::Vec3f(std::span<const int, 3>{{1, 2, 3}}), mr::Vec3f(1, 2, 3));
+  EXPECT_EQ(mr::Vec3f(std::span<const int, 4>{{1, 2, 3, 4}}), mr::Vec3f(1, 2, 3));
+  EXPECT_EQ(mr::Vec3f(std::span<const int>{{1, 2, 3}}), mr::Vec3f(1, 2, 3));
 }
 
 TEST_F(Vector3DTest, Getters) {

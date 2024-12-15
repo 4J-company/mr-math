@@ -64,7 +64,7 @@ namespace mr {
       // TODO: implement using Vc
       template <ArithmeticT U, size_t M>
         constexpr Vec(std::span<const U, M> span) noexcept {
-          const size_t len = std::min(N, M);
+          const size_t len = std::min(N, span.size());
           for (size_t i = 0; i < len; i++) {
             _data._set_ind(i, span[i]);
           }

@@ -230,3 +230,21 @@ TEST_F(MatrixTest, RotateVector) {
 }
 
 // TODO: camera tests
+
+
+TEST(Utility, Within) {
+  EXPECT_FALSE(mr::within(1, 10)(0));
+  EXPECT_TRUE(mr::within(1, 10)(1));
+  EXPECT_TRUE(mr::within(1, 10)(5));
+  EXPECT_TRUE(mr::within(1, 10)(10));
+  EXPECT_FALSE(mr::within(1, 10)(11));
+
+  EXPECT_FALSE(mr::within_ex(1, 10)(0));
+  EXPECT_FALSE(mr::within_ex(1, 10)(1));
+  EXPECT_TRUE(mr::within_ex(1, 10)(5));
+  EXPECT_FALSE(mr::within_ex(1, 10)(10));
+  EXPECT_FALSE(mr::within_ex(1, 10)(11));
+
+  EXPECT_TRUE(mr::within(1., 10.f)(5));
+  EXPECT_TRUE(mr::within_ex(1., 10.f)(5));
+}

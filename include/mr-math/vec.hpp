@@ -258,6 +258,17 @@ namespace mr {
           return *this;
         }
 
+        constexpr Vec clamped(T low, T high) const noexcept {
+          assert(low < high);
+          const auto &data = _data._data;
+          return {stdx::iif(data <= low, SimdT(low), stdx::iif(data >= high, SimdT(high), data))};
+        }
+
+        constexpr Vec & clamp(T low, T high) noexcept {
+          *this = clamped(low, high);
+          return *this;
+        }
+
         constexpr bool operator==(const Vec &other) const noexcept {
           return _data == other._data;
         }

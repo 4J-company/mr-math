@@ -106,6 +106,12 @@ TEST_F(Vector3DTest, Abs) {
   EXPECT_EQ(v.abs(), mr::Vec3f(30, 47, 80));
 }
 
+TEST_F(Vector3DTest, Clamp) {
+  mr::Vec3f v{-30, 47, -80};
+  EXPECT_EQ(v.clamped(-47, 0), mr::Vec3f(-30, 0, -47));
+  EXPECT_EQ(v.clamp(-47, 0), mr::Vec3f(-30, 0, -47));
+}
+
 class MatrixTest : public ::testing::Test {
 protected:
   mr::Matr4f m1 {

@@ -12,14 +12,14 @@ namespace mr {
     using ValueT = float;
 
     template <std::floating_point T>
-      constexpr Color(T r, T g, T b, T a = 1) noexcept
+      Color(T r, T g, T b, T a = 1) noexcept
         : _data{Vec4f{r, g, b, a}} {}
 
-    constexpr Color(Vec4f rgba) noexcept
+    Color(Vec4f rgba) noexcept
       : _data{rgba} {}
 
     template <std::integral T>
-      constexpr Color(T r, T g, T b, T a = 255) noexcept
+      Color(T r, T g, T b, T a = 255) noexcept
         : _data{r, g, b, a} {
         assert(r <= 255);
         assert(g <= 255);
@@ -28,7 +28,7 @@ namespace mr {
         _data /= 255;
       }
 
-    constexpr explicit Color(uint32_t rgba) noexcept
+    explicit Color(uint32_t rgba) noexcept
       : Color(
         uint8_t((rgba & 0xFF'00'00'00) >> 24),
         uint8_t((rgba & 0x00'FF'00'00) >> 16),
@@ -37,11 +37,11 @@ namespace mr {
       ) {}
 
     // setters
-    constexpr void r(ValueT r) noexcept { _data.x(r); }
-    constexpr void g(ValueT g) noexcept { _data.y(g); }
-    constexpr void b(ValueT b) noexcept { _data.z(b); }
-    constexpr void a(ValueT a) noexcept { _data.w(a); }
-    constexpr void set(size_t i, ValueT value) noexcept {
+    void r(ValueT r) noexcept { _data.x(r); }
+    void g(ValueT g) noexcept { _data.y(g); }
+    void b(ValueT b) noexcept { _data.z(b); }
+    void a(ValueT a) noexcept { _data.w(a); }
+    void set(size_t i, ValueT value) noexcept {
       assert(i < 4);
       _data.set(i, value);
     }
@@ -58,23 +58,23 @@ namespace mr {
 
     // structured binding support
     template <size_t I> requires (I < 4)
-      constexpr ValueT get() const { return _data[I]; }
+      ValueT get() const { return _data[I]; }
 
-    constexpr operator Vec4f() noexcept {
+    operator Vec4f() noexcept {
       return _data;
     }
 
     // format conversions
     // TODO: implement using shuffle
-    constexpr Vec4f argb() const noexcept {
+    Vec4f argb() const noexcept {
       return {a(), r(), g(), b()};
     }
 
-    constexpr Vec4f bgra() const noexcept {
+    Vec4f bgra() const noexcept {
       return {b(), g(), r(), a()};
     }
 
-    constexpr Vec4f abgr() const noexcept {
+    Vec4f abgr() const noexcept {
       return {a(), b(), g(), r()};
     }
 
@@ -88,11 +88,11 @@ namespace mr {
       return *this;
     }
 
-    constexpr bool operator==(const Color &other) const noexcept {
+    bool operator==(const Color &other) const noexcept {
       return _data == other._data;
     }
 
-    constexpr bool equal(const Color &other, ValueT eps = epsilon<ValueT>()) const noexcept {
+    bool equal(const Color &other, ValueT eps = epsilon<ValueT>()) const noexcept {
       return _data.equal(other._data, eps);
     }
 
@@ -109,7 +109,7 @@ namespace mr {
 
 namespace literals {
 
-  constexpr Color operator"" _rgba(unsigned long long value) {
+  Color operator"" _rgba(unsigned long long value) {
     assert(value <= 0xFF'FF'FF'FF);
     return Color{static_cast<uint32_t>(value)};
   }

@@ -10,5 +10,6 @@
 #include "units.hpp"
 #include "camera.hpp"
 #include "bound_box.hpp"
+#include "color.hpp"
 
 #endif // __math_hpp_

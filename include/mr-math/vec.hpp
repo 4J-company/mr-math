@@ -63,6 +63,16 @@ namespace mr {
       requires (sizeof...(Args) >= 2) && (sizeof...(Args) <= N)
         constexpr Vec(Args... args) : _data(args...) {}
 
+      // from span constructor
+      // TODO: implement using Vc
+      template <ArithmeticT U, size_t M>
+        constexpr Vec(std::span<const U, M> span) noexcept {
+          const size_t len = std::min(N, span.size());
+          for (size_t i = 0; i < len; i++) {
+            _data._set_ind(i, span[i]);
+          }
+        }
+
       // conversion constructor
       template <ArithmeticT R, std::size_t S>
         constexpr Vec(const Vec<R, S> &v) noexcept : _data(v._data) {}
@@ -242,14 +252,24 @@ namespace mr {
           return *this;
         }
 
+        constexpr Vec absed() const noexcept {
+          return {stdx::abs(_data._data)};
+        }
+
         constexpr Vec & abs() noexcept {
-          stdx::where(_data._data < 0) | _data._data = -_data._data;
+          *this = absed();
           return *this;
         }
 
-        constexpr Vec absed() const noexcept {
-          Vec copy = *this;
-          return copy.abs();
+        constexpr Vec clamped(T low, T high) const noexcept {
+          assert(low < high);
+          const auto &data = _data._data;
+          return {stdx::iif(data <= low, SimdT(low), stdx::iif(data >= high, SimdT(high), data))};
+        }
+
+        constexpr Vec & clamp(T low, T high) noexcept {
+          *this = clamped(low, high);
+          return *this;
         }
 
         constexpr bool operator==(const Vec &other) const noexcept {

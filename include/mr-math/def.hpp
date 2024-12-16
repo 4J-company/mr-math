@@ -13,6 +13,7 @@
 #include <atomic>
 #include <mutex>
 #include <cmath>
+#include <span>
 #include <bit>
 #ifdef __cpp_lib_format
   #include <format>
@@ -53,30 +54,66 @@ namespace mr {
   // fast 1 / sqrt implementation for floats
   // use 1 / std::sqrt() for higher precision
   constexpr float fast_rsqrt(float number) {
-    unsigned i;
-    float y;
-
-    y = number;
-    i = std::bit_cast<unsigned>(y); // evil floating point bit level hacking
-    i = 0x5f3759df - (i >> 1);      // what the fuck?
-    y = std::bit_cast<float>(i);
-
-    return y;
+    // evil floating point bit level hacking
+    // what the fuck?
+    return std::bit_cast<float>(0x5f3759df - (std::bit_cast<unsigned>(number) >> 1));
   }
 
   // fast 1 / sqrt implementation for doubles
   // use 1 / std::sqrt() for higher precision
   constexpr double fast_rsqrt(double number) {
-    unsigned long long i;
-    double y;
-
-    y = number;
-    i = std::bit_cast<unsigned long long>(y); // evil floating point bit level hacking
-    i = 0x5fe6f7ced9168800 - (i >> 1);      // what the fuck?
-    y = std::bit_cast<double>(i);
-
-    return y;
+    // evil floating point bit level hacking
+    // what the fuck?
+    return std::bit_cast<double>(0x5fe6f7ced9168800 - (std::bit_cast<unsigned long long>(number) >> 1));
   }
+
+  inline struct UncheckedTag {} unchecked;
+
+  // inclusive numeric interval [low, high]
+  // use operator() to check if value is in range
+  template<typename L, typename H>
+    class Interval {
+    public:
+      Interval(const L& low_, const H& high_)
+        : low(low_), high(high_) {}
+
+      template<typename T>
+        requires std::totally_ordered_with<T, L> && std::totally_ordered_with<T, H>
+      bool operator()(const T& value) { return low <= value && value <= high; }
+
+      const L& low;
+      const H& high;
+    };
+
+  // returns inclusive interval
+  // usage: if (mr::within_(1, 10)(x))
+  template<typename L, typename H>
+    constexpr Interval<L, H> within(const L& low, const H& high) {
+      return {low, high};
+    }
+
+  // exclusive numeric interval (low, high)
+  // use operator() to check if value is in range
+  template<typename L, typename H>
+    class IntervalEx {
+    public:
+      IntervalEx(const L& low_, const H& high_)
+        : low(low_), high(high_) {}
+
+      template<typename T>
+        requires std::totally_ordered_with<T, L> && std::totally_ordered_with<T, H>
+      bool operator()(const T& value) { return low < value && value < high; }
+
+      const L& low;
+      const H& high;
+    };
+
+  // returns exclusive interval
+  // usage: if (mr::within_ex(1, 10)(x))
+  template<typename L, typename H>
+    constexpr IntervalEx<L, H> within_ex(const L& low, const H& high) {
+      return {low, high};
+    }
 } // namespace mr
 
 #endif // __def_hpp_

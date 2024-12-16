@@ -35,6 +35,7 @@ add_library(${MR_MATH_LIB_NAME} INTERFACE
   include/mr-math/math.hpp
   include/mr-math/bound_box.hpp
   include/mr-math/color.hpp
+  include/mr-math/debug.hpp
 )
 
 target_include_directories(${MR_MATH_LIB_NAME} INTERFACE

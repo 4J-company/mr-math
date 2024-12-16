@@ -6,6 +6,7 @@
 #include "rot.hpp"
 #include "norm.hpp"
 #include "matr.hpp"
+#include "quat.hpp"
 #include "units.hpp"
 #include "camera.hpp"
 #include "bound_box.hpp"

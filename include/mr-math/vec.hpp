@@ -12,6 +12,8 @@ namespace mr {
     struct Norm;
   template <ArithmeticT T, std::size_t N>
     struct Matr;
+  template <ArithmeticT T>
+    struct Quat;
 
   // common aliases
   template <ArithmeticT T>
@@ -39,8 +41,9 @@ namespace mr {
 
   // base vector (use aliases for full functional)
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
-    struct [[nodiscard]] Vec : public RowOperators<Vec<T, N>>
-    {
+    struct [[nodiscard]] Vec : public RowOperators<Vec<T, N>> {
+      friend struct Quat<T>;
+
     public:
       using ValueT = T;
       using RowT = Row<T, N>;
@@ -59,6 +62,16 @@ namespace mr {
       template <ArithmeticT... Args>
       requires (sizeof...(Args) >= 2) && (sizeof...(Args) <= N)
         constexpr Vec(Args... args) : _data(args...) {}
+
+      // from span constructor
+      // TODO: implement using Vc
+      template <ArithmeticT U, size_t M>
+        constexpr Vec(std::span<const U, M> span) noexcept {
+          const size_t len = std::min(N, span.size());
+          for (size_t i = 0; i < len; i++) {
+            _data._set_ind(i, span[i]);
+          }
+        }
 
       // conversion constructor
       template <ArithmeticT R, std::size_t S>
@@ -239,14 +252,24 @@ namespace mr {
           return *this;
         }
 
+        constexpr Vec absed() const noexcept {
+          return {stdx::abs(_data._data)};
+        }
+
         constexpr Vec & abs() noexcept {
-          stdx::where(_data._data < 0) | _data._data = -_data._data;
+          *this = absed();
           return *this;
         }
 
-        constexpr Vec absed() const noexcept {
-          Vec copy = *this;
-          return copy.abs();
+        constexpr Vec clamped(T low, T high) const noexcept {
+          assert(low < high);
+          const auto &data = _data._data;
+          return {stdx::iif(data <= low, SimdT(low), stdx::iif(data >= high, SimdT(high), data))};
+        }
+
+        constexpr Vec & clamp(T low, T high) noexcept {
+          *this = clamped(low, high);
+          return *this;
         }
 
         constexpr bool operator==(const Vec &other) const noexcept {

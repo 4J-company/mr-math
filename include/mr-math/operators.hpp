@@ -28,6 +28,28 @@ namespace mr {
         return lhs;
       }
 
+      friend constexpr DerivedT &
+      operator+(const DerivedT &lhs, const ArithmeticT auto rhs) noexcept {
+        return DerivedT{lhs._data + rhs};
+      }
+
+      friend constexpr DerivedT
+      operator-(const DerivedT &lhs, const ArithmeticT auto rhs) noexcept {
+        return DerivedT{lhs._data - rhs};
+      }
+
+      friend constexpr DerivedT &
+      operator+=(DerivedT &lhs, const ArithmeticT auto rhs) noexcept {
+        lhs._data += rhs;
+        return lhs;
+      }
+
+      friend constexpr DerivedT &
+      operator-=(DerivedT &lhs, const ArithmeticT auto rhs) noexcept {
+        lhs._data -= rhs;
+        return lhs;
+      }
+
       friend constexpr DerivedT
       operator*(const DerivedT &lhs, const ArithmeticT auto rhs) noexcept {
         return DerivedT{lhs._data * static_cast<DerivedT::ValueT>(rhs)};

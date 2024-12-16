@@ -1,5 +1,8 @@
+#include <array>
+
 #include "gtest/gtest.h"
 #include "mr-math/math.hpp"
+#include "mr-math/units.hpp"
 
 using namespace mr::literals;
 
@@ -8,6 +11,19 @@ protected:
   mr::Vec3f v1{1.0, 2.0, 3.0};
   mr::Vec3f v2{4.0, 5.0, 6.0};
 };
+
+TEST_F(Vector3DTest, Constructors) {
+  EXPECT_EQ(mr::Vec3f(), mr::Vec3f(0, 0, 0));
+  EXPECT_EQ(mr::Vec3f(1), mr::Vec3f(1, 1, 1));
+  EXPECT_EQ(mr::Vec3f(mr::Vec2f(1, 2)), mr::Vec3f(1, 2, 0));
+  // TODO: EXPECT_EQ(mr::Vec3f(mr::Vec2f(1, 2), 3), mr::Vec3f(1, 2, 3));
+  EXPECT_EQ(mr::Vec3f(mr::Vec4f(1, 2, 3, 4)), mr::Vec3f(1, 2, 3));
+
+  EXPECT_EQ(mr::Vec3f(std::span<const int, 2>{{1, 2}}), mr::Vec3f(1, 2, 0));
+  EXPECT_EQ(mr::Vec3f(std::span<const int, 3>{{1, 2, 3}}), mr::Vec3f(1, 2, 3));
+  EXPECT_EQ(mr::Vec3f(std::span<const int, 4>{{1, 2, 3, 4}}), mr::Vec3f(1, 2, 3));
+  EXPECT_EQ(mr::Vec3f(std::span<const int>{{1, 2, 3}}), mr::Vec3f(1, 2, 3));
+}
 
 TEST_F(Vector3DTest, Getters) {
   EXPECT_EQ(v1.x(), 1.0);
@@ -89,6 +105,12 @@ TEST_F(Vector3DTest, Abs) {
   mr::Vec3f v{-30, 47, -80};
   EXPECT_EQ(v.absed(), mr::Vec3f(30, 47, 80));
   EXPECT_EQ(v.abs(), mr::Vec3f(30, 47, 80));
+}
+
+TEST_F(Vector3DTest, Clamp) {
+  mr::Vec3f v{-30, 47, -80};
+  EXPECT_EQ(v.clamped(-47, 0), mr::Vec3f(-30, 0, -47));
+  EXPECT_EQ(v.clamp(-47, 0), mr::Vec3f(-30, 0, -47));
 }
 
 class MatrixTest : public ::testing::Test {
@@ -212,4 +234,142 @@ TEST_F(MatrixTest, RotateVector) {
   mr::Vec3f v{30, 47, 80};
   mr::Vec3f expected{38.340427, 81.678845, 36.980571};
   EXPECT_TRUE(mr::equal(v * mr::Matr4f::rotate({1, 1, 1}, 102_deg), expected, 0.0001));
+}
+
+class QuaternionTest : public ::testing::Test {
+protected:
+  mr::Quat<float> q1 {mr::Degreesf(90), 1, 0, 0};
+};
+
+TEST_F(QuaternionTest, DefaultConstructor) {
+  mr::Quat<float> q;
+  EXPECT_EQ((mr::Vec4f)q, mr::Vec4f());
+}
+
+TEST_F(QuaternionTest, ParameterizedConstructor) {
+    float w = 1.0, x = 2.0, y = 3.0, z = 4.0;
+    mr::Quat<float> p(mr::Radiansf(w), x, y, z);
+    EXPECT_EQ(p.w(), w);
+    EXPECT_EQ(p.vec(), mr::Vec3f(x, y, z));
+}
+
+TEST_F(QuaternionTest, Multiplication) {
+    mr::Quat<float> a(mr::Radiansf(1), 2, 3, 4);
+    mr::Quat<float> b(mr::Radiansf(5), 6, 7, 8);
+    mr::Quat<float> res = a * b;
+    mr::Quat<float> expected(mr::Radiansf(-60), 12, 30, 24);
+    EXPECT_TRUE(mr::equal(res.vec(), expected.vec()));
+    EXPECT_TRUE(mr::equal(res.w(), expected.w()));
+}
+
+TEST_F(QuaternionTest, Addition) {
+    mr::Quat<float> c(mr::Radiansf(1), 2, 3, 4);
+    mr::Quat<float> d(mr::Radiansf(5), 6, 7, 8);
+    mr::Quat<float> res = c + d;
+    mr::Quat<float> sum(mr::Radiansf(6), 8, 10, 12);
+    EXPECT_TRUE(mr::equal(res.vec(), sum.vec()));
+    EXPECT_TRUE(mr::equal(res.w(), sum.w()));
+}
+
+TEST_F(QuaternionTest, Subtraction) {
+    mr::Quat<float> e(mr::Radiansf(1), 2, 3, 4);
+    mr::Quat<float> f(mr::Radiansf(5), 6, 7, 8);
+    mr::Quat<float> diff(mr::Radiansf(-4), -4, -4, -4);
+    mr::Quat<float> res = e - f;
+    EXPECT_TRUE(mr::equal(res.vec(), diff.vec()));
+    EXPECT_TRUE(mr::equal(res.w(), diff.w()));
+}
+
+TEST_F(QuaternionTest, Normalize) {
+    mr::Quat<float> g(mr::Radiansf(3), 4, 0, 0);
+    g.normalize();
+    EXPECT_TRUE(mr::equal(g.w(), 0.6));
+    EXPECT_TRUE(mr::equal(g.vec(), mr::Vec3f(0.8, 0, 0)));
+}
+
+TEST_F(QuaternionTest, RotateMatrix) {
+  mr::Vec3f v {0, 1, 0};
+  mr::Vec3f expected {0, 0, 1};
+  EXPECT_TRUE(mr::equal(v * q1, expected));
+}
+
+// TODO: camera tests
+
+TEST(ColorTest, Constructors) {
+  const mr::Color expected1{0.3, 0.47, 0.8, 1.0};
+  EXPECT_EQ(mr::Color(0.3, 0.47, 0.8), expected1);
+  EXPECT_EQ(mr::Color(mr::Vec4f(0.3, 0.47, 0.8, 1)), expected1);
+
+  const mr::Color expected2{0.2980392156862745, 0.4666666666666667, 0.8, 1.0};
+  EXPECT_EQ(mr::Color(76, 119, 204, 255), expected2);
+  EXPECT_EQ(mr::Color(0x4C'77'CC'FF), expected2);
+  EXPECT_EQ(0x4C'77'CC'FF_rgba, expected2);
+}
+
+TEST(ColorTest, Formats) {
+  const auto color = 0x4C'77'CC'FF_rgba;
+  EXPECT_EQ(color.argb(), 0xFF'4C'77'CC_rgba);
+  EXPECT_EQ(color.bgra(), 0xCC'77'4c'FF_rgba);
+  EXPECT_EQ(color.abgr(), 0xFF'CC'77'4c_rgba);
+}
+
+TEST(ColorTest, Getters) {
+  const auto color = 0x4C'77'CC'FF_rgba;
+  EXPECT_FLOAT_EQ(color.r(), 0.2980392156862745f);
+  EXPECT_FLOAT_EQ(color.g(), 0.4666666666666667f);
+  EXPECT_FLOAT_EQ(color.b(), 0.8);
+  EXPECT_FLOAT_EQ(color.a(), 1.0);
+
+  EXPECT_EQ(color[0], color.r());
+  EXPECT_EQ(color[1], color.g());
+  EXPECT_EQ(color[2], color.b());
+  EXPECT_EQ(color[3], color.a());
+
+  const auto[r, g, b, a] = color;
+  EXPECT_EQ(r, color.r());
+  EXPECT_EQ(g, color.g());
+  EXPECT_EQ(b, color.b());
+  EXPECT_EQ(a, color.a());
+}
+
+TEST(ColorTest, Setters) {
+  auto color = 0x4C'77'CC'FF_rgba;
+  color.r(1.0);
+  color.set(1, 0.5);
+  EXPECT_EQ(color, mr::Color(1.0, 0.5, 0.8, 1.0));
+}
+
+TEST(ColorTest, Equality) {
+  const auto color1 = 0x4C'77'CC'FF_rgba;
+  const auto copy = color1;
+  EXPECT_EQ(color1, copy);
+  EXPECT_TRUE(color1.equal(copy));
+  EXPECT_TRUE(equal(color1, copy));
+
+  const auto color2 = 0x00'00'00'00_rgba;
+  EXPECT_NE(color1, color2);
+  EXPECT_FALSE(color1.equal(color2));
+  EXPECT_FALSE(equal(color1, color2));
+}
+
+TEST(ColorTest, Addition) {
+  // Values can exeed 1.0 (should they?)
+  EXPECT_EQ(mr::Color(1.0, 0.0, 0.5, 1.0) + mr::Color(0.0, 1.0, 0.5, 1.0), mr::Color(1.0, 1.0, 1.0, 2.0));
+}
+
+TEST(UtilityTest, Within) {
+  EXPECT_FALSE(mr::within(1, 10)(0));
+  EXPECT_TRUE(mr::within(1, 10)(1));
+  EXPECT_TRUE(mr::within(1, 10)(5));
+  EXPECT_TRUE(mr::within(1, 10)(10));
+  EXPECT_FALSE(mr::within(1, 10)(11));
+
+  EXPECT_FALSE(mr::within_ex(1, 10)(0));
+  EXPECT_FALSE(mr::within_ex(1, 10)(1));
+  EXPECT_TRUE(mr::within_ex(1, 10)(5));
+  EXPECT_FALSE(mr::within_ex(1, 10)(10));
+  EXPECT_FALSE(mr::within_ex(1, 10)(11));
+
+  EXPECT_TRUE(mr::within(1., 10.f)(5));
+  EXPECT_TRUE(mr::within_ex(1., 10.f)(5));
 }

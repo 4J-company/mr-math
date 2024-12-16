@@ -1,6 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
+  <!-- mr::Vec2 -->
+  <Type Name="mr::Vec&lt;*, 2&gt;">
+    <DisplayString>X={x()}, Y={y()}</DisplayString>
+    <Expand>
+      <Item Name="X">x()</Item>
+      <Item Name="Y">y()</Item>
+      <Item Name="Length">length()</Item>
+    </Expand>
+  </Type>
+
+  <!-- mr::Vec3 -->
+  <Type Name="mr::Vec&lt;*, 3&gt;">
+    <DisplayString>X={x()}, Y={y()}, Z={z()}</DisplayString>
+    <Expand>
+      <Item Name="X">x()</Item>
+      <Item Name="Y">y()</Item>
+      <Item Name="Z">z()</Item>
+      <Item Name="Length">length()</Item>
+    </Expand>
+  </Type>
+
+  <!-- mr::Vec4 -->
+  <Type Name="mr::Vec&lt;*, 4&gt;">
+    <DisplayString>X={x()}, Y={y()}, Z={z()}, W={w()}</DisplayString>
+    <Expand>
+      <Item Name="X">x()</Item>
+      <Item Name="Y">y()</Item>
+      <Item Name="Z">z()</Item>
+      <Item Name="W">w()</Item>
+      <Item Name="Length">length()</Item>
+    </Expand>
+  </Type>
+
   <!-- mr::Color -->
   <Type Name="mr::Color">
     <DisplayString>R={r()}, G={g()}, B={b()}, A={a()}}</DisplayString>

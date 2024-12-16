@@ -146,6 +146,10 @@ namespace mr {
         }
 
       private:
+        friend struct Vec<T, N>;
+        friend struct Rotation<T>;
+        constexpr Norm(const VecT &v) noexcept : Norm(unchecked, v) {}
+
         VecT _data;
     };
 } // namespace mr

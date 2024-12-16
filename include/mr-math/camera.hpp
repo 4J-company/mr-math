@@ -7,10 +7,10 @@
 
 namespace mr {
   template <std::floating_point T = float>
-    class [[nodiscard]] Camera {
+    struct [[nodiscard]] Camera {
       public:
         struct Projection {
-          friend class Camera;
+          friend struct Camera;
         public:
           T distance = 0.1f;
           T far = (1 << 10);

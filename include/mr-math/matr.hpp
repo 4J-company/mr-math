@@ -9,7 +9,7 @@ namespace mr
 {
   // forward declarations
   template <ArithmeticT T, std::size_t N>
-    class Matr;
+    struct Matr;
   template <ArithmeticT T, std::size_t N>
     struct ScaleMatr;
   template <ArithmeticT T, std::size_t N>
@@ -59,7 +59,7 @@ namespace mr
   using TranslateMatr4u = TranslateMatr4<uint32_t>;
 
   template <ArithmeticT T, std::size_t N>
-    class [[nodiscard]] Matr
+    struct [[nodiscard]] Matr
     {
     public:
       using ValueT = T;

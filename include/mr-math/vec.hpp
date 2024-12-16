@@ -11,7 +11,7 @@ namespace mr {
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
     struct Norm;
   template <ArithmeticT T, std::size_t N>
-    class Matr;
+    struct Matr;
 
   // common aliases
   template <ArithmeticT T>

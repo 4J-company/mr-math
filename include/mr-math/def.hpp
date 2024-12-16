@@ -68,6 +68,52 @@ namespace mr {
   }
 
   inline struct UncheckedTag {} unchecked;
+
+  // inclusive numeric interval [low, high]
+  // use operator() to check if value is in range
+  template<typename L, typename H>
+    class Interval {
+    public:
+      Interval(const L& low_, const H& high_)
+        : low(low_), high(high_) {}
+
+      template<typename T>
+        requires std::totally_ordered_with<T, L> && std::totally_ordered_with<T, H>
+      bool operator()(const T& value) { return low <= value && value <= high; }
+
+      const L& low;
+      const H& high;
+    };
+
+  // returns inclusive interval
+  // usage: if (mr::within_(1, 10)(x))
+  template<typename L, typename H>
+    constexpr Interval<L, H> within(const L& low, const H& high) {
+      return {low, high};
+    }
+
+  // exclusive numeric interval (low, high)
+  // use operator() to check if value is in range
+  template<typename L, typename H>
+    class IntervalEx {
+    public:
+      IntervalEx(const L& low_, const H& high_)
+        : low(low_), high(high_) {}
+
+      template<typename T>
+        requires std::totally_ordered_with<T, L> && std::totally_ordered_with<T, H>
+      bool operator()(const T& value) { return low < value && value < high; }
+
+      const L& low;
+      const H& high;
+    };
+
+  // returns exclusive interval
+  // usage: if (mr::within_ex(1, 10)(x))
+  template<typename L, typename H>
+    constexpr IntervalEx<L, H> within_ex(const L& low, const H& high) {
+      return {low, high};
+    }
 } // namespace mr
 
 #endif // __def_hpp_

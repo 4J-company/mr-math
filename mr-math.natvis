@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+  <!-- mr::Color -->
+  <Type Name="mr::Color">
+    <DisplayString>R={r()}, G={g()}, B={b()}, A={a()}}</DisplayString>
+    <Expand>
+      <Item Name="R">r()</Item>
+      <Item Name="G">g()</Item>
+      <Item Name="B">b()</Item>
+      <Item Name="A">a()</Item>
+      <Item Name="Hex">(uint32_t(r() * 255) &lt;&lt; 24) + (uint32_t(g() * 255) &lt;&lt; 16) + (uint32_t(b() * 255) &lt;&lt; 8) + (uint32_t(a() * 255)), Xb</Item>
+    </Expand>
+  </Type>
+
+</AutoVisualizer>

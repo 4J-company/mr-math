@@ -16,6 +16,8 @@ namespace mr
     struct ScaleMatr;
   template <ArithmeticT T, std::size_t N>
     struct TranslateMatr;
+  template <ArithmeticT T>
+    struct RotateMatr;
 
   // common aliases
   template <ArithmeticT T>
@@ -59,6 +61,11 @@ namespace mr
   using TranslateMatr4d = TranslateMatr4<double>;
   using TranslateMatr4i = TranslateMatr4<int>;
   using TranslateMatr4u = TranslateMatr4<uint32_t>;
+
+  using RotateMatr4f = RotateMatr<float>;
+  using RotateMatr4d = RotateMatr<double>;
+  using RotateMatr4i = RotateMatr<int>;
+  using RotateMatr4u = RotateMatr<uint32_t>;
 
   template <ArithmeticT T, std::size_t N>
     struct [[nodiscard]] Matr

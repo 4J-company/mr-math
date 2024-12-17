@@ -3,6 +3,8 @@
 
 #include "def.hpp"
 #include "row.hpp"
+#include "vec.hpp"
+#include "norm.hpp"
 #include "units.hpp"
 
 namespace mr
@@ -308,30 +310,6 @@ namespace mr
         };
       }
 
-      static constexpr Matr4<T> rotate(const Norm<T, 3> &n, const Radians<T> &rad) noexcept {
-        T co = std::cos(rad._data);
-        T si = std::sin(rad._data);
-        T nco = 1 - co;
-
-        Vec<T, 3> tmp0 {n * n * nco + Vec<T, 3>{co}};
-        // TODO: implement using Vec4(Vec3, T) constructor
-        Matr4<T> tmp1 = ScaleMatr<T, 4>({tmp0.x(), tmp0.y(), tmp0.z(), 1});
-        Matr4<T> tmp2 = Matr4<T> {
-                            0, n.x() * n.y() * nco, n.x() * n.z() * nco, 0,
-          n.x() * n.y() * nco,                   0, n.y() * n.z() * nco, 0,
-          n.x() * n.z() * nco, n.y() * n.z() * nco,                   0, 0,
-                            0,                   0,                   0, 0
-        };
-        Matr4<T> tmp3 = Matr4<T> {
-                    0, -n.z() * si,  n.y() * si, 0,
-           n.z() * si,           0, -n.x() * si, 0,
-          -n.y() * si,  n.x() * si,           0, 0,
-                    0,           0,           0, 0
-        };
-
-        return tmp1 + tmp2 + tmp3;
-      }
-
       constexpr bool operator==(const Matr &other) const noexcept {
         for (size_t i = 0; i < N; i++) {
           if (_data[i] != other._data[i]) {
@@ -503,6 +481,74 @@ namespace mr
           }
       };
 
+    template <ArithmeticT T>
+      struct RotateMatr {
+        private:
+          mr::Quat<T> _data {};
+
+        public:
+          constexpr RotateMatr() = default;
+          constexpr RotateMatr(mr::Quat<T> rotate) : _data(rotate) {}
+
+          constexpr RotateMatr(mr::Radians<T> rad, mr::Norm3<T> v) noexcept
+            : _data(rad, (mr::Vec3f)v) { }
+
+          constexpr RotateMatr(mr::Radians<T> rad, mr::Vec3<T> v) noexcept
+            : RotateMatr(rad, v.normalized_unchecked()) {}
+
+          constexpr RotateMatr(mr::Yaw<T> angle) noexcept
+            : RotateMatr(angle.value, mr::Norm3<T>(mr::unchecked, mr::axis::y)) { }
+
+          constexpr RotateMatr(mr::Pitch<T> angle) noexcept
+            : RotateMatr(angle.value, mr::Norm3<T>(mr::unchecked, mr::axis::x)) { }
+
+          constexpr RotateMatr(mr::Roll<T> angle) noexcept
+            : RotateMatr(angle.value, mr::Norm3<T>(mr::unchecked, mr::axis::z)) { }
+
+          constexpr RotateMatr &inverse() noexcept {
+            _data.inverse();
+            return *this;
+          }
+          constexpr RotateMatr inversed() const noexcept {
+            return RotateMatr(_data.inversed());
+          }
+
+          friend constexpr RotateMatr operator*(const RotateMatr &lhs, const RotateMatr &rhs) noexcept {
+            RotateMatr res = lhs;
+            res._data *= rhs._data;
+            return res;
+          }
+          friend constexpr RotateMatr & operator*=(RotateMatr &lhs, const RotateMatr &rhs) noexcept {
+            lhs._data *= rhs._data;
+            return lhs;
+          }
+
+          template <std::size_t N>
+            friend constexpr Matr<T, N> operator*(const Matr<T, N> &lhs, const RotateMatr &rhs) noexcept {
+              return lhs * rhs._data;
+            }
+          template <std::size_t N>
+            friend constexpr Matr<T, N> & operator*=(Matr<T, N> &lhs, const RotateMatr &rhs) noexcept {
+              lhs = lhs * rhs;
+              return lhs;
+            }
+
+          friend constexpr Vec3<T> operator*(const Vec3<T> &lhs, const RotateMatr &rhs) noexcept {
+            T alpha = (mr::pi._data + rhs._data.w()) / 2;
+            mr::Vec3<T> vec = rhs._data.vec().normalized_unchecked();
+
+            auto vq = vec * std::cos(alpha);
+            auto t = vq % lhs;
+            auto u = std::sin(alpha) * t + vq % t;
+            return {lhs + u + u};
+          }
+
+          friend constexpr Vec3<T> & operator*=(Vec3<T> &lhs, const RotateMatr &rhs) noexcept {
+            lhs = lhs * rhs;
+            return lhs;
+          }
+      };
+
     template <typename T, std::size_t N>
       constexpr ScaleMatr<T, N> scale(mr::Vec<T, N> v) noexcept {
         return ScaleMatr<T, N>(v);
@@ -511,6 +557,36 @@ namespace mr
     template <typename T, std::size_t N>
       constexpr ScaleMatr<T, N> translate(mr::Vec<T, N> v) noexcept {
         return TranslateMatr<T, N>(v);
+      }
+
+    template <typename T>
+      constexpr RotateMatr<T> rotate(mr::Quat<T> v) noexcept {
+        return RotateMatr<T>(v);
+      }
+
+    template <typename T>
+      constexpr RotateMatr<T> rotate(mr::Radians<T> rad, mr::Vec3<T> v) noexcept {
+        return RotateMatr(rad, v);
+      }
+
+    template <typename T>
+      constexpr RotateMatr<T> rotate(mr::Radians<T> rad, mr::Norm3<T> v) noexcept {
+        return RotateMatr(rad, v);
+      }
+
+    template <typename T>
+      constexpr RotateMatr<T> rotate(mr::Yaw<T> rad) noexcept {
+        return RotateMatr(rad);
+      }
+
+    template <typename T>
+      constexpr RotateMatr<T> rotate(mr::Pitch<T> rad) noexcept {
+        return RotateMatr(rad);
+      }
+
+    template <typename T>
+      constexpr RotateMatr<T> rotate(mr::Roll<T> rad) noexcept {
+        return RotateMatr(rad);
       }
 } // namespace mr
 

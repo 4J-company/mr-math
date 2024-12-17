@@ -45,8 +45,6 @@ inline namespace math {
           _data.normalize();
         }
 
-      constexpr Norm(const VecT &v) noexcept : Norm(unchecked, v.normalized_unchecked()) {}
-
       constexpr Norm(UncheckedTag, const VecT &v) noexcept : _data(v) {
           assert(mr::equal(v.length(), 1, 0.1f));
         }
@@ -153,6 +151,7 @@ inline namespace math {
 
         VecT _data;
     };
+} // namespace math
 } // namespace mr
 
 #ifdef __cpp_structured_bindings

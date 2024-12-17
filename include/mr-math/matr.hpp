@@ -326,6 +326,7 @@ inline namespace math
         T nco = 1 - co;
 
         Vec<T, 3> tmp0 {n * n * nco + Vec<T, 3>{co}};
+        // TODO: implement using Vec4(Vec3, T) constructor
         Matr4<T> tmp1 = ScaleMatr<T, 4>({tmp0.x(), tmp0.y(), tmp0.z(), 1});
         Matr4<T> tmp2 = Matr4<T> {
                             0, n.x() * n.y() * nco, n.x() * n.z() * nco, 0,
@@ -494,11 +495,6 @@ inline namespace math
             return lhs;
           }
 
-          friend inline constexpr Matr<T, N> & operator*(const Matr<T, N> &lhs, const TranslateMatr &rhs) noexcept {
-            lhs = lhs * rhs;
-            return lhs;
-          }
-
           friend inline constexpr Vec<T, N> operator*(const Vec<T, N> &lhs, const TranslateMatr &rhs) noexcept {
             Vec<T, N> res = lhs + rhs._data;
             return res;
@@ -572,13 +568,7 @@ inline namespace math
             }
 
           friend constexpr Vec3<T> operator*(const Vec3<T> &lhs, const RotateMatr &rhs) noexcept {
-            T alpha = (mr::pi._data + rhs._data.w()) / 2;
-            mr::Vec3<T> vec = rhs._data.vec().normalized_unchecked();
-
-            auto vq = vec * std::cos(alpha);
-            auto t = vq % lhs;
-            auto u = std::sin(alpha) * t + vq % t;
-            return {lhs + u + u};
+            return lhs * rhs._data;
           }
 
           friend constexpr Vec3<T> & operator*=(Vec3<T> &lhs, const RotateMatr &rhs) noexcept {

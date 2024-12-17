@@ -2,7 +2,7 @@
 #define __MR_QUAT_HPP_
 
 #include "def.hpp"
-#include "operators.hpp"
+#include "mr-math/operators.hpp"
 #include "vec.hpp"
 #include "matr.hpp"
 #include "rot.hpp"
@@ -48,7 +48,14 @@ inline namespace math {
         return Vec4<T>{w(), x(), y(), z()};
       }
 
-      explicit operator Matr<T, 4>() const noexcept {
+<<<<<<< HEAD
+      [[nodiscard]] constexpr T length2()          const noexcept { return w() * w() + vec().length2(); }
+      [[nodiscard]] constexpr T length()           const noexcept { return std::sqrt(length2()); }
+      [[nodiscard]] constexpr T inversed_length()  const noexcept { return fast_rsqrt(length2()); }
+
+||||||| parent of 740efc4 (Add mr::RotateMatr)
+=======
+      operator Matr<T, 4>() const noexcept {
         T rad = w();
         mr::Norm n = vec().normalized_unchecked();
 
@@ -75,10 +82,7 @@ inline namespace math {
         return tmp1 + tmp2 + tmp3;
       }
 
-      [[nodiscard]] constexpr T length2()          const noexcept { return w() * w() + vec().length2(); }
-      [[nodiscard]] constexpr T length()           const noexcept { return std::sqrt(length2()); }
-      [[nodiscard]] constexpr T inversed_length()  const noexcept { return fast_rsqrt(length2()); }
-
+>>>>>>> 740efc4 (Add mr::RotateMatr)
       // normalize methods
       constexpr Quat & normalize() noexcept {
         auto len = length2();
@@ -131,6 +135,7 @@ inline namespace math {
         lhs = lhs * rhs;
         return lhs;
       }
+<<<<<<< HEAD
 
       [[nodiscard]] friend constexpr Quat operator*(const Quat &lhs, T rhs) noexcept {
         return {
@@ -172,6 +177,22 @@ inline namespace math {
         os << '(' << q.w() << ", " << q.vec() << ')';
         return os;
       }
+||||||| parent of 740efc4 (Add mr::RotateMatr)
+
+        friend constexpr Vec<T, 3> operator*(const Vec<T, 3> &lhs, const Quat &rhs) noexcept {
+          auto vq = rhs.vec() * std::cos(rhs.w() / 2);
+          auto t = vq % lhs;
+          auto u = std::sin(rhs.w() / 2) * t + vq % t;
+
+          return {lhs + u + u};
+        }
+      template <std::size_t N>
+        friend constexpr Vec<T, N> & operator*=(Vec<T, N> &lhs, const Quat &rhs) noexcept {
+          lhs = lhs * rhs;
+          return lhs;
+        }
+=======
+>>>>>>> 740efc4 (Add mr::RotateMatr)
     };
 
   template <ArithmeticT T>

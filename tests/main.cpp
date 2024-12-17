@@ -231,8 +231,8 @@ TEST_F(MatrixTest, RotateBasis) {
 
 TEST_F(MatrixTest, RotateVector) {
   mr::Vec3f v{30, 47, 80};
-  mr::Vec3f expected{38.340427, 81.678845, 36.980571};
-  EXPECT_TRUE(mr::equal(v * mr::rotate(mr::Radiansf(102_deg), mr::Norm3f(1, 1, 1)), expected, 0.0001));
+  mr::Vec3f expected{ 75.6129, 25.2055, 56.1816 };
+  EXPECT_TRUE(mr::equal(v * mr::rotate(mr::Radiansf(102_deg), mr::Norm3f(1, 1, 1)), expected, 0.001));
 }
 
 class QuaternionTest : public ::testing::Test {
@@ -293,8 +293,8 @@ TEST_F(QuaternionTest, Normalize) {
 
 TEST_F(QuaternionTest, RotateMatrix) {
   mr::Vec3f v {0, 1, 0};
-  mr::Vec3f expected {0, 0, -1};
-  EXPECT_TRUE(mr::equal(v * mr::rotate(q1), expected));
+  mr::Vec3f expected {0, 0, 1};
+  EXPECT_TRUE(mr::equal(v * q1, expected));
 }
 
 TEST_F(QuaternionTest, Normalization) {

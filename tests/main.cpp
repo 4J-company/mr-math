@@ -296,6 +296,8 @@ TEST_F(QuaternionTest, RotateMatrix) {
 // TODO: camera tests
 
 TEST(ColorTest, Constructors) {
+  EXPECT_EQ(mr::Color(), mr::Color(0, 0, 0, 0));
+
   const mr::Color expected1{0.3, 0.47, 0.8, 1.0};
   EXPECT_EQ(mr::Color(0.3, 0.47, 0.8), expected1);
   EXPECT_EQ(mr::Color(mr::Vec4f(0.3, 0.47, 0.8, 1)), expected1);

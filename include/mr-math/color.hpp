@@ -11,6 +11,8 @@ namespace mr {
   public:
     using ValueT = float;
 
+    Color() = default;
+
     template <std::floating_point T>
       Color(T r, T g, T b, T a = 1) noexcept
         : _data{Vec4f{r, g, b, a}} {}

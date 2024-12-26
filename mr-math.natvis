@@ -126,4 +126,12 @@
     </Expand>
   </Type>
 
+  <!-- mr::Matr -->
+  <Type Name="mr::Matr&lt;*, *&gt;">
+    <DisplayString>{_data[0]} ...</DisplayString>
+    <Expand>
+      <Item Name="Rows">_data</Item>
+    </Expand>
+  </Type>
+
 </AutoVisualizer>

@@ -1,5 +1,5 @@
-#ifndef __quat_hpp_
-#define __quat_hpp_
+#ifndef __MR_QUAT_HPP_
+#define __MR_QUAT_HPP_
 
 #include "def.hpp"
 #include "mr-math/operators.hpp"
@@ -111,4 +111,4 @@ namespace mr {
     };
 }
 
-#endif // __quat_hpp_
+#endif // __MR_QUAT_HPP_

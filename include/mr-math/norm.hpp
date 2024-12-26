@@ -1,5 +1,5 @@
-#ifndef __norm_hpp_
-#define __norm_hpp_
+#ifndef __MR_NORM_HPP_
+#define __MR_NORM_HPP_
 
 #include "def.hpp"
 #include "vec.hpp"
@@ -169,4 +169,4 @@ namespace std
 }
 #endif
 
-#endif // __norm_hpp_
+#endif // __MR_NORM_HPP_

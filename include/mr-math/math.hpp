@@ -1,5 +1,5 @@
-#ifndef __math_hpp_
-#define __math_hpp_
+#ifndef __MR_MATH_HPP_
+#define __MR_MATH_HPP_
 
 #include "def.hpp"
 #include "vec.hpp"
@@ -16,4 +16,4 @@
   #include "debug.hpp"
 #endif
 
-#endif // __math_hpp_
+#endif // __MR_MATH_HPP_

@@ -1,5 +1,5 @@
-#ifndef __camera_hpp_
-#define __camera_hpp_
+#ifndef __MR_CAMERA_HPP_
+#define __MR_CAMERA_HPP_
 
 #include "vec.hpp"
 #include "rot.hpp"
@@ -249,4 +249,4 @@ namespace mr {
     };
 }
 
-#endif // __camera_hpp_
+#endif // __MR_CAMERA_HPP_

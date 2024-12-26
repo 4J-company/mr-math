@@ -1,5 +1,5 @@
-#ifndef __Matr_hpp_
-#define __Matr_hpp_
+#ifndef __MR_MATR_HPP_
+#define __MR_MATR_HPP_
 
 #include "def.hpp"
 #include "row.hpp"
@@ -621,4 +621,4 @@ namespace std {
 } // namespace std
 #endif
 
-#endif // __Matr_hpp_
+#endif // __MR_MATR_HPP_

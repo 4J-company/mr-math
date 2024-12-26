@@ -1,5 +1,5 @@
-#ifndef __Operators_hpp__
-#define __Operators_hpp__
+#ifndef __MR_OPERATORS_HPP_
+#define __MR_OPERATORS_HPP_
 
 #include "def.hpp"
 
@@ -141,4 +141,4 @@ namespace mr {
     };
 }
 
-#endif // __Operators_hpp__
+#endif // __MR_OPERATORS_HPP_

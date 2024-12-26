@@ -1,5 +1,5 @@
-#ifndef __def_hpp_
-#define __def_hpp_
+#ifndef __MR_DEF_HPP_
+#define __MR_DEF_HPP_
 
 #include <type_traits>
 #include <algorithm>
@@ -116,4 +116,4 @@ namespace mr {
     }
 } // namespace mr
 
-#endif // __def_hpp_
+#endif // __MR_DEF_HPP_

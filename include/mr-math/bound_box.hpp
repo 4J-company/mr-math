@@ -1,5 +1,5 @@
-#ifndef __bound_box_hpp_
-#define __bound_box_hpp_
+#ifndef __MR_BOUND_HPP_
+#define __MR_BOUND_HPP_
 
 #include "def.hpp"
 #include "vec.hpp"
@@ -46,4 +46,4 @@ namespace mr {
     };
 }
 
-#endif // __bound_box_hpp_
+#endif // __MR_BOUND_HPP_

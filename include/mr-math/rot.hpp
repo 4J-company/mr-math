@@ -1,5 +1,5 @@
-#ifndef __rot_hpp_
-#define __rot_hpp_
+#ifndef __MR_ROT_HPP_
+#define __MR_ROT_HPP_
 
 #include "units.hpp"
 #include "vec.hpp"
@@ -95,4 +95,4 @@ namespace mr {
     };
 }
 
-#endif // __rot_hpp_
+#endif // __MR_ROT_HPP_

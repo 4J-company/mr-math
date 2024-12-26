@@ -64,6 +64,16 @@
     </Expand>
   </Type>
 
+  <!-- mr::Radians -->
+  <Type Name="mr::Radians&lt;*&gt;">
+    <DisplayString>{_data} rad</DisplayString>
+  </Type>
+
+  <!-- mr::Degrees -->
+  <Type Name="mr::Degrees&lt;*&gt;">
+    <DisplayString>{_data} deg</DisplayString>
+  </Type>
+
   <!-- mr::Color -->
   <Type Name="mr::Color">
     <DisplayString>R={r()}, G={g()}, B={b()}, A={a()}}</DisplayString>

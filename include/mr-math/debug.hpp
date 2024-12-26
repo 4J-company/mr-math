@@ -91,6 +91,22 @@ inline namespace norm {
 
 } // namespace norm
 
+inline namespace bounb_box {
+
+  void instantiate_aabb_dimensions(const auto& aabb) {
+    volatile auto d = aabb.dimensions(); (void)d;
+  }
+
+#define MR_INSTANTIATE_AABB(T) template void instantiate_aabb_dimensions(const AABB<T>&)
+
+  // instantiate types
+  MR_INSTANTIATE_AABB(float);
+  MR_INSTANTIATE_AABB(double);
+  MR_INSTANTIATE_AABB(int);
+  MR_INSTANTIATE_AABB(uint32_t);
+
+} // namespace norm
+
 } // namespace debug
 } // namespace mr
 

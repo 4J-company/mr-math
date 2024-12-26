@@ -33,7 +33,7 @@
 
   <!-- mr::Vec2 -->
   <Type Name="mr::Vec&lt;*, 2&gt;">
-    <DisplayString>X={x()}, Y={y()}</DisplayString>
+    <DisplayString>{{{x()}, {y()}}}</DisplayString>
     <Expand>
       <Item Name="X">x()</Item>
       <Item Name="Y">y()</Item>
@@ -43,7 +43,7 @@
 
   <!-- mr::Vec3 -->
   <Type Name="mr::Vec&lt;*, 3&gt;">
-    <DisplayString>X={x()}, Y={y()}, Z={z()}</DisplayString>
+    <DisplayString>{{{x()}, {y()}, {z()}}}</DisplayString>
     <Expand>
       <Item Name="X">x()</Item>
       <Item Name="Y">y()</Item>
@@ -54,7 +54,7 @@
 
   <!-- mr::Vec4 -->
   <Type Name="mr::Vec&lt;*, 4&gt;">
-    <DisplayString>X={x()}, Y={y()}, Z={z()}, W={w()}</DisplayString>
+    <DisplayString>{{{x()}, {y()}, {z()}, {w()}}}</DisplayString>
     <Expand>
       <Item Name="X">x()</Item>
       <Item Name="Y">y()</Item>
@@ -66,7 +66,7 @@
 
   <!-- mr::Norm2 -->
   <Type Name="mr::Norm&lt;*, 2&gt;">
-    <DisplayString>X={x()}, Y={y()}</DisplayString>
+    <DisplayString>{{{x()}, {y()}}}</DisplayString>
     <Expand>
       <Item Name="X">x()</Item>
       <Item Name="Y">y()</Item>
@@ -75,7 +75,7 @@
 
   <!-- mr::Norm3 -->
   <Type Name="mr::Norm&lt;*, 3&gt;">
-    <DisplayString>X={x()}, Y={y()}, Z={z()}</DisplayString>
+    <DisplayString>{{{x()}, {y()}, {z()}}}</DisplayString>
     <Expand>
       <Item Name="X">x()</Item>
       <Item Name="Y">y()</Item>
@@ -85,7 +85,7 @@
 
   <!-- mr::Norm4 -->
   <Type Name="mr::Norm&lt;*, 4&gt;">
-    <DisplayString>X={x()}, Y={y()}, Z={z()}, W={w()}</DisplayString>
+    <DisplayString>{{{x()}, {y()}, {z()}, {w()}}}</DisplayString>
     <Expand>
       <Item Name="X">x()</Item>
       <Item Name="Y">y()</Item>
@@ -113,6 +113,16 @@
       <Item Name="B">b()</Item>
       <Item Name="A">a()</Item>
       <Item Name="Hex">(uint32_t(r() * 255) &lt;&lt; 24) + (uint32_t(g() * 255) &lt;&lt; 16) + (uint32_t(b() * 255) &lt;&lt; 8) + (uint32_t(a() * 255)), Xb</Item>
+    </Expand>
+  </Type>
+
+  <!-- mr::AABB -->
+  <Type Name="mr::AABB&lt;*&gt;">
+    <DisplayString>{min} : {max}</DisplayString>
+    <Expand>
+      <Item Name="Min">min</Item>
+      <Item Name="Max">max</Item>
+      <Item Name="Dimensions">dimensions()</Item>
     </Expand>
   </Type>
 

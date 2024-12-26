@@ -9,7 +9,9 @@
 namespace mr {
 namespace debug {
 
-  // following functions instantiate methods of template structs desired in debug visualization
+// following functions instantiate methods of template structs desired in debug visualization
+
+inline namespace vec {
 
   void instantiate_vec_x_y_length(const auto& vec) {
     volatile auto x = vec.x(); (void)x;
@@ -37,6 +39,38 @@ namespace debug {
   MR_INSTANTIATE_VEC2_VEC3_VEC4(double);
   MR_INSTANTIATE_VEC2_VEC3_VEC4(int);
   MR_INSTANTIATE_VEC2_VEC3_VEC4(uint32_t);
+
+} // namespace vec
+
+inline namespace norm {
+
+  void instantiate_norm_x_y(const auto& norm) {
+    volatile auto x = norm.x(); (void)x;
+    volatile auto y = norm.y(); (void)y;
+  }
+
+  void instantiate_norm_x_y_z(const auto& norm) {
+    instantiate_norm_x_y(norm);
+    volatile auto z = norm.z(); (void)z;
+  }
+
+  void instantiate_norm_x_y_z_w(const auto& norm) {
+    instantiate_norm_x_y_z(norm);
+    volatile auto w = norm.w(); (void)w;
+  }
+
+#define MR_INSTANTIATE_NORM2(T) template void instantiate_norm_x_y(const Norm2<T>&)
+#define MR_INSTANTIATE_NORM3(T) template void instantiate_norm_x_y_z(const Norm3<T>&)
+#define MR_INSTANTIATE_NORM4(T) template void instantiate_norm_x_y_z_w(const Norm4<T>&)
+#define MR_INSTANTIATE_NORM2_NORM3_NORM4(T) MR_INSTANTIATE_NORM2(T); MR_INSTANTIATE_NORM3(T); MR_INSTANTIATE_NORM4(T)
+
+  // instantiate types
+  MR_INSTANTIATE_NORM2_NORM3_NORM4(float);
+  MR_INSTANTIATE_NORM2_NORM3_NORM4(double);
+  MR_INSTANTIATE_NORM2_NORM3_NORM4(int);
+  MR_INSTANTIATE_NORM2_NORM3_NORM4(uint32_t);
+
+} // namespace norm
 
 } // namespace debug
 } // namespace mr

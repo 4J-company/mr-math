@@ -11,6 +11,25 @@ namespace debug {
 
 // following functions instantiate methods of template structs desired in debug visualization
 
+inline namespace row {
+
+  void instantiate_row_get(const auto& row) {
+    volatile auto x = row.get(0); (void)x;
+  }
+
+#define MR_INSTANTIATE_ROW2(T) template void instantiate_row_get(const Row<T, 2>&)
+#define MR_INSTANTIATE_ROW3(T) template void instantiate_row_get(const Row<T, 3>&)
+#define MR_INSTANTIATE_ROW4(T) template void instantiate_row_get(const Row<T, 4>&)
+#define MR_INSTANTIATE_ROW2_ROW3_ROW4(T) MR_INSTANTIATE_ROW2(T); MR_INSTANTIATE_ROW3(T); MR_INSTANTIATE_ROW4(T)
+
+  // instantiate types
+  MR_INSTANTIATE_ROW2_ROW3_ROW4(float);
+  MR_INSTANTIATE_ROW2_ROW3_ROW4(double);
+  MR_INSTANTIATE_ROW2_ROW3_ROW4(int);
+  MR_INSTANTIATE_ROW2_ROW3_ROW4(uint32_t);
+
+} // namespace row
+
 inline namespace vec {
 
   void instantiate_vec_x_y_length(const auto& vec) {

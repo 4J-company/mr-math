@@ -1,5 +1,5 @@
-#ifndef __math_hpp_
-#define __math_hpp_
+#ifndef __MR_MATH_HPP_
+#define __MR_MATH_HPP_
 
 #include "def.hpp"
 #include "vec.hpp"
@@ -12,4 +12,4 @@
 #include "bound_box.hpp"
 #include "color.hpp"
 
-#endif // __math_hpp_
+#endif // __MR_MATH_HPP_

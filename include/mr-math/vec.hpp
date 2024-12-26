@@ -1,5 +1,5 @@
-#ifndef __Vec_hpp_
-#define __Vec_hpp_
+#ifndef __MR_VEC_HPP_
+#define __MR_VEC_HPP_
 
 #include "def.hpp"
 #include "row.hpp"
@@ -300,4 +300,4 @@ namespace std
 }
 #endif
 
-#endif // __Vec_hpp_
+#endif // __MR_VEC_HPP_

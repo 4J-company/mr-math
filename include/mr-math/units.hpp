@@ -1,5 +1,5 @@
-﻿#ifndef __units_hpp_
-#define __units_hpp_
+﻿#ifndef __MR_UNITS_HPP_
+#define __MR_UNITS_HPP_
 
 #include "vec.hpp"
 
@@ -171,4 +171,4 @@ namespace std {
 } // namespace std
 #endif
 
-#endif // __units_hpp_
+#endif // __MR_UNITS_HPP_

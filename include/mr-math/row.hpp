@@ -1,5 +1,5 @@
-#ifndef __Row_hpp_
-#define __Row_hpp_
+#ifndef __MR_ROW_HPP_
+#define __MR_ROW_HPP_
 
 #include "operators.hpp"
 
@@ -139,4 +139,4 @@ namespace std {
 } // namespace std
 #endif
 
-#endif // __Row_hpp_
+#endif // __MR_ROW_HPP_

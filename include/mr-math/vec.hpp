@@ -1,5 +1,5 @@
-#ifndef __Vec_hpp_
-#define __Vec_hpp_
+#ifndef __MR_VEC_HPP_
+#define __MR_VEC_HPP_
 
 #include "def.hpp"
 #include "row.hpp"
@@ -12,6 +12,8 @@ namespace mr {
     struct Norm;
   template <ArithmeticT T, std::size_t N>
     struct Matr;
+  template <ArithmeticT T>
+    struct Quat;
 
   // common aliases
   template <ArithmeticT T>
@@ -39,8 +41,9 @@ namespace mr {
 
   // base vector (use aliases for full functional)
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
-    struct [[nodiscard]] Vec : public RowOperators<Vec<T, N>>
-    {
+    struct [[nodiscard]] Vec : public RowOperators<Vec<T, N>> {
+      friend struct Quat<T>;
+
     public:
       using ValueT = T;
       using RowT = Row<T, N>;
@@ -297,4 +300,4 @@ namespace std
 }
 #endif
 
-#endif // __Vec_hpp_
+#endif // __MR_VEC_HPP_

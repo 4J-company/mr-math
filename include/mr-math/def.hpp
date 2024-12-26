@@ -1,5 +1,5 @@
-#ifndef __def_hpp_
-#define __def_hpp_
+#ifndef __MR_DEF_HPP_
+#define __MR_DEF_HPP_
 
 #include <type_traits>
 #include <algorithm>
@@ -69,12 +69,12 @@ namespace mr {
 
   inline struct UncheckedTag {} unchecked;
 
-  // inclusive range [low, high]
+  // inclusive numeric interval [low, high]
   // use operator() to check if value is in range
   template<typename L, typename H>
-    class Range {
+    class Interval {
     public:
-      Range(const L& low_, const H& high_)
+      Interval(const L& low_, const H& high_)
         : low(low_), high(high_) {}
 
       template<typename T>
@@ -85,19 +85,19 @@ namespace mr {
       const H& high;
     };
 
-  // returns inclusive range
+  // returns inclusive interval
   // usage: if (mr::within_(1, 10)(x))
   template<typename L, typename H>
-    constexpr Range<L, H> within(const L& low, const H& high) {
+    constexpr Interval<L, H> within(const L& low, const H& high) {
       return {low, high};
     }
 
-  // inclusive range (low, high)
+  // exclusive numeric interval (low, high)
   // use operator() to check if value is in range
   template<typename L, typename H>
-    class RangeEx {
+    class IntervalEx {
     public:
-      RangeEx(const L& low_, const H& high_)
+      IntervalEx(const L& low_, const H& high_)
         : low(low_), high(high_) {}
 
       template<typename T>
@@ -108,12 +108,12 @@ namespace mr {
       const H& high;
     };
 
-  // returns exclusive rang
+  // returns exclusive interval
   // usage: if (mr::within_ex(1, 10)(x))
   template<typename L, typename H>
-    constexpr RangeEx<L, H> within_ex(const L& low, const H& high) {
+    constexpr IntervalEx<L, H> within_ex(const L& low, const H& high) {
       return {low, high};
     }
 } // namespace mr
 
-#endif // __def_hpp_
+#endif // __MR_DEF_HPP_

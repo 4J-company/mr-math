@@ -1,5 +1,5 @@
-#ifndef __debug_hpp_
-#define __debug_hpp_
+#ifndef __MR_DEBUG_HPP_
+#define __MR_DEBUG_HPP_
 
 // This file provides template instantiations used by debug visualizers
 // and is intended for debug builds only
@@ -110,5 +110,5 @@ inline namespace bounb_box {
 } // namespace debug
 } // namespace mr
 
-#endif // __debug_hpp_
+#endif // __MR_DEBUG_HPP_
 

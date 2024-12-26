@@ -1,11 +1,16 @@
-#ifndef __Row_hpp_
-#define __Row_hpp_
+#ifndef __MR_ROW_HPP_
+#define __MR_ROW_HPP_
 
 #include "operators.hpp"
 
 namespace mr {
+  template <ArithmeticT T>
+    struct Quat;
+
   template <ArithmeticT T, std::size_t N>
     struct Row : RowOperators<Row<T, N>> {
+      friend struct Quat<T>;
+
     public:
       using ValueT = T;
       using SimdT = SimdImpl<T, N>;
@@ -138,4 +143,4 @@ namespace std {
 } // namespace std
 #endif
 
-#endif // __Row_hpp_
+#endif // __MR_ROW_HPP_

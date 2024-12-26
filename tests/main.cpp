@@ -2,6 +2,7 @@
 
 #include "gtest/gtest.h"
 #include "mr-math/math.hpp"
+#include "mr-math/units.hpp"
 
 using namespace mr::literals;
 
@@ -235,9 +236,68 @@ TEST_F(MatrixTest, RotateVector) {
   EXPECT_TRUE(mr::equal(v * mr::Matr4f::rotate({1, 1, 1}, 102_deg), expected, 0.0001));
 }
 
+class QuaternionTest : public ::testing::Test {
+protected:
+  mr::Quat<float> q1 {mr::Degreesf(90), 1, 0, 0};
+};
+
+TEST_F(QuaternionTest, DefaultConstructor) {
+  mr::Quat<float> q;
+  EXPECT_EQ((mr::Vec4f)q, mr::Vec4f());
+}
+
+TEST_F(QuaternionTest, ParameterizedConstructor) {
+    float w = 1.0, x = 2.0, y = 3.0, z = 4.0;
+    mr::Quat<float> p(mr::Radiansf(w), x, y, z);
+    EXPECT_EQ(p.w(), w);
+    EXPECT_EQ(p.vec(), mr::Vec3f(x, y, z));
+}
+
+TEST_F(QuaternionTest, Multiplication) {
+    mr::Quat<float> a(mr::Radiansf(1), 2, 3, 4);
+    mr::Quat<float> b(mr::Radiansf(5), 6, 7, 8);
+    mr::Quat<float> res = a * b;
+    mr::Quat<float> expected(mr::Radiansf(-60), 12, 30, 24);
+    EXPECT_TRUE(mr::equal(res.vec(), expected.vec()));
+    EXPECT_TRUE(mr::equal(res.w(), expected.w()));
+}
+
+TEST_F(QuaternionTest, Addition) {
+    mr::Quat<float> c(mr::Radiansf(1), 2, 3, 4);
+    mr::Quat<float> d(mr::Radiansf(5), 6, 7, 8);
+    mr::Quat<float> res = c + d;
+    mr::Quat<float> sum(mr::Radiansf(6), 8, 10, 12);
+    EXPECT_TRUE(mr::equal(res.vec(), sum.vec()));
+    EXPECT_TRUE(mr::equal(res.w(), sum.w()));
+}
+
+TEST_F(QuaternionTest, Subtraction) {
+    mr::Quat<float> e(mr::Radiansf(1), 2, 3, 4);
+    mr::Quat<float> f(mr::Radiansf(5), 6, 7, 8);
+    mr::Quat<float> diff(mr::Radiansf(-4), -4, -4, -4);
+    mr::Quat<float> res = e - f;
+    EXPECT_TRUE(mr::equal(res.vec(), diff.vec()));
+    EXPECT_TRUE(mr::equal(res.w(), diff.w()));
+}
+
+TEST_F(QuaternionTest, Normalize) {
+    mr::Quat<float> g(mr::Radiansf(3), 4, 0, 0);
+    g.normalize();
+    EXPECT_TRUE(mr::equal(g.w(), 0.6));
+    EXPECT_TRUE(mr::equal(g.vec(), mr::Vec3f(0.8, 0, 0)));
+}
+
+TEST_F(QuaternionTest, RotateMatrix) {
+  mr::Vec3f v {0, 1, 0};
+  mr::Vec3f expected {0, 0, 1};
+  EXPECT_TRUE(mr::equal(v * q1, expected));
+}
+
 // TODO: camera tests
 
 TEST(ColorTest, Constructors) {
+  EXPECT_EQ(mr::Color(), mr::Color(0, 0, 0, 0));
+
   const mr::Color expected1{0.3, 0.47, 0.8, 1.0};
   EXPECT_EQ(mr::Color(0.3, 0.47, 0.8), expected1);
   EXPECT_EQ(mr::Color(mr::Vec4f(0.3, 0.47, 0.8, 1)), expected1);

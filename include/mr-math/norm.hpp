@@ -1,5 +1,5 @@
-#ifndef __norm_hpp_
-#define __norm_hpp_
+#ifndef __MR_NORM_HPP_
+#define __MR_NORM_HPP_
 
 #include "def.hpp"
 #include "vec.hpp"
@@ -84,7 +84,7 @@ namespace mr {
 
       // dot product
       [[nodiscard]] constexpr T dot(const VecT &other) const noexcept {
-        return (_data._data * other._data._data).sum();
+        return (_data._data._data * other._data._data).sum();
       }
 
       [[nodiscard]] constexpr T operator&(const VecT &other) const noexcept {
@@ -167,4 +167,4 @@ namespace std
 }
 #endif
 
-#endif // __norm_hpp_
+#endif // __MR_NORM_HPP_

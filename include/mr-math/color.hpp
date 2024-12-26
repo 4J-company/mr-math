@@ -1,5 +1,5 @@
-#ifndef __color_hpp_
-#define __color_hpp_
+#ifndef __MR_COLOR_HPP_
+#define __MR_COLOR_HPP_
 
 #include "def.hpp"
 #include "vec.hpp"
@@ -10,6 +10,8 @@ namespace mr {
   struct [[nodiscard]] Color {
   public:
     using ValueT = float;
+
+    Color() = default;
 
     template <std::floating_point T>
       Color(T r, T g, T b, T a = 1) noexcept
@@ -109,7 +111,7 @@ namespace mr {
 
 namespace literals {
 
-  Color operator"" _rgba(unsigned long long value) {
+  inline Color operator"" _rgba(unsigned long long value) {
     assert(value <= 0xFF'FF'FF'FF);
     return Color{static_cast<uint32_t>(value)};
   }
@@ -133,4 +135,4 @@ namespace std
 }
 #endif // __cpp_structured_bindings
 
-#endif // __color_hpp_
+#endif // __MR_COLOR_HPP_

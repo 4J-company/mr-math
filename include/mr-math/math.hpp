@@ -1,11 +1,12 @@
-#ifndef __math_hpp_
-#define __math_hpp_
+#ifndef __MR_MATH_HPP_
+#define __MR_MATH_HPP_
 
 #include "def.hpp"
 #include "vec.hpp"
 #include "rot.hpp"
 #include "norm.hpp"
 #include "matr.hpp"
+#include "quat.hpp"
 #include "units.hpp"
 #include "camera.hpp"
 #include "bound_box.hpp"
@@ -15,4 +16,4 @@
   #include "debug.hpp"
 #endif
 
-#endif // __math_hpp_
+#endif // __MR_MATH_HPP_

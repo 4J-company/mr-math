@@ -1,5 +1,5 @@
-﻿#ifndef __units_hpp_
-#define __units_hpp_
+﻿#ifndef __MR_UNITS_HPP_
+#define __MR_UNITS_HPP_
 
 #include "vec.hpp"
 
@@ -49,7 +49,7 @@ namespace mr {
     public:
       using ValueT = T;
 
-      T _data;
+      T _data {};
 
       constexpr Radians() noexcept {};
       explicit constexpr Radians(T x) noexcept : _data(x) {};
@@ -79,7 +79,7 @@ namespace mr {
     public:
       using ValueT = T;
 
-      T _data;
+      T _data {};
 
       explicit constexpr Degrees(T x) noexcept : _data(x) {};
 
@@ -171,4 +171,4 @@ namespace std {
 } // namespace std
 #endif
 
-#endif // __units_hpp_
+#endif // __MR_UNITS_HPP_

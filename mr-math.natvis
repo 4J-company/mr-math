@@ -1,6 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
+  <!-- mr::Row2 -->
+  <Type Name="mr::Row&lt;*, 2&gt;">
+    <DisplayString>{{{get(0)}, {get(1)}}}</DisplayString>
+    <Expand>
+      <Item Name="[0]">get(0)</Item>
+      <Item Name="[1]">get(1)</Item>
+    </Expand>
+  </Type>
+
+  <!-- mr::Row3 -->
+  <Type Name="mr::Row&lt;*, 3&gt;">
+    <DisplayString>{{{get(0)}, {get(1)}, {get(2)}}}</DisplayString>
+    <Expand>
+      <Item Name="[0]">get(0)</Item>
+      <Item Name="[1]">get(1)</Item>
+      <Item Name="[2]">get(2)</Item>
+    </Expand>
+  </Type>
+
+  <!-- mr::Row4 -->
+  <Type Name="mr::Row&lt;*, 4&gt;">
+    <DisplayString>{{{get(0)}, {get(1)}, {get(2)}, {get(3)}}}</DisplayString>
+    <Expand>
+      <Item Name="[0]">get(0)</Item>
+      <Item Name="[1]">get(1)</Item>
+      <Item Name="[2]">get(2)</Item>
+      <Item Name="[3]">get(3)</Item>
+    </Expand>
+  </Type>
+
   <!-- mr::Vec2 -->
   <Type Name="mr::Vec&lt;*, 2&gt;">
     <DisplayString>X={x()}, Y={y()}</DisplayString>

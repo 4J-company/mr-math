@@ -81,6 +81,10 @@ namespace mr {
         return _data[i];
       }
 
+      [[nodiscard]] constexpr T get(std::size_t i) const {
+        return _data[i];
+      }
+
       constexpr bool operator==(const Row &other) const noexcept {
         return stdx::all_of(_data == other._data);
       }

@@ -12,4 +12,8 @@
 #include "bound_box.hpp"
 #include "color.hpp"
 
+#ifndef NDEBUG
+  #include "debug.hpp"
+#endif
+
 #endif // __MR_MATH_HPP_

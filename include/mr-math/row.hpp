@@ -24,6 +24,13 @@ namespace mr {
       constexpr Row(const SimdT &rhs) noexcept : _data(rhs) {}
 
       constexpr Row(const T data) : _data(data) {}
+      // constexpr Row(const T data) {
+      //   std::array<T, SimdT::size> buf {};
+      //   for (uint32_t i = 0; i < N; i++) {
+      //     buf[i] = data;
+      //   }
+      //   _data = _data.load_unaligned(buf.data());
+      // }
 
 // TODO: implement this usign Vc library
 #if 0
@@ -42,7 +49,11 @@ namespace mr {
       // copy constructor from different row type
       template <ArithmeticT R, std::size_t S>
         constexpr Row(const Row<R, S> &rhs) noexcept {
-          _data = stdx::simd_cast<decltype(_data)>(rhs._data);
+          // _data = stdx::simd_cast<decltype(_data)>(rhs._data);
+          // std::array<R, std::max(S, N)> buf {};
+          std::array<R, std::max(SimdT::size, Row<R, S>::SimdT::size)> buf {};
+          rhs._data.store_unaligned(buf.data());
+          _data = _data.load_unaligned(buf.data());
 
 #if 0
           // size conversion
@@ -78,38 +89,75 @@ namespace mr {
 #endif
 
       [[nodiscard]] constexpr T operator[](std::size_t i) const {
-        return _data[i];
+        // return _data[i];
+        return _data.get(i);
       }
 
       [[nodiscard]] constexpr T get(std::size_t i) const {
-        return _data[i];
+        return _data.get(i);
+        // return _data[i];
       }
 
       constexpr bool operator==(const Row &other) const noexcept {
-        return stdx::all_of(_data == other._data);
+        // return stdx::all_of(_data == other._data);
+        // return _data.eq(other._data);
+
+        // return stdx::all(stdx::eq(_data, other._data));
+
+        // this variant works only for vec3, make this more generic is too hard
+        // auto batch = stdx::eq(_data, other._data);
+        // decltype(batch) mask_batch(true, true, true, false);
+        // return stdx::all(batch || mask_batch);
+
+        std::array<T, SimdT::size> left_buf, right_buf;
+        _data.store_unaligned(left_buf.data());
+        other._data.store_unaligned(right_buf.data());
+        for (uint32_t i = 0; i < N; i++) {
+          if (left_buf[i] != right_buf[i]) {
+            return false;
+          }
+        }
+        return true;
       }
 
       constexpr bool equal(const Row &other, ValueT eps = epsilon<ValueT>()) const noexcept {
-        for (size_t i = 0; i < N; i++) {
-          if (!mr::equal(_data[i], other._data[i], eps))
+        std::array<T, SimdT::size> left_buf, right_buf;
+        _data.store_unaligned(left_buf.data());
+        other._data.store_unaligned(right_buf.data());
+        for (uint32_t i = 0; i < N; i++) {
+          if (!mr::equal(left_buf[i], right_buf[i], eps)) {
             return false;
+          }
         }
         return true;
+
+        // for (size_t i = 0; i < N; i++) {
+        //   if (!mr::equal(_data[i], other._data[i], eps))
+        //     return false;
+        // }
+        // return true;
       }
 
     protected:
       template <ArithmeticT... Args>
         requires (sizeof...(Args) >= 1) && (sizeof...(Args) <= N)
         constexpr void _set(Args... args) noexcept {
-          _data = {static_cast<T>(args)...};
+          // _data = {static_cast<T>(args)...};
 
+          // std::array<T, N> arr {static_cast<T>(args)...};
+          std::array<T, SimdT::size> arr {static_cast<T>(args)...};
+          _data = _data.load_unaligned(arr.data());
           // std::array<T, N> arr {static_cast<T>(args)...};
           // _data.copy_from(arr.data(), stdx::element_aligned);
         }
 
     public:
       constexpr void _set_ind(std::size_t ind, T value) noexcept {
-        _data[ind] = value;
+        // _data[ind] = value;
+        std::array<T, SimdT::size> arr;
+        _data.store_unaligned(arr.data());
+        arr[ind] = value;
+        _data = _data.load_unaligned(arr.data());
 
         // std::array<T, N> arr;
         // _data.copy_to(arr.data(), stdx::element_aligned);

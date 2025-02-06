@@ -43,7 +43,8 @@ target_include_directories(${MR_MATH_LIB_NAME} INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
-target_link_libraries(${MR_MATH_LIB_NAME} INTERFACE Vc)
+# target_link_libraries(${MR_MATH_LIB_NAME} INTERFACE Vc)
+target_link_libraries(${MR_MATH_LIB_NAME} INTERFACE xsimd)
 target_compile_features(${MR_MATH_LIB_NAME} INTERFACE cxx_std_23)
 
 if (MR_MATH_ENABLE_BENCHMARK)

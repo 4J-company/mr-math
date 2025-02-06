@@ -84,7 +84,8 @@ namespace mr {
 
       // dot product
       [[nodiscard]] constexpr T dot(const VecT &other) const noexcept {
-        return (_data._data._data * other._data._data).sum();
+        // return (_data._data._data * other._data._data).sum();
+        return stdx::reduce_add(_data._data._data * other._data._data);
       }
 
       [[nodiscard]] constexpr T operator&(const VecT &other) const noexcept {

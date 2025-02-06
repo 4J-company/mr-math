@@ -56,7 +56,7 @@ namespace mr {
       constexpr Vec() noexcept = default;
 
       // from simd constructor
-      constexpr Vec(const RowT &row) noexcept : _data(row._data) {};
+      constexpr Vec(const RowT &row) noexcept : _data(row._data) {}
 
       // from elements constructor
       template <ArithmeticT... Args>
@@ -102,8 +102,17 @@ namespace mr {
 
       // cross product
       constexpr Vec cross(const Vec &other) const noexcept requires (N == 3) {
-        return RowT(_data._data.rotated(1) * other._data._data.rotated(-1)
-          - _data._data.rotated(-1) * other._data._data.rotated(1));
+        // return RowT(_data._data.rotated(1) * other._data._data.rotated(-1)
+        //   - _data._data.rotated(-1) * other._data._data.rotated(1));
+
+        constexpr auto pos = stdx::index<3> {};
+        return RowT(
+          stdx::rotate_left<1>(stdx::insert(_data._data, _data._data.get(0), pos)) *
+          stdx::rotate_right<1>(stdx::insert(other._data._data, other._data._data.get(2), pos))
+          -
+          stdx::rotate_right<1>(stdx::insert(_data._data, _data._data.get(2), pos)) *
+          stdx::rotate_left<1>(stdx::insert(other._data._data, other._data._data.get(0), pos))
+        );
 
 #if 0
         std::array<T, 3> arr {
@@ -124,7 +133,8 @@ namespace mr {
 
       // length methods
       [[nodiscard]] constexpr T length2() const noexcept {
-        return (_data._data * _data._data).sum();
+        // return (_data._data * _data._data).sum();
+        return stdx::reduce_add(_data._data * _data._data);
       }
 
       [[nodiscard]] constexpr T length() const noexcept {
@@ -191,7 +201,8 @@ namespace mr {
 
       // dot product
       [[nodiscard]] constexpr T dot(const Vec &other) const noexcept {
-        return (_data._data * other._data._data).sum();
+        // return (_data._data * other._data._data).sum();
+        return stdx::reduce_add(_data._data * other._data._data);
       }
 
       [[nodiscard]] constexpr T operator&(const Vec &other) const noexcept {
@@ -263,8 +274,20 @@ namespace mr {
 
         constexpr Vec clamped(T low, T high) const noexcept {
           assert(low < high);
-          const auto &data = _data._data;
-          return {stdx::iif(data <= low, SimdT(low), stdx::iif(data >= high, SimdT(high), data))};
+
+          // clamp low
+          auto low_batch = SimdT(low);
+          auto v = stdx::select(stdx::lt(_data._data, low_batch), low_batch, _data._data);
+
+          // clamp hi
+          auto high_batch = SimdT(high);
+          v = stdx::select(stdx::gt(_data._data, high_batch), high_batch, v);
+
+          return RowT(v);
+
+          // TODO(DK6)
+          // const auto &data = _data._data;
+          // return {stdx::iif(data <= low, SimdT(low), stdx::iif(data >= high, SimdT(high), data))};
         }
 
         constexpr Vec & clamp(T low, T high) noexcept {

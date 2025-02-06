@@ -141,16 +141,22 @@ namespace mr
       }
 
       constexpr Matr transposed() const noexcept {
-        Matr transposed;
-        for (size_t i = 0; i < N; i++) {
-          transposed[i] = SimdImpl<T, N>([this, i](size_t j) { return _data[j][i]; });
-        }
+        Matr transposed = *this;
+        transposed.transpose();
         return transposed;
+        // Matr transposed;
+        // for (size_t i = 0; i < N; i++) {
+        //   transposed[i] = SimdImpl<T, N>([this, i](size_t j) { return _data[j][i]; });
+        // }
+        // return transposed;
       }
 
       constexpr Matr & transpose() noexcept {
-        *this = transposed();
+        auto *ptr = &_data.front()._data;
+        stdx::transpose(ptr, ptr + N);
         return *this;
+        // *this = transposed();
+        // return *this;
       }
 
 // TODO: implement this using Vc library
@@ -338,14 +344,28 @@ namespace mr
 
     private:
       static Matr get_identity() {
-        std::array<RowT, N> id;
-        constexpr auto io = std::ranges::iota_view {(size_t)0, N};
+        // TODO: why it doesnt work?
+        // std::array<RowT, N> id {
+        //   {1, 0, 0, 0},
+        //   {0, 1, 0, 0},
+        //   {0, 0, 1, 0},
+        //   {0, 0, 0, 1}
+        // };
 
-        std::transform(
-          io.begin(), io.end(), id.begin(),
-          [&io](size_t i) -> RowT {
-            return SimdImpl<T, N>([i](size_t j) { return j == i ? 1 : 0; });
-          });
+        std::array<RowT, N> id;
+        id[0] = {1, 0, 0, 0};
+        id[1] = {0, 1, 0, 0};
+        id[2] = {0, 0, 1, 0};
+        id[3] = {0, 0, 0, 1};
+
+        // std::array<RowT, N> id;
+        // constexpr auto io = std::ranges::iota_view {(size_t)0, N};
+
+        // std::transform(
+        //   io.begin(), io.end(), id.begin(),
+        //   [&io](size_t i) -> RowT {
+        //     return SimdImpl<T, N>([i](size_t j) { return j == i ? 1 : 0; });
+        //   });
 
         return id;
       }

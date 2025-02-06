@@ -19,16 +19,21 @@
   #include <format>
 #endif
 
-#include "Vc/Vc"
+// #include "Vc/Vc"
+// namespace stdx = Vc;
 
-namespace stdx = Vc;
+#include "xsimd/xsimd.hpp"
+namespace stdx = xsimd;
 
 namespace mr {
   template <typename T>
     concept ArithmeticT = std::integral<T> || std::floating_point<T>;
 
   template <ArithmeticT T, std::size_t N>
-    using SimdImpl = stdx::fixed_size_simd<T, N>;
+    // using SimdImpl = stdx::fixed_size_simd<T, N>;
+    // using SimdImpl = stdx::make_sized_batch<T, N>;
+    // using SimdImpl = stdx::make_sized_batch<T, 4>;
+    using SimdImpl = typename stdx::make_sized_batch<T, 4>::type;
 
   template<ArithmeticT T>
     constexpr T epsilon() {

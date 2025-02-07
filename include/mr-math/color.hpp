@@ -67,17 +67,19 @@ namespace mr {
     }
 
     // format conversions
-    // TODO: implement using shuffle
     Vec4f argb() const noexcept {
-      return {a(), r(), g(), b()};
+      // return {a(), r(), g(), b()};
+      return _data.swizzled(3, 0, 1, 2);
     }
 
     Vec4f bgra() const noexcept {
-      return {b(), g(), r(), a()};
+      // return {b(), g(), r(), a()};
+      return _data.swizzled(2, 1, 0, 3);
     }
 
     Vec4f abgr() const noexcept {
-      return {a(), b(), g(), r()};
+      // return {a(), b(), g(), r()};
+      return _data.swizzled(3, 2, 1, 0);
     }
 
     friend Color operator+(Color lhs, const Color &rhs) noexcept {

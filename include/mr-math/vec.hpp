@@ -265,6 +265,18 @@ namespace mr {
           return *this;
         }
 
+      template<std::integral ...Ints>
+      constexpr void swizzle(Ints ...ints) {
+        _data.swizzle(ints...);
+      }
+
+      template<std::integral ...Ints>
+      constexpr Vec swizzled(Ints ...ints) const {
+        auto res = *this;
+        res.swizzle(ints...);
+        return res;
+      }
+
         // reflect from other vector
         constexpr Vec reflected(const NormT &n) const noexcept {
           return -(*this - (2 * dot(n) * (Vec)n));
@@ -296,10 +308,6 @@ namespace mr {
           v = stdx::select(stdx::gt(_data._data, high_batch), high_batch, v);
 
           return RowT(v);
-
-          // TODO(DK6)
-          // const auto &data = _data._data;
-          // return {stdx::iif(data <= low, SimdT(low), stdx::iif(data >= high, SimdT(high), data))};
         }
 
         constexpr Vec & clamp(T low, T high) noexcept {

@@ -34,6 +34,14 @@ TEST_F(Vector3DTest, Getters) {
   EXPECT_EQ(v1[2], 3.0);
 }
 
+TEST_F(Vector3DTest, Swizzle) {
+  EXPECT_EQ(v2.swizzled(2, 1, 0), mr::Vec3f(6, 5, 4));
+
+  auto copy = v2;
+  copy.swizzle(0, 2, 1);
+  EXPECT_EQ(copy, mr::Vec3f(4, 6, 5));
+}
+
 TEST_F(Vector3DTest, Setters) {
   mr::Vec3f v{0, 0, 3};
   v.x(1);
@@ -332,6 +340,7 @@ TEST(ColorTest, Constructors) {
 
 TEST(ColorTest, Formats) {
   const auto color = 0x4C'77'CC'FF_rgba;
+
   EXPECT_EQ(color.argb(), 0xFF'4C'77'CC_rgba);
   EXPECT_EQ(color.bgra(), 0xCC'77'4c'FF_rgba);
   EXPECT_EQ(color.abgr(), 0xFF'CC'77'4c_rgba);

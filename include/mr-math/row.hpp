@@ -98,6 +98,25 @@ namespace mr {
         // return _data[i];
       }
 
+      constexpr void swizzle(const std::array<std::size_t, N> &mask) {
+        using IntSimdT = SimdImpl<uint32_t, N>;
+        std::array<uint32_t, IntSimdT::size> buf;
+        for (std::size_t i = 0; i < N; i++) {
+          buf[i] = mask[i];
+        }
+        for (std::size_t i = N; i < buf.size(); i++) {
+          buf[i] = i;
+        }
+        auto simd_mask = stdx::load_unaligned(buf.data());
+        _data = stdx::swizzle(_data, simd_mask);
+      }
+
+      template<std::integral ...Ints>
+      requires(sizeof...(Ints) == N)
+      constexpr void swizzle(Ints ...ints) {
+        swizzle(std::array {(std::size_t)ints...});
+      }
+
       constexpr bool operator==(const Row &other) const noexcept {
         // return stdx::all_of(_data == other._data);
         // return _data.eq(other._data);

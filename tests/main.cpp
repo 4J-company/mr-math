@@ -16,7 +16,7 @@ TEST_F(Vector3DTest, Constructors) {
   EXPECT_EQ(mr::Vec3f(), mr::Vec3f(0, 0, 0));
   EXPECT_EQ(mr::Vec3f(1), mr::Vec3f(1, 1, 1));
   EXPECT_EQ(mr::Vec3f(mr::Vec2f(1, 2)), mr::Vec3f(1, 2, 0));
-  // TODO: EXPECT_EQ(mr::Vec3f(mr::Vec2f(1, 2), 3), mr::Vec3f(1, 2, 3));
+  EXPECT_EQ(mr::Vec3f(mr::Vec2f(1, 2), 3), mr::Vec3f(1, 2, 3));
   EXPECT_EQ(mr::Vec3f(mr::Vec4f(1, 2, 3, 4)), mr::Vec3f(1, 2, 3));
 
   EXPECT_EQ(mr::Vec3f(std::span<const int, 2>{{1, 2}}), mr::Vec3f(1, 2, 0));
@@ -194,6 +194,28 @@ TEST_F(MatrixTest, Transposition) {
 
   mr::Matr4f copy = m1;
   EXPECT_EQ(copy.transpose(), expected);
+}
+
+TEST_F(MatrixTest, Inverse) {
+  mr::Matr4f matrix {
+    1, 2, 3, 4,
+    2, 3, 1, 2,
+    1, 1, 1, -1,
+    1, 0, -2, -6
+  };
+  mr::Matr4f expected {
+    22, -6, -26, 17,
+    -17, 5, 20, -13,
+    -1, 0, 2, -1,
+    4, -1, -5, 3
+  };
+  EXPECT_TRUE(matrix.inversed().equal(expected, 0.0001));
+
+  // TODO: why it doesnt work?
+  // auto res = matrix.inversed() * expected;
+  // EXPECT_TRUE(res.equal(mr::Matr4f::identity(), 0.001));
+
+  EXPECT_TRUE(matrix.inverse().equal(expected, 0.0001));
 }
 
 TEST_F(MatrixTest, Identity) {

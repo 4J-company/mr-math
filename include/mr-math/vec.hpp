@@ -64,24 +64,36 @@ namespace mr {
         constexpr Vec(Args... args) : _data(args...) {}
 
       // from span constructor
-      // TODO: implement using Vc
       template <ArithmeticT U, size_t M>
         constexpr Vec(std::span<const U, M> span) noexcept {
           const size_t len = std::min(N, span.size());
-          for (size_t i = 0; i < len; i++) {
-            _data._set_ind(i, span[i]);
+          std::array<T, RowT::SimdT::size> buf {};
+          for (std::size_t i = 0; i < len; i++) {
+            buf[i] = span[i];
           }
+          _data._data = stdx::load_unaligned(buf.data());
+          // for (size_t i = 0; i < len; i++) {
+          //   _data._set_ind(i, span[i]);
+          // }
         }
 
       // conversion constructor
       template <ArithmeticT R, std::size_t S>
         constexpr Vec(const Vec<R, S> &v) noexcept : _data(v._data) {}
 
-// TODO: implement this using Vc library
-#if 0
       template <ArithmeticT R, std::size_t S, ArithmeticT ... Args>
-        constexpr Vec(const Vec<R, S> &v, Args ... args) noexcept : _data(v, args...) {}
-#endif
+        requires (sizeof...(Args) + S == N)
+        // TODO: use RowT consturctor here, move code to it (now doesnt compile)
+        // constexpr Vec(const Vec<R, S> &v, Args ... args) noexcept : _data(v, args...) {}
+        constexpr Vec(const Vec<R, S> &v, Args ... args) noexcept {
+          std::array<T, RowT::SimdT::size> buf;
+          v._data._data.store_unaligned(buf.data());
+          std::array args_buf {args...};
+          for (std::size_t i = S; i < N; i++) {
+            buf[i] = args_buf[i - S];
+          }
+          _data._data = stdx::load_unaligned(buf.data());
+        }
 
       // setters
       constexpr void set(size_t i, T value) noexcept { _data._set_ind(i, value); } // for some reason `T & RowT::operator[]` doesn't compile (maybe I'm just stupid)

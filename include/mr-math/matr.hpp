@@ -159,20 +159,60 @@ namespace mr
         // return *this;
       }
 
-// TODO: implement this using Vc library
-#if 0
       constexpr Matr inversed() const noexcept {
         constexpr auto io = std::ranges::iota_view{(size_t)0, N};
 
-        std::array<Row<T, 2 * N>, N> tmp;
-        std::for_each(io.begin(), io.end(),
-                      [&tmp, this](auto i) {
-                        // adding temporary variable here brings performance down 2.5 times (reason unknown)
-                        tmp[i] += stdx::simd_cast<SimdImpl<T, 2 * N>>(stdx::concat(_data[i]._data, identity[i]._data));
-                      });
+        struct Row2N {
+          std::array<Row<T, N>, 2> rows;
 
-        // null bottom triangle
-        for (size_t i = 1; i < N; i++) {
+          Row2N(T value = 0) {
+            rows[0] = {0};
+            rows[1] = {0};
+          }
+
+          void load(const std::array<T, 2 * N> &buf) {
+            rows[0] = stdx::load_unaligned(buf.data());
+            rows[1] = stdx::load_unaligned(buf.data() + N);
+          }
+
+          void store(std::array<T, 2 * N> &buf) {
+            rows[0]._data.store_unaligned(buf.data());
+            rows[1]._data.store_unaligned(buf.data() + N);
+          }
+
+          Row2N operator*(T value) {
+            Row2N res;
+            res.rows[0] = rows[0] * value;
+            res.rows[1] = rows[1] * value;
+            return res;
+          }
+
+          Row2N & operator/=(T value) {
+            rows[0] /= value;
+            rows[1] /= value;
+            return *this;
+          }
+
+          Row2N & operator-=(const Row2N &other) {
+            rows[0] -= other.rows[0];
+            rows[1] -= other.rows[1];
+            return *this;
+          }
+
+          T operator[](std::size_t i) {
+            return i < N ? rows[0][i] : rows[1][i - N];
+          }
+        };
+
+        std::array<Row2N, N> tmp {};
+        for (auto i : io) {
+          std::array<T, 2 * N> buf;
+          _data[i]._data.store_unaligned(buf.data());
+          _identity[i]._data.store_unaligned(buf.data() + N);
+          tmp[i].load(buf);
+        }
+
+        for (std::size_t i = 1; i < N; i++) {
           tmp[i - 1] /= tmp[i - 1][i - 1];
           for (size_t j = i; j < N; j++) {
             tmp[j] -= std::abs(tmp[i - 1][i - 1]) <= _epsilon ? static_cast<T>(0) : tmp[i - 1] * tmp[j][i - 1];
@@ -188,20 +228,14 @@ namespace mr
         }
 
         std::array<RowT, N> res;
-        std::for_each(io.begin(), io.end(),
-          [&tmp, &res](auto i) {
-            auto [a, b] = stdx::split<N, N>(tmp[i]._data);
-            res[i] = stdx::simd_cast<SimdImpl<T, N>>(b);
-          });
+        for (auto i : io) {
+          std::array<T, 2 * N> buf;
+          tmp[i].store(buf);
+          res[i]._data = stdx::load_unaligned(buf.data() + N);
+        }
 
         return res;
       }
-#else
-      // dummy
-      constexpr Matr inversed() const noexcept {
-        return {};
-      }
-#endif
 
       constexpr Matr & inverse() noexcept {
         *this = inversed();

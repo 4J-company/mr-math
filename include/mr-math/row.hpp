@@ -23,7 +23,8 @@ namespace mr {
       // simd-like constructors
       constexpr Row(const SimdT &rhs) noexcept : _data(rhs) {}
 
-      constexpr Row(const T data) : _data(data) {}
+      // TODO: this code for vec3 fill 4th float as value instead 0 too
+      constexpr Row(const T value) : _data(value) {}
       // constexpr Row(const T data) {
       //   std::array<T, SimdT::size> buf {};
       //   for (uint32_t i = 0; i < N; i++) {
@@ -32,12 +33,11 @@ namespace mr {
       //   _data = _data.load_unaligned(buf.data());
       // }
 
-// TODO: implement this usign Vc library
-#if 0
-      constexpr Row(const T *data) {
-        _data.copy_from(data, stdx::element_aligned);
-      }
-#endif
+      // TODO: this conflicts with previous constructor, ambigious call
+      // constexpr Row(const T *data) {
+      //   _data = stdx::load_unaligned(data);
+      //   // _data.copy_from(data, stdx::element_aligned);
+      // }
 
       // from elements constructor
       template <ArithmeticT... Args>

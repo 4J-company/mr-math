@@ -31,9 +31,9 @@ namespace mr {
 
   template <ArithmeticT T, std::size_t N>
     // using SimdImpl = stdx::fixed_size_simd<T, N>;
-    // using SimdImpl = stdx::make_sized_batch<T, N>;
-    // using SimdImpl = stdx::make_sized_batch<T, 4>;
+    requires(sizeof(T) == 4)
     using SimdImpl = typename stdx::make_sized_batch<T, 4>::type;
+    // using SimdImpl = typename stdx::make_sized_batch<T, N>::type;
 
   template<ArithmeticT T>
     constexpr T epsilon() {

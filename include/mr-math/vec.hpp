@@ -117,14 +117,17 @@ namespace mr {
         // return RowT(_data._data.rotated(1) * other._data._data.rotated(-1)
         //   - _data._data.rotated(-1) * other._data._data.rotated(1));
 
-        constexpr auto pos = stdx::index<3> {};
-        return RowT(
-          stdx::rotate_left<1>(stdx::insert(_data._data, _data._data.get(0), pos)) *
-          stdx::rotate_right<1>(stdx::insert(other._data._data, other._data._data.get(2), pos))
-          -
-          stdx::rotate_right<1>(stdx::insert(_data._data, _data._data.get(2), pos)) *
-          stdx::rotate_left<1>(stdx::insert(other._data._data, other._data._data.get(0), pos))
-        );
+        return swizzled(1, 2, 0) * other.swizzled(2, 0, 1) -
+               swizzled(2, 0, 1) * other.swizzled(1, 2, 0);
+
+        // constexpr auto pos = stdx::index<3> {};
+        // return RowT(
+        //   stdx::rotate_left<1>(stdx::insert(_data._data, _data._data.get(0), pos)) *
+        //   stdx::rotate_right<1>(stdx::insert(other._data._data, other._data._data.get(2), pos))
+        //   -
+        //   stdx::rotate_right<1>(stdx::insert(_data._data, _data._data.get(2), pos)) *
+        //   stdx::rotate_left<1>(stdx::insert(other._data._data, other._data._data.get(0), pos))
+        // );
 
 #if 0
         std::array<T, 3> arr {

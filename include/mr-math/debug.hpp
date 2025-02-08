@@ -24,7 +24,7 @@ inline namespace row {
 
   // instantiate types
   MR_INSTANTIATE_ROW2_ROW3_ROW4(float);
-  MR_INSTANTIATE_ROW2_ROW3_ROW4(double);
+  // MR_INSTANTIATE_ROW2_ROW3_ROW4(double);
   MR_INSTANTIATE_ROW2_ROW3_ROW4(int);
   MR_INSTANTIATE_ROW2_ROW3_ROW4(uint32_t);
 
@@ -55,7 +55,7 @@ inline namespace vec {
 
   // instantiate types
   MR_INSTANTIATE_VEC2_VEC3_VEC4(float);
-  MR_INSTANTIATE_VEC2_VEC3_VEC4(double);
+  // MR_INSTANTIATE_VEC2_VEC3_VEC4(double);
   MR_INSTANTIATE_VEC2_VEC3_VEC4(int);
   MR_INSTANTIATE_VEC2_VEC3_VEC4(uint32_t);
 
@@ -85,7 +85,7 @@ inline namespace norm {
 
   // instantiate types
   MR_INSTANTIATE_NORM2_NORM3_NORM4(float);
-  MR_INSTANTIATE_NORM2_NORM3_NORM4(double);
+  // MR_INSTANTIATE_NORM2_NORM3_NORM4(double);
   MR_INSTANTIATE_NORM2_NORM3_NORM4(int);
   MR_INSTANTIATE_NORM2_NORM3_NORM4(uint32_t);
 
@@ -101,7 +101,7 @@ inline namespace bounb_box {
 
   // instantiate types
   MR_INSTANTIATE_AABB(float);
-  MR_INSTANTIATE_AABB(double);
+  // MR_INSTANTIATE_AABB(double);
   MR_INSTANTIATE_AABB(int);
   MR_INSTANTIATE_AABB(uint32_t);
 

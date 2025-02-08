@@ -1,4 +1,5 @@
 #include <array>
+#include <print>
 
 #include "gtest/gtest.h"
 #include "mr-math/math.hpp"
@@ -16,7 +17,7 @@ TEST_F(Vector3DTest, Constructors) {
   EXPECT_EQ(mr::Vec3f(), mr::Vec3f(0, 0, 0));
   EXPECT_EQ(mr::Vec3f(1), mr::Vec3f(1, 1, 1));
   EXPECT_EQ(mr::Vec3f(mr::Vec2f(1, 2)), mr::Vec3f(1, 2, 0));
-  // TODO: EXPECT_EQ(mr::Vec3f(mr::Vec2f(1, 2), 3), mr::Vec3f(1, 2, 3));
+  EXPECT_EQ(mr::Vec3f(mr::Vec2f(1, 2), 3), mr::Vec3f(1, 2, 3));
   EXPECT_EQ(mr::Vec3f(mr::Vec4f(1, 2, 3, 4)), mr::Vec3f(1, 2, 3));
 
   EXPECT_EQ(mr::Vec3f(std::span<const int, 2>{{1, 2}}), mr::Vec3f(1, 2, 0));
@@ -32,6 +33,14 @@ TEST_F(Vector3DTest, Getters) {
   EXPECT_EQ(v1[0], 1.0);
   EXPECT_EQ(v1[1], 2.0);
   EXPECT_EQ(v1[2], 3.0);
+}
+
+TEST_F(Vector3DTest, Swizzle) {
+  EXPECT_EQ(v2.swizzled(2, 1, 0), mr::Vec3f(6, 5, 4));
+
+  auto copy = v2;
+  copy.swizzle(0, 2, 1);
+  EXPECT_EQ(copy, mr::Vec3f(4, 6, 5));
 }
 
 TEST_F(Vector3DTest, Setters) {
@@ -196,6 +205,30 @@ TEST_F(MatrixTest, Transposition) {
   EXPECT_EQ(copy.transpose(), expected);
 }
 
+TEST_F(MatrixTest, Inverse) {
+  mr::Matr4f matrix {
+    1, 2, 3, 4,
+    2, 3, 1, 2,
+    1, 1, 1, -1,
+    1, 0, -2, -6
+  };
+  mr::Matr4f expected {
+    22, -6, -26, 17,
+    -17, 5, 20, -13,
+    -1, 0, 2, -1,
+    4, -1, -5, 3
+  };
+  EXPECT_TRUE(matrix.inversed().equal(expected, 0.0001));
+
+  auto res = matrix.inversed() * matrix;
+  EXPECT_TRUE(res.equal(mr::Matr4f::identity(), 0.001));
+
+  // std::println("-----------------------------------------");
+  // matrix.inverse();
+  // std::println("after functrion");
+  EXPECT_TRUE(matrix.inverse().equal(expected, 0.0001));
+}
+
 TEST_F(MatrixTest, Identity) {
   mr::Matr4f expected {
     1, 0, 0, 0,
@@ -234,6 +267,103 @@ TEST_F(MatrixTest, RotateVector) {
   mr::Vec3f v{30, 47, 80};
   mr::Vec3f expected{38.340427, 81.678845, 36.980571};
   EXPECT_TRUE(mr::equal(v * mr::Matr4f::rotate({1, 1, 1}, 102_deg), expected, 0.0001));
+}
+
+class Matrix3x3Test : public ::testing::Test {
+protected:
+  mr::Matr3f m1 {
+    1, 2, 3,
+    4, 5, 6,
+    7, 8, 9
+  };
+  mr::Matr3f m2 {
+    10, 11, 12,
+    13, 14, 15,
+    16, 17, 18
+  };
+};
+
+TEST_F(Matrix3x3Test, Equality) {
+  mr::Matr3f copy = m1;
+  EXPECT_EQ(m1, copy);
+  EXPECT_TRUE(m1.equal(copy));
+  EXPECT_TRUE(equal(m1, copy));
+
+  EXPECT_NE(m1, m2);
+  EXPECT_FALSE(m1.equal(m2));
+  EXPECT_FALSE(equal(m1, m2));
+}
+
+TEST_F(Matrix3x3Test, Addition) {
+  mr::Matr3f result = m1 + m2;
+  mr::Matr3f expected {
+    11, 13, 15,
+    17, 19, 21,
+    23, 25, 27
+  };
+
+  EXPECT_TRUE(equal(result, expected));
+}
+
+TEST_F(Matrix3x3Test, Multiplication) {
+  mr::Matr3f result = m1 * m2;
+  mr::Matr3f expected {
+    84,  90,  96,
+    201, 216, 231,
+    318, 342, 366
+  };
+
+  EXPECT_EQ(result, expected);
+
+  mr::Matr3f D {
+    1, 2, 1,
+    4, 2, 2,
+    0, 1, 7
+  };
+  mr::Matr3f F {
+    7, 5, 1,
+    2, 1, 2,
+    4, 3, 4
+  };
+  expected = mr::Matr3f {
+    15, 10, 9,
+    40, 28, 16,
+    30, 22, 30
+  };
+
+  D *= F;
+  EXPECT_TRUE(equal(D, expected));
+}
+
+TEST_F(Matrix3x3Test, Transposition) {
+  mr::Matr3f expected {
+    1, 4, 7,
+    2, 5, 8,
+    3, 6, 9
+  };
+  EXPECT_EQ(m1.transposed(), expected);
+
+  mr::Matr3f copy = m1;
+  EXPECT_EQ(copy.transpose(), expected);
+}
+
+TEST_F(Matrix3x3Test, Inverse) {
+  mr::Matr3f matrix {
+     2, -1,  0,
+     0,  2, -1,
+    -1, -1,  1
+  };
+  mr::Matr3f expected {
+    1, 1, 1,
+    1, 2, 2,
+    2, 3, 4
+  };
+  EXPECT_TRUE(matrix.inversed().equal(expected, 0.0001));
+
+  auto res = matrix.inversed() * matrix;
+  EXPECT_TRUE(res.equal(mr::Matr3f::identity(), 0.001));
+
+  EXPECT_TRUE(matrix.inverse().equal(expected, 0.0001));
 }
 
 class QuaternionTest : public ::testing::Test {
@@ -310,6 +440,7 @@ TEST(ColorTest, Constructors) {
 
 TEST(ColorTest, Formats) {
   const auto color = 0x4C'77'CC'FF_rgba;
+
   EXPECT_EQ(color.argb(), 0xFF'4C'77'CC_rgba);
   EXPECT_EQ(color.bgra(), 0xCC'77'4c'FF_rgba);
   EXPECT_EQ(color.abgr(), 0xFF'CC'77'4c_rgba);

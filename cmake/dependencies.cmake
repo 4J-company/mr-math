@@ -6,12 +6,19 @@ file(
 )
 include(${CMAKE_CURRENT_BINARY_DIR}/cmake/CPM.cmake)
 
+# CPMFindPackage(
+#   NAME Vc
+#   GITHUB_REPOSITORY 4J-company/Vc
+#   GIT_TAG 1.4
+#   OPTIONS
+#     "USE_CCACHE ON"
+# )
+
 CPMFindPackage(
-  NAME Vc
-  GITHUB_REPOSITORY 4J-company/Vc
-  GIT_TAG 1.4
-  OPTIONS
-    "USE_CCACHE ON"
+  NAME xsimd
+  GITHUB_REPOSITORY xtensor-stack/xsimd
+  # GIT_TAG 12.1.1
+  GIT_TAG master
 )
 
 if (MR_MATH_ENABLE_BENCHMARK)

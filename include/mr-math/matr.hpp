@@ -16,9 +16,17 @@ namespace mr
     using Matr4 = Matr<T, 4>;
 
   using Matr4f = Matr4<float>;
-  using Matr4d = Matr4<double>;
+  // using Matr4d = Matr4<double>;
   using Matr4i = Matr4<int>;
   using Matr4u = Matr4<uint32_t>;
+
+  template <ArithmeticT T>
+    using Matr3 = Matr<T, 3>;
+
+  using Matr3f = Matr3<float>;
+  // using Matr4d = Matr4<double>;
+  using Matr3i = Matr3<int>;
+  using Matr3u = Matr3<uint32_t>;
 
   template <ArithmeticT T, std::size_t N>
     struct [[nodiscard]] Matr
@@ -44,12 +52,17 @@ namespace mr
         constexpr Matr(Args... args) noexcept {
           std::array<T, N * N> tmp {static_cast<T>(args)...};
           for (size_t i = 0; i < N; i++) {
-            _data[i] = RowT {
-              tmp[N * i + 0],
-              tmp[N * i + 1],
-              tmp[N * i + 2],
-              tmp[N * i + 3]
-            };
+            [this, &tmp, i]<std::size_t ...I>
+            (std::integer_sequence<std::size_t, I...>) {
+              _data[i] = RowT { tmp[N * i + I]... };
+            }(std::make_integer_sequence<std::size_t, N> {});
+
+            // _data[i] = RowT {
+            //   tmp[N * i + 0],
+            //   tmp[N * i + 1],
+            //   tmp[N * i + 2],
+            //   tmp[N * i + 3]
+            // };
           }
         }
 
@@ -90,11 +103,19 @@ namespace mr
       }
 
       constexpr Matr operator*(const Matr &other) const noexcept {
+        // TODO: in simple test case all work without this constexpr if, added extra cases
         std::array<RowT, N> tmp{};
         for (size_t i = 0; i < N; i++) {
-          for (size_t j = 0; j < N; j++) {
-            tmp[j] += other._data[i] * _data[j][i];
-          }
+          // if constexpr (N == 4) {
+            for (size_t j = 0; j < N; j++) {
+              tmp[j] += other._data[i] * _data[j][i];
+            }
+          // } else if (N == 3) {
+          //   auto last1 = stdx::insert(other._data[i]._data, 0.0f, xsimd::index<N> {});
+          //   for (size_t j = 0; j < N; j++) {
+          //     tmp[j] += last1 * _data[j][i];
+          //   }
+          // }
         }
         return {tmp};
       }
@@ -152,8 +173,22 @@ namespace mr
       }
 
       constexpr Matr & transpose() noexcept {
-        auto *ptr = &_data.front()._data;
-        stdx::transpose(ptr, ptr + N);
+        if constexpr (N == 4) {
+          auto *ptr = &_data.front()._data;
+          stdx::transpose(ptr, ptr + N);
+        } else if (N == 3) {
+          std::array<Row<T, 4>, 4> data {
+            _data[0],
+            _data[1],
+            _data[2],
+            Row<T, 4>{}
+          };
+          auto *ptr = &data.front()._data;
+          stdx::transpose(ptr, ptr + 4);
+          for (std::size_t i = 0; i < N; i++) {
+            _data[i] = data[i];
+          }
+        }
         return *this;
         // *this = transposed();
         // return *this;
@@ -165,17 +200,25 @@ namespace mr
         struct Row2N {
           std::array<Row<T, N>, 2> rows;
 
+          // this doenst work, local structs cant have static fields
+          // static constexpr std::size_t buf_size = Row<T, N>::SimdT::size;
+          static consteval std::size_t buf_size() {
+            return 2 * Row<T, N>::SimdT::size;
+          }
+
           Row2N(T value = 0) {
             rows[0] = {0};
             rows[1] = {0};
           }
 
-          void load(const std::array<T, 2 * N> &buf) {
+          // void load(const std::array<T, 2 * N> &buf) {
+          void load(const std::array<T, buf_size()> &buf) {
             rows[0] = stdx::load_unaligned(buf.data());
             rows[1] = stdx::load_unaligned(buf.data() + N);
           }
 
-          void store(std::array<T, 2 * N> &buf) {
+          // void store(std::array<T, 2 * N> &buf) {
+          void store(std::array<T, buf_size()> &buf) {
             rows[0]._data.store_unaligned(buf.data());
             rows[1]._data.store_unaligned(buf.data() + N);
           }
@@ -206,7 +249,8 @@ namespace mr
 
         std::array<Row2N, N> tmp {};
         for (auto i : io) {
-          std::array<T, 2 * N> buf;
+          // std::array<T, 2 * N> buf;
+          std::array<T, Row2N::buf_size()> buf;
           _data[i]._data.store_unaligned(buf.data());
           _identity[i]._data.store_unaligned(buf.data() + N);
           tmp[i].load(buf);
@@ -229,7 +273,8 @@ namespace mr
 
         std::array<RowT, N> res;
         for (auto i : io) {
-          std::array<T, 2 * N> buf;
+          // std::array<T, 2 * N> buf;
+          std::array<T, Row2N::buf_size()> buf;
           tmp[i].store(buf);
           res[i]._data = stdx::load_unaligned(buf.data() + N);
         }
@@ -239,6 +284,7 @@ namespace mr
 
       constexpr Matr & inverse() noexcept {
         *this = inversed();
+        // [[maybe_unused]] auto a = inversed();
         return *this;
       }
 
@@ -378,19 +424,18 @@ namespace mr
 
     private:
       static Matr get_identity() {
-        // TODO: why it doesnt work?
-        // std::array<RowT, N> id {
-        //   {1, 0, 0, 0},
-        //   {0, 1, 0, 0},
-        //   {0, 0, 1, 0},
-        //   {0, 0, 0, 1}
-        // };
-
+        // TODO: beautify it
         std::array<RowT, N> id;
-        id[0] = {1, 0, 0, 0};
-        id[1] = {0, 1, 0, 0};
-        id[2] = {0, 0, 1, 0};
-        id[3] = {0, 0, 0, 1};
+        if constexpr (N == 4) {
+          id[0] = {1, 0, 0, 0};
+          id[1] = {0, 1, 0, 0};
+          id[2] = {0, 0, 1, 0};
+          id[3] = {0, 0, 0, 1};
+        } else if (N == 3) {
+          id[0] = {1, 0, 0};
+          id[1] = {0, 1, 0};
+          id[2] = {0, 0, 1};
+        }
 
         // std::array<RowT, N> id;
         // constexpr auto io = std::ranges::iota_view {(size_t)0, N};

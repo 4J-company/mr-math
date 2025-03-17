@@ -16,9 +16,17 @@ namespace mr
     using Matr4 = Matr<T, 4>;
 
   using Matr4f = Matr4<float>;
-  using Matr4d = Matr4<double>;
+  // using Matr4d = Matr4<double>;
   using Matr4i = Matr4<int>;
   using Matr4u = Matr4<uint32_t>;
+
+  template <ArithmeticT T>
+    using Matr3 = Matr<T, 3>;
+
+  using Matr3f = Matr3<float>;
+  // using Matr4d = Matr4<double>;
+  using Matr3i = Matr3<int>;
+  using Matr3u = Matr3<uint32_t>;
 
   template <ArithmeticT T, std::size_t N>
     struct [[nodiscard]] Matr
@@ -44,12 +52,17 @@ namespace mr
         constexpr Matr(Args... args) noexcept {
           std::array<T, N * N> tmp {static_cast<T>(args)...};
           for (size_t i = 0; i < N; i++) {
-            _data[i] = RowT {
-              tmp[N * i + 0],
-              tmp[N * i + 1],
-              tmp[N * i + 2],
-              tmp[N * i + 3]
-            };
+            [this, &tmp, i]<std::size_t ...I>
+            (std::integer_sequence<std::size_t, I...>) {
+              _data[i] = RowT { tmp[N * i + I]... };
+            }(std::make_integer_sequence<std::size_t, N> {});
+
+            // _data[i] = RowT {
+            //   tmp[N * i + 0],
+            //   tmp[N * i + 1],
+            //   tmp[N * i + 2],
+            //   tmp[N * i + 3]
+            // };
           }
         }
 
@@ -90,11 +103,19 @@ namespace mr
       }
 
       constexpr Matr operator*(const Matr &other) const noexcept {
+        // TODO: in simple test case all work without this constexpr if, added extra cases
         std::array<RowT, N> tmp{};
         for (size_t i = 0; i < N; i++) {
-          for (size_t j = 0; j < N; j++) {
-            tmp[j] += other._data[i] * _data[j][i];
-          }
+          // if constexpr (N == 4) {
+            for (size_t j = 0; j < N; j++) {
+              tmp[j] += other._data[i] * _data[j][i];
+            }
+          // } else if (N == 3) {
+          //   auto last1 = stdx::insert(other._data[i]._data, 0.0f, xsimd::index<N> {});
+          //   for (size_t j = 0; j < N; j++) {
+          //     tmp[j] += last1 * _data[j][i];
+          //   }
+          // }
         }
         return {tmp};
       }
@@ -141,32 +162,101 @@ namespace mr
       }
 
       constexpr Matr transposed() const noexcept {
-        Matr transposed;
-        for (size_t i = 0; i < N; i++) {
-          transposed[i] = SimdImpl<T, N>([this, i](size_t j) { return _data[j][i]; });
-        }
+        Matr transposed = *this;
+        transposed.transpose();
         return transposed;
+        // Matr transposed;
+        // for (size_t i = 0; i < N; i++) {
+        //   transposed[i] = SimdImpl<T, N>([this, i](size_t j) { return _data[j][i]; });
+        // }
+        // return transposed;
       }
 
       constexpr Matr & transpose() noexcept {
-        *this = transposed();
+        if constexpr (N == 4) {
+          auto *ptr = &_data.front()._data;
+          stdx::transpose(ptr, ptr + N);
+        } else if (N == 3) {
+          std::array<Row<T, 4>, 4> data {
+            _data[0],
+            _data[1],
+            _data[2],
+            Row<T, 4>{}
+          };
+          auto *ptr = &data.front()._data;
+          stdx::transpose(ptr, ptr + 4);
+          for (std::size_t i = 0; i < N; i++) {
+            _data[i] = data[i];
+          }
+        }
         return *this;
+        // *this = transposed();
+        // return *this;
       }
 
-// TODO: implement this using Vc library
-#if 0
       constexpr Matr inversed() const noexcept {
         constexpr auto io = std::ranges::iota_view{(size_t)0, N};
 
-        std::array<Row<T, 2 * N>, N> tmp;
-        std::for_each(io.begin(), io.end(),
-                      [&tmp, this](auto i) {
-                        // adding temporary variable here brings performance down 2.5 times (reason unknown)
-                        tmp[i] += stdx::simd_cast<SimdImpl<T, 2 * N>>(stdx::concat(_data[i]._data, identity[i]._data));
-                      });
+        struct Row2N {
+          std::array<Row<T, N>, 2> rows;
 
-        // null bottom triangle
-        for (size_t i = 1; i < N; i++) {
+          // this doenst work, local structs cant have static fields
+          // static constexpr std::size_t buf_size = Row<T, N>::SimdT::size;
+          static consteval std::size_t buf_size() {
+            return 2 * Row<T, N>::SimdT::size;
+          }
+
+          Row2N(T value = 0) {
+            rows[0] = {0};
+            rows[1] = {0};
+          }
+
+          // void load(const std::array<T, 2 * N> &buf) {
+          void load(const std::array<T, buf_size()> &buf) {
+            rows[0] = stdx::load_unaligned(buf.data());
+            rows[1] = stdx::load_unaligned(buf.data() + N);
+          }
+
+          // void store(std::array<T, 2 * N> &buf) {
+          void store(std::array<T, buf_size()> &buf) {
+            rows[0]._data.store_unaligned(buf.data());
+            rows[1]._data.store_unaligned(buf.data() + N);
+          }
+
+          Row2N operator*(T value) {
+            Row2N res;
+            res.rows[0] = rows[0] * value;
+            res.rows[1] = rows[1] * value;
+            return res;
+          }
+
+          Row2N & operator/=(T value) {
+            rows[0] /= value;
+            rows[1] /= value;
+            return *this;
+          }
+
+          Row2N & operator-=(const Row2N &other) {
+            rows[0] -= other.rows[0];
+            rows[1] -= other.rows[1];
+            return *this;
+          }
+
+          T operator[](std::size_t i) {
+            return i < N ? rows[0][i] : rows[1][i - N];
+          }
+        };
+
+        std::array<Row2N, N> tmp {};
+        for (auto i : io) {
+          // std::array<T, 2 * N> buf;
+          std::array<T, Row2N::buf_size()> buf;
+          _data[i]._data.store_unaligned(buf.data());
+          _identity[i]._data.store_unaligned(buf.data() + N);
+          tmp[i].load(buf);
+        }
+
+        for (std::size_t i = 1; i < N; i++) {
           tmp[i - 1] /= tmp[i - 1][i - 1];
           for (size_t j = i; j < N; j++) {
             tmp[j] -= std::abs(tmp[i - 1][i - 1]) <= _epsilon ? static_cast<T>(0) : tmp[i - 1] * tmp[j][i - 1];
@@ -182,23 +272,19 @@ namespace mr
         }
 
         std::array<RowT, N> res;
-        std::for_each(io.begin(), io.end(),
-          [&tmp, &res](auto i) {
-            auto [a, b] = stdx::split<N, N>(tmp[i]._data);
-            res[i] = stdx::simd_cast<SimdImpl<T, N>>(b);
-          });
+        for (auto i : io) {
+          // std::array<T, 2 * N> buf;
+          std::array<T, Row2N::buf_size()> buf;
+          tmp[i].store(buf);
+          res[i]._data = stdx::load_unaligned(buf.data() + N);
+        }
 
         return res;
       }
-#else
-      // dummy
-      constexpr Matr inversed() const noexcept {
-        return {};
-      }
-#endif
 
       constexpr Matr & inverse() noexcept {
         *this = inversed();
+        // [[maybe_unused]] auto a = inversed();
         return *this;
       }
 
@@ -338,14 +424,27 @@ namespace mr
 
     private:
       static Matr get_identity() {
+        // TODO: beautify it
         std::array<RowT, N> id;
-        constexpr auto io = std::ranges::iota_view {(size_t)0, N};
+        if constexpr (N == 4) {
+          id[0] = {1, 0, 0, 0};
+          id[1] = {0, 1, 0, 0};
+          id[2] = {0, 0, 1, 0};
+          id[3] = {0, 0, 0, 1};
+        } else if (N == 3) {
+          id[0] = {1, 0, 0};
+          id[1] = {0, 1, 0};
+          id[2] = {0, 0, 1};
+        }
 
-        std::transform(
-          io.begin(), io.end(), id.begin(),
-          [&io](size_t i) -> RowT {
-            return SimdImpl<T, N>([i](size_t j) { return j == i ? 1 : 0; });
-          });
+        // std::array<RowT, N> id;
+        // constexpr auto io = std::ranges::iota_view {(size_t)0, N};
+
+        // std::transform(
+        //   io.begin(), io.end(), id.begin(),
+        //   [&io](size_t i) -> RowT {
+        //     return SimdImpl<T, N>([i](size_t j) { return j == i ? 1 : 0; });
+        //   });
 
         return id;
       }

@@ -31,7 +31,7 @@ jobs:
       run: ./build/mr-math-bench --benchmark_format=json | tee benchmark_result.json
 
     - name: Download previous results
-      uses: actions/cache@v3.3.2
+      uses: actions/cache@v4
       with:
         path: ./cache
         key: ${{ runner.os }}-benchmark

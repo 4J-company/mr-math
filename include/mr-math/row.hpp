@@ -137,7 +137,7 @@ namespace std {
         auto format(const mr::Row<T, N> &r, FmtContext& ctx) const {
           ostringstream out;
           out << r;
-          return ranges::copy(move(out).str(), ctx.out()).out;
+          return ranges::copy(std::move(out).str(), ctx.out()).out;
         }
     };
 } // namespace std

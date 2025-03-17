@@ -193,7 +193,7 @@ namespace std {
         auto format(U u, FmtContext& ctx) const {
           ostringstream out;
           out << u;
-          return ranges::copy(move(out).str(), ctx.out()).out;
+          return ranges::copy(std::move(out).str(), ctx.out()).out;
         }
     };
 } // namespace std

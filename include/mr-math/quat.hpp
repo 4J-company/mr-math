@@ -8,6 +8,13 @@
 #include "rot.hpp"
 
 namespace mr {
+  template <ArithmeticT T> struct Quat;
+
+  using Quatf = Quat<float>;
+  using Quatd = Quat<double>;
+  using Quati = Quat<int>;
+  using Quatu = Quat<unsigned int>;
+
   template <ArithmeticT T>
     struct Quat {
     private:
@@ -82,18 +89,17 @@ namespace mr {
         return lhs;
       }
 
-        friend constexpr Vec<T, 3> operator*(const Vec<T, 3> &lhs, const Quat &rhs) noexcept {
-          auto vq = rhs.vec() * std::cos(rhs.w() / 2);
-          auto t = vq % lhs;
-          auto u = std::sin(rhs.w() / 2) * t + vq % t;
+      friend constexpr Vec<T, 3> operator*(const Vec<T, 3> &lhs, const Quat &rhs) noexcept {
+        auto vq = rhs.vec() * std::cos(rhs.w() / 2);
+        auto t = vq % lhs;
+        auto u = std::sin(rhs.w() / 2) * t + vq % t;
 
-          return {lhs + u + u};
-        }
-      template <std::size_t N>
-        friend constexpr Vec<T, N> & operator*=(Vec<T, N> &lhs, const Quat &rhs) noexcept {
-          lhs = lhs * rhs;
-          return lhs;
-        }
+        return {lhs + u + u};
+      }
+      friend constexpr Vec<T, 3> & operator*=(Vec<T, 3> &lhs, const Quat &rhs) noexcept {
+        lhs = lhs * rhs;
+        return lhs;
+      }
     };
 }
 

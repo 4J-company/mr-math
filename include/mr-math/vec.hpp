@@ -64,7 +64,6 @@ namespace mr {
         constexpr Vec(Args... args) : _data(args...) {}
 
       // from span constructor
-      // TODO: implement using Vc
       template <ArithmeticT U, size_t M>
         constexpr Vec(std::span<const U, M> span) noexcept {
           const size_t len = std::min(N, span.size());
@@ -77,11 +76,8 @@ namespace mr {
       template <ArithmeticT R, std::size_t S>
         constexpr Vec(const Vec<R, S> &v) noexcept : _data(v._data) {}
 
-// TODO: implement this using Vc library
-#if 0
       template <ArithmeticT R, std::size_t S, ArithmeticT ... Args>
-        constexpr Vec(const Vec<R, S> &v, Args ... args) noexcept : _data(v, args...) {}
-#endif
+        constexpr Vec(const Vec<R, S> &v, Args ... args) noexcept : _data(v._data, args...) {}
 
       // setters
       constexpr void set(size_t i, T value) noexcept { _data._set_ind(i, value); } // for some reason `T & RowT::operator[]` doesn't compile (maybe I'm just stupid)
@@ -104,18 +100,6 @@ namespace mr {
       constexpr Vec cross(const Vec &other) const noexcept requires (N == 3) {
         return RowT(_data._data.rotated(1) * other._data._data.rotated(-1)
           - _data._data.rotated(-1) * other._data._data.rotated(1));
-
-#if 0
-        std::array<T, 3> arr {
-          _data[1] * other._data[2] - _data[2] * other._data[1],
-          _data[2] * other._data[0] - _data[0] * other._data[2],
-          _data[0] * other._data[1] - _data[1] * other._data[0]
-        };
-
-        SimdImpl<T, 3> ans;
-        ans.copy_from(arr.data(), stdx::element_aligned);
-        return {ans};
-#endif
       }
 
       constexpr Vec operator%(const Vec &other) const noexcept requires (N == 3) {

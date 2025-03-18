@@ -2,7 +2,6 @@
 
 #include "gtest/gtest.h"
 #include "mr-math/math.hpp"
-#include "mr-math/units.hpp"
 
 using namespace mr::literals;
 
@@ -247,50 +246,101 @@ TEST_F(QuaternionTest, DefaultConstructor) {
 }
 
 TEST_F(QuaternionTest, ParameterizedConstructor) {
-    float w = 1.0, x = 2.0, y = 3.0, z = 4.0;
-    mr::Quat<float> p(mr::Radiansf(w), x, y, z);
-    EXPECT_EQ(p.w(), w);
-    EXPECT_EQ(p.vec(), mr::Vec3f(x, y, z));
+  float w = 0.8775825618903728;
+  float x = 0.17805417504364543;
+  float y = 0.2670812625654681;
+  float z = 0.35610835008729086;
+
+  mr::Quat<float> p(1_rad, 2, 3, 4);
+  EXPECT_TRUE(mr::equal(p.w(), w));
+  EXPECT_TRUE(mr::equal(p.vec(), mr::Vec3f(x, y, z)));
 }
 
 TEST_F(QuaternionTest, Multiplication) {
-    mr::Quat<float> a(mr::Radiansf(1), 2, 3, 4);
-    mr::Quat<float> b(mr::Radiansf(5), 6, 7, 8);
-    mr::Quat<float> res = a * b;
-    mr::Quat<float> expected(mr::Radiansf(-60), 12, 30, 24);
-    EXPECT_TRUE(mr::equal(res.vec(), expected.vec()));
-    EXPECT_TRUE(mr::equal(res.w(), expected.w()));
+  mr::Quat<float> a(1, 2, 3, 4);
+  mr::Quat<float> b(5, 6, 7, 8);
+  mr::Quat<float> res = a * b;
+  mr::Quat<float> expected(-60, 12, 30, 24);
+  EXPECT_TRUE(mr::equal(res.vec(), expected.vec()));
+  EXPECT_TRUE(mr::equal(res.w(), expected.w()));
 }
 
 TEST_F(QuaternionTest, Addition) {
-    mr::Quat<float> c(mr::Radiansf(1), 2, 3, 4);
-    mr::Quat<float> d(mr::Radiansf(5), 6, 7, 8);
-    mr::Quat<float> res = c + d;
-    mr::Quat<float> sum(mr::Radiansf(6), 8, 10, 12);
-    EXPECT_TRUE(mr::equal(res.vec(), sum.vec()));
-    EXPECT_TRUE(mr::equal(res.w(), sum.w()));
+  mr::Quat<float> c(1, 2, 3, 4);
+  mr::Quat<float> d(5, 6, 7, 8);
+  mr::Quat<float> res = c + d;
+  mr::Quat<float> sum(6, 8, 10, 12);
+  EXPECT_TRUE(mr::equal(res.w(), sum.w()));
+  EXPECT_TRUE(mr::equal(res.vec(), sum.vec()));
 }
 
 TEST_F(QuaternionTest, Subtraction) {
-    mr::Quat<float> e(mr::Radiansf(1), 2, 3, 4);
-    mr::Quat<float> f(mr::Radiansf(5), 6, 7, 8);
-    mr::Quat<float> diff(mr::Radiansf(-4), -4, -4, -4);
-    mr::Quat<float> res = e - f;
-    EXPECT_TRUE(mr::equal(res.vec(), diff.vec()));
-    EXPECT_TRUE(mr::equal(res.w(), diff.w()));
+  mr::Quat<float> e(1, 2, 3, 4);
+  mr::Quat<float> f(5, 6, 7, 8);
+  mr::Quat<float> diff(-4, -4, -4, -4);
+  mr::Quat<float> res = e - f;
+  EXPECT_TRUE(mr::equal(res.vec(), diff.vec()));
+  EXPECT_TRUE(mr::equal(res.w(), diff.w()));
 }
 
 TEST_F(QuaternionTest, Normalize) {
-    mr::Quat<float> g(mr::Radiansf(3), 4, 0, 0);
-    g.normalize();
-    EXPECT_TRUE(mr::equal(g.w(), 0.6));
-    EXPECT_TRUE(mr::equal(g.vec(), mr::Vec3f(0.8, 0, 0)));
+  mr::Quat<float> g(3, 4, 0, 0);
+  g.normalize();
+
+  EXPECT_TRUE(mr::equal(g.w(), 0.6));
+  EXPECT_TRUE(mr::equal(g.vec(), mr::Vec3f(0.8, 0, 0)));
 }
 
 TEST_F(QuaternionTest, RotateMatrix) {
   mr::Vec3f v {0, 1, 0};
   mr::Vec3f expected {0, 0, -1};
   EXPECT_TRUE(mr::equal(v * mr::rotate(q1), expected));
+}
+
+TEST_F(QuaternionTest, Normalization) {
+  // Should create proper unit quaternion
+  mr::Quatf q = mr::Quatf(mr::Radiansf(1.0f), mr::Vec3f(0.5f, 0.5f, 0.5f));
+
+  // Check unit length
+  float length = q.length();
+  EXPECT_TRUE(mr::equal(length, 1.0f));
+}
+
+TEST_F(QuaternionTest, RotationOperation) {
+  // 180 degree rotation around X-axis
+  mr::Quatf q(mr::pi, mr::Vec3f(1.0f, 0.0f, 0.0f));
+
+  // Should invert Y-component
+  mr::Vec3f v(0.0f, 1.0f, 0.0f);
+  mr::Vec3f rotated = v * q;
+
+  EXPECT_TRUE(mr::equal(rotated, mr::Vec3f{0, -1, 0}));
+}
+
+TEST_F(QuaternionTest, QuaternionMultiplication) {
+  // 90 degree rotation around Z-axis
+  mr::Quatf q1(mr::pi / 2, mr::Vec3f(0, 0, 1));
+  // 90 degree rotation around X-axis
+  mr::Quatf q2(mr::pi / 2, mr::Vec3f(1, 0, 0));
+
+  // Should combine rotations
+  mr::Quatf q_combined = q1 * q2;
+
+  // Test against known combination
+  mr::Vec3f v(0, 1, 0);
+  mr::Vec3f rotated = v * q_combined;
+
+  // Expected result from combined rotations
+  EXPECT_TRUE(mr::equal(rotated, mr::Vec3f(0, 0, 1)));
+}
+
+TEST_F(QuaternionTest, IdentityRotation) {
+  // Identity quaternion should not change vector
+  mr::Quatf q_identity(1.f, mr::Vec3f());
+  mr::Vec3f v(1, 2, 3);
+  mr::Vec3f rotated = v * q_identity;
+
+  EXPECT_TRUE(mr::equal(rotated, mr::Vec3f(1, 2, 3)));
 }
 
 // TODO: camera tests
@@ -327,7 +377,7 @@ TEST(ColorTest, Getters) {
   EXPECT_EQ(color[2], color.b());
   EXPECT_EQ(color[3], color.a());
 
-  const auto[r, g, b, a] = color;
+  const auto [r, g, b, a] = color;
   EXPECT_EQ(r, color.r());
   EXPECT_EQ(g, color.g());
   EXPECT_EQ(b, color.b());

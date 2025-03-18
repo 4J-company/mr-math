@@ -131,11 +131,17 @@ namespace mr {
         return lhs;
       }
 
-      [[nodiscard]] constexpr Quat conjugate() const noexcept {
-        return Quat(w(), -vec());
+      [[nodiscard]] friend constexpr Quat operator*(const Quat &lhs, T rhs) noexcept {
+        return {
+          lhs.w() * rhs,
+          lhs.vec() * rhs,
+        };
+      }
+      friend constexpr Quat & operator*=(Quat &lhs, T rhs) noexcept {
+        lhs = lhs * rhs;
+        return lhs;
       }
 
-      // Vector rotation operator (correct implementation)
       [[nodiscard]] friend constexpr Vec3<T> operator*(const Vec3<T>& v, const Quat& q) noexcept {
         const Quat pure(0, v.x(), v.y(), v.z());
         const Quat result = q * pure * q.conjugate();
@@ -146,11 +152,34 @@ namespace mr {
         return lhs;
       }
 
+      [[nodiscard]] friend constexpr Quat operator/(const Quat &lhs, T rhs) noexcept {
+        return {
+          lhs.w() / rhs,
+          lhs.vec() / rhs,
+        };
+      }
+      friend constexpr Quat & operator/=(Quat &lhs, T rhs) noexcept {
+        lhs = lhs / rhs;
+        return lhs;
+      }
+
+      [[nodiscard]] constexpr Quat conjugate() const noexcept {
+        return Quat(w(), -vec());
+      }
+
       friend std::ostream & operator<<(std::ostream &os, const Quat &q) noexcept {
         os << '(' << q.w() << ", " << q.vec() << ')';
         return os;
       }
     };
+
+  template <ArithmeticT T>
+  [[nodiscard]] constexpr Quat<T> slerp(Quat<T> q1, Quat<T> q2, float t) noexcept {
+    float angle = std::acos(q1.w() * q2.w() + q1.vec().dot(q2.vec()));
+    float denom = std::sin(angle);
+
+    return (q1 * std::sin((1 - t) * angle) + q2 * std::sin(t * angle)) / denom;
+  }
 }
 
 #endif // __MR_QUAT_HPP_

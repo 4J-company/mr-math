@@ -54,9 +54,9 @@ namespace mr {
         constexpr Camera(VecT position, VecT direction, VecT up = {0, 1, 0}) :
           _position(position),
           _rotation(
-              direction.normalized(),
-              up.normalized(),
-              (direction % up).normalized()) {}
+              direction.normalized_unchecked(),
+              up.normalized_unchecked(),
+              (direction % up).normalized_unchecked()) {}
 
         // copy semantics
         constexpr Camera(const Camera &other) noexcept {

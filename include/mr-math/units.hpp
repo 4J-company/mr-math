@@ -65,6 +65,8 @@ namespace mr {
         }
       explicit constexpr operator T() const noexcept { return _data; };
 
+      constexpr T value() const noexcept { return _data; }
+
       // comparison operator
       [[nodiscard]] friend constexpr auto operator<=>(Radians lhs, Radians rhs) = default;
 
@@ -94,6 +96,8 @@ namespace mr {
         }
 
       explicit constexpr operator T() const noexcept { return _data; };
+
+      constexpr T value() const noexcept { return _data; }
 
       // comparison operator
       [[nodiscard]] friend constexpr auto operator<=>(Degrees lhs, Degrees rhs) = default;

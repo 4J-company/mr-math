@@ -55,15 +55,14 @@ mr::Vec3f v4 = v1 * v2; // (0, -2, 6); element-wise multiplication
 mr::Vec3f v5 = -v1;     // (-1, -2, -3)
 mr::Vec3f v6 = 3 * v1;  // (3, 6, 9) - or v1 * 3
 ```
-- normalization:
+- comparison
 ```cpp
-mr::Vec3f v {2, 0, 0};
-mr::Norm3f n {2, 0, 0}; // normalize at compile time 
+mr::Vec3f v1 {1, 2, 3};
+mr::Vec3f v2 {1, 2, 3;
 
-std::optional<mr::Norm3f> on = v.normalized(); // does not change v; returns std::nullopt if v.length2() near to zero
-mr::Vec3f &rv = v.normalize();                 // change v
-```
-We provide `*_fast` versions when less precision is acceptable and/or `*_unchecked` when you are sure that vector's length greater than 0.
+bool exact_same = v1 == v2; // uses operator == for T
+bool equal = v1.equal(v2, 0.001); // test for equality within given epsilon
+```  
 - get vector's modulus/magnitude/length/norm:
 ```cpp
 mr::Vec3f v {3, 4, 0};
@@ -83,8 +82,17 @@ auto [x, y, z] = v;    // 30, 47, 80
 
 v.z(80) // set component
 ```
+- normalization:
+```cpp
+mr::Vec3f v {2, 0, 0};
+mr::Norm3f n {2, 0, 0}; // normalize at compile time 
 
-#### Matrices
+std::optional<mr::Norm3f> on = v.normalized(); // does not change v; returns std::nullopt if v.length2() near to zero
+mr::Vec3f &rv = v.normalize();                 // change v
+```
+We provide `*_fast` version when less precision is acceptable and `*_unchecked` ones when you are sure that vector's length greater than 0.
+
+### Matrices
 Initialization
 ```cpp
 /// alias for mr::Matr<float, 4>
@@ -129,7 +137,7 @@ mr::Matr4f m6 = m4.inverse();
 
 // etc (+ - * [][] ...)
 ```
-#### Camera
+### Camera
 Initialization
 ```cpp
 mr::Camera cam1 {{0}};
@@ -152,7 +160,7 @@ auto perspective = cam1.perspective(); // world -> device
 auto frustum = cam1.frustum();         // device -> screen (realistic depth perseption)
 auto ortholinear = cam1.orthographic(); // device -> screen (no depth to size corelation)
 ```
-#### Quaternions
+### Quaternions
 Initialization
 ```cpp
 mr::Quatf q1 = mr::Quatf(mr::pi / 2, mr::axis::y); // from angle and vector
@@ -179,7 +187,7 @@ mr::Vec3f point = mr::Vec3f(1.0f, 0.0f, 0.0f);
 mr::Vec3f rotated_point = point * q1;
 ```
 
-#### Color
+### Color
 Initialization
 ```cpp
 mr::Color c1; // same as Vec4f(0, 0, 0, 0)
@@ -208,8 +216,30 @@ bool is_equal = c10 == copy; // == true
 mr::Color c11 = mr::Color(1.0, 0.0, 0.5, 1.0) + mr::Color(0.0, 1.0, 0.5, 1.0); // == mr::Color(1.0, 1.0, 1.0, 2.0));
 ```
 
-#### Useful stuff
+### Useful stuff
 ```cpp
+// concept for integers and floating-point types
+bool var = mr::ArithmeticT<float> and mr::ArithmeticT<int>; // true
+
+template <mr::ArithmeticT T>
+  void print_number(T number); 
+
+// shortcut for std::numeric_limits<T>::epsilon()
+float eps = mr::epsion<float>();
+
+// copmare primitive or mr-provided types
+bool equal = mr::equal(mr::Vec3f{}, mr::Vec3f{0, 0, 0}, 0);
+bool near = mr::equal(0.1 + 0.2, 0.3);
+
+// check if a value is within a given range
+int x = 47;
+if (mr::within_ex(30, 47)(x)) // excluding boundaries
+  std::println("X <= 30 or 47 <= X");
+
+auto is_digit = mr::within(0, 9); // including boundaries
+if (is_digit(x))
+  std::println("X is digit");
+
 // variable with value of pi and type mr::Radiansf
 mr::pi = mr::Radiansf(std::numbers::pi_v<float>);
 

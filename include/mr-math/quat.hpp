@@ -18,52 +18,67 @@ namespace mr {
   template <ArithmeticT T>
     struct Quat {
     private:
-      Radians<T> _angle {};
+      T _angle {};
       Vec3<T> _vec {};
 
     public:
       constexpr Quat() noexcept = default;
+      constexpr Quat(Radians<T> angle, Vec3<T> axis) noexcept {
+        axis.normalize();
+
+        T half_angle = angle.value() / 2;
+
+        _angle = std::cos(half_angle);
+        _vec = axis * std::sin(half_angle);
+      }
+      constexpr Quat(Radians<T> a, T x, T y, T z) noexcept : Quat(a, Vec3<T>{x, y, z}) {}
       constexpr Quat(Vec4<T> v) noexcept : _angle(v.x()), _vec(v.y(), v.z(), v.w()) {}
-      constexpr Quat(Radians<T> a, Vec3<T> v) noexcept : _angle(a), _vec(v) {}
-      constexpr Quat(Radians<T> a, T x, T y, T z) noexcept : _angle(a), _vec(x, y, z) {}
+      constexpr Quat(T a, T x, T y, T z) noexcept : Quat(Vec4<T>{a, x, y, z}) {}
+      constexpr Quat(T a, Vec3<T> v) noexcept : Quat(Vec4<T>{a, v.x(), v.y(), v.z()}) {}
 
       // getters
       [[nodiscard]] constexpr Vec3<T> vec() const noexcept { return _vec; }
       [[nodiscard]] constexpr T x() const noexcept { return _vec.x(); }
       [[nodiscard]] constexpr T y() const noexcept { return _vec.y(); }
       [[nodiscard]] constexpr T z() const noexcept { return _vec.z(); }
-      [[nodiscard]] constexpr T w() const noexcept { return _angle._data; }
+      [[nodiscard]] constexpr T w() const noexcept { return _angle; }
 
-      explicit constexpr operator Vec4<T>() const noexcept {
-        return Vec4<T>{_angle._data, _vec.x(), _vec.y(), _vec.z()};
+      [[nodiscard]] explicit constexpr operator Vec4<T>() const noexcept {
+        return Vec4<T>{w(), x(), y(), z()};
       }
+
+      [[nodiscard]] constexpr T length2()          const noexcept { return w() * w() + vec().length2(); }
+      [[nodiscard]] constexpr T length()           const noexcept { return std::sqrt(length2()); }
+      [[nodiscard]] constexpr T inversed_length()  const noexcept { return fast_rsqrt(length2()); }
 
       // normalize methods
       constexpr Quat & normalize() noexcept {
-        auto len = _vec.length2() + w() * w();
+        auto len = length2();
         if (len <= mr::Vec3<T>::_epsilon) [[unlikely]] return *this;
-        _vec /= std::sqrt(len);
-        _angle /= std::sqrt(len);
+        auto invlen = 1 / std::sqrt(len);
+        _vec *= invlen;
+        _angle *= invlen;
         return *this;
       };
 
-      constexpr std::optional<Quat> normalized() const noexcept {
-        auto len = _vec.length2() + w() * w();
+      [[nodiscard]] constexpr std::optional<Quat> normalized() const noexcept {
+        auto len = length2();
         if (len <= mr::Vec3<T>::_epsilon) [[unlikely]] return std::nullopt;
+        auto invlen = 1 / std::sqrt(len);
         auto res = *this;
-        res._vec /= sqrt(len);
-        res._angle /= sqrt(len);
+        res._vec *= invlen;
+        res._angle *= invlen;
         return res;
       };
 
-      friend constexpr Quat
+      [[nodiscard]] friend constexpr Quat
       operator+(const Quat &lhs, const Quat &rhs) noexcept {
-        return Quat{mr::Radiansf(lhs.w() + rhs.w()), lhs.vec() + rhs.vec()};
+        return Quat{lhs.w() + rhs.w(), lhs.vec() + rhs.vec()};
       }
 
-      friend constexpr Quat
+      [[nodiscard]] friend constexpr Quat
       operator-(const Quat &lhs, const Quat &rhs) noexcept {
-        return Quat{mr::Radiansf(lhs.w() - rhs.w()), lhs.vec() - rhs.vec()};
+        return Quat{lhs.w() - rhs.w(), lhs.vec() - rhs.vec()};
       }
 
       friend constexpr Quat &
@@ -78,9 +93,9 @@ namespace mr {
         return lhs;
       }
 
-      friend constexpr Quat operator*(const Quat &lhs, const Quat &rhs) noexcept {
+      [[nodiscard]] friend constexpr Quat operator*(const Quat &lhs, const Quat &rhs) noexcept {
         return {
-          mr::Radiansf(lhs.w() * rhs.w() - lhs.vec().dot(rhs.vec())),
+          lhs.w() * rhs.w() - lhs.vec().dot(rhs.vec()),
           lhs.w() * rhs.vec() + rhs.w() * lhs.vec() + lhs.vec() % rhs.vec()
         };
       }
@@ -89,16 +104,24 @@ namespace mr {
         return lhs;
       }
 
-      friend constexpr Vec<T, 3> operator*(const Vec<T, 3> &lhs, const Quat &rhs) noexcept {
-        auto vq = rhs.vec() * std::cos(rhs.w() / 2);
-        auto t = vq % lhs;
-        auto u = std::sin(rhs.w() / 2) * t + vq % t;
+      [[nodiscard]] constexpr Quat conjugate() const noexcept {
+        return Quat(w(), -vec());
+      }
 
-        return {lhs + u + u};
+      // Vector rotation operator (correct implementation)
+      [[nodiscard]] friend constexpr Vec3<T> operator*(const Vec3<T>& v, const Quat& q) noexcept {
+        const Quat pure(0, v.x(), v.y(), v.z());
+        const Quat result = q * pure * q.conjugate();
+        return result.vec();
       }
       friend constexpr Vec<T, 3> & operator*=(Vec<T, 3> &lhs, const Quat &rhs) noexcept {
         lhs = lhs * rhs;
         return lhs;
+      }
+
+      friend std::ostream & operator<<(std::ostream &os, const Quat &q) noexcept {
+        os << '(' << q.w() << ", " << q.vec() << ')';
+        return os;
       }
     };
 }

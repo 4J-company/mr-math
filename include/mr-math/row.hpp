@@ -25,13 +25,6 @@ namespace mr {
 
       constexpr Row(const T data) : _data(data) {}
 
-// TODO: implement this usign Vc library
-#if 0
-      constexpr Row(const T *data) {
-        _data.copy_from(data, stdx::element_aligned);
-      }
-#endif
-
       // from elements constructor
       template <ArithmeticT... Args>
       requires (sizeof...(Args) >= 2) && (sizeof...(Args) <= N)
@@ -42,40 +35,20 @@ namespace mr {
       // copy constructor from different row type
       template <ArithmeticT R, std::size_t S>
         constexpr Row(const Row<R, S> &rhs) noexcept {
-          _data = stdx::simd_cast<decltype(_data)>(rhs._data);
-
-#if 0
-          // size conversion
-          std::array<R, std::max(S, N)> tmp1;
-          rhs._data.copy_to(tmp1.data(), stdx::element_aligned);
-
-          stdx::fixed_size_simd<R, N> tmp2;
-          tmp2.copy_from(tmp1.data(), stdx::element_aligned);
-
-          // type conversion
-          _data = tmp2;
-#endif
+          _data = stdx::simd_cast<SimdT>(rhs._data);
         }
 
-// TODO: implement this usign Vc library
-#if 0
       template <ArithmeticT R, std::size_t S, ArithmeticT ... Args>
         requires (sizeof...(Args) + S == N)
         constexpr Row(const Row<R, S> &rhs, Args ... args) noexcept {
-          // size conversion
-          std::array<R, N> tmp1;
-          rhs._data.copy_to(tmp1.data(), stdx::element_aligned);
+          [this, &rhs]<size_t ...Is>(std::index_sequence<Is...>) {
+            (_set_ind(Is, rhs[Is]), ...);
+          }(std::make_index_sequence<S>());
 
-          Row tmp3 {static_cast<R>(args)...};
-          tmp3._data.copy_to(tmp1.data() + S, stdx::element_aligned);
-
-          stdx::fixed_size_simd<R, N> tmp2;
-          tmp2.copy_from(tmp1.data(), stdx::element_aligned);
-
-          // type conversion
-          _data = tmp2;
+          [this, &args...]<size_t ...Is>(std::index_sequence<Is...>) {
+            (_set_ind(S + Is, args), ...);
+          }(std::make_index_sequence<sizeof...(Args)>());
         }
-#endif
 
       [[nodiscard]] constexpr T operator[](std::size_t i) const {
         return _data[i];
@@ -102,19 +75,11 @@ namespace mr {
         requires (sizeof...(Args) >= 1) && (sizeof...(Args) <= N)
         constexpr void _set(Args... args) noexcept {
           _data = {static_cast<T>(args)...};
-
-          // std::array<T, N> arr {static_cast<T>(args)...};
-          // _data.copy_from(arr.data(), stdx::element_aligned);
         }
 
     public:
       constexpr void _set_ind(std::size_t ind, T value) noexcept {
         _data[ind] = value;
-
-        // std::array<T, N> arr;
-        // _data.copy_to(arr.data(), stdx::element_aligned);
-        // arr[ind] = value;
-        // _data.copy_from(arr.data(), stdx::element_aligned);
       }
     };
 } // namespace mr

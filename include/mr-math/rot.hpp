@@ -60,9 +60,9 @@ namespace mr {
             const VecT &right,
             const VecT &up) noexcept
           : _data (
-                RowT(direction, 0), // direction
-                RowT(right, 0),     // right
-                RowT(up, 0),        // up
+                RowT(direction._data, 0), // direction
+                RowT(right._data, 0),     // right
+                RowT(up._data, 0),        // up
                 RowT(0, 0, 0, 0)
             ) {}
 

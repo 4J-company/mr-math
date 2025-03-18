@@ -37,7 +37,7 @@ namespace mr {
 
   template <ArithmeticT T, ArithmeticT U>
     constexpr bool equal(T a, U b, T epsilon = 0.0001) {
-      return std::abs(a - b) < epsilon;
+      return std::abs(a - b) <= epsilon;
     }
 
   template <typename T, typename U>

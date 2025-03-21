@@ -4,6 +4,7 @@
 #include "operators.hpp"
 
 namespace mr {
+inline namespace math {
   template <ArithmeticT T>
     struct Quat;
 
@@ -82,6 +83,7 @@ namespace mr {
         _data[ind] = value;
       }
     };
+} // namespace math
 } // namespace mr
 
 #ifdef __cpp_lib_format

@@ -5,6 +5,8 @@
 #include "vec.hpp"
 
 namespace mr {
+inline namespace math {
+
   template <ArithmeticT T>
     struct AABB;
 
@@ -44,6 +46,7 @@ namespace mr {
       VecT min;
       VecT max;
     };
+}
 }
 
 #endif // __MR_BOUND_HPP_

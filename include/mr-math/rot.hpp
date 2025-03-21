@@ -7,6 +7,7 @@
 #include "norm.hpp"
 
 namespace mr {
+inline namespace math {
   template <std::floating_point T>
     struct Rotation;
 
@@ -121,6 +122,7 @@ namespace mr {
           RowT(0, 0, 0, 0)   // dummy
         };
     };
+}
 }
 
 #endif // __MR_ROT_HPP_

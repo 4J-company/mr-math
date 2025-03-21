@@ -24,6 +24,7 @@
 namespace stdx = Vc;
 
 namespace mr {
+inline namespace math {
   template <typename T>
     concept ArithmeticT = std::integral<T> || std::floating_point<T>;
 
@@ -114,6 +115,7 @@ namespace mr {
     constexpr IntervalEx<L, H> within_ex(const L& low, const H& high) {
       return {low, high};
     }
+} // namespace math
 } // namespace mr
 
 #endif // __MR_DEF_HPP_

@@ -7,6 +7,8 @@
 
 namespace mr
 {
+inline namespace math
+{
   // forward declarations
   template <ArithmeticT T, std::size_t N>
     struct Matr;
@@ -362,6 +364,7 @@ namespace mr
     template <ArithmeticT T, std::size_t N>
       const Matr<T, N> Matr<T, N>::_identity = Matr<T, N>::get_identity();
 
+} // namespace math
 } // namespace mr
 
 #ifdef __cpp_lib_format

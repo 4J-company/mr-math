@@ -5,6 +5,7 @@
 #include "row.hpp"
 
 namespace mr {
+inline namespace math {
   // forward declarations
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
     struct Vec;
@@ -267,6 +268,7 @@ namespace mr {
       private:
         static constexpr T _epsilon = std::numeric_limits<T>::epsilon();
     };
+} // namespace math
 } // namespace mr
 
 #ifdef __cpp_structured_bindings

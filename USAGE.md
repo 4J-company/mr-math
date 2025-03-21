@@ -1,4 +1,8 @@
 # Usage
+### To get started
+Include `mr-math/math.hpp` to access the whole library.
+All the functionality resides in `mr::math` namespace.
+`math` is an inline namespace and hence can be omitted (You can use it in case of ambiguity).
 ### Vectors
 Initialization:
 - aliases:

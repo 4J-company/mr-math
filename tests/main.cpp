@@ -235,6 +235,13 @@ TEST_F(MatrixTest, RotateVector) {
   EXPECT_TRUE(mr::equal(v * mr::Matr4f::rotate({1, 1, 1}, 102_deg), expected, 0.0001));
 }
 
+TEST(NormalPackingTest, Octahedron) {
+  mr::Norm3f n{30, 47, 80};
+  const auto packed = mr::pack_oct(n);
+  mr::Norm3f unpacked = mr::unpack_oct(packed);
+  EXPECT_TRUE(mr::equal(unpacked, n, 0.0001));
+}
+
 class QuaternionTest : public ::testing::Test {
 protected:
   mr::Quat<float> q1 {mr::Degreesf(90), 1, 0, 0};

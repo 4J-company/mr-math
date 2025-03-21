@@ -271,6 +271,14 @@ inline namespace math {
 } // namespace math
 } // namespace mr
 
+namespace std {
+
+  template <mr::ArithmeticT T, std::size_t N>
+  constexpr mr::Vec<T, N> abs(const mr::Vec<T, N>& v) noexcept {
+    return v.absed();
+  }
+
+} // namespace std
 #ifdef __cpp_structured_bindings
 // specializations for structured binding support
 namespace std

@@ -4,6 +4,7 @@
 #include "def.hpp"
 
 namespace mr {
+inline namespace math {
   template <typename DerivedT>
     struct UnitOperators {
       friend constexpr DerivedT
@@ -139,6 +140,7 @@ namespace mr {
         return s;
       }
     };
+}
 }
 
 #endif // __MR_OPERATORS_HPP_

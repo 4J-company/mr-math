@@ -4,6 +4,7 @@
 #include "vec.hpp"
 
 namespace mr {
+inline namespace math {
   // type that has only 'ArithmeticT value' member
   // and supports arithmetics operations
   template <typename T>
@@ -177,6 +178,7 @@ namespace mr {
       return value * pi;
     }
   }
+}
 }
 
 #ifdef __cpp_lib_format

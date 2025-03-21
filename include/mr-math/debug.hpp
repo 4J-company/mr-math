@@ -7,6 +7,7 @@
 #include "vec.hpp"
 
 namespace mr {
+inline namespace math {
 namespace debug {
 
 // following functions instantiate methods of template structs desired in debug visualization
@@ -108,6 +109,7 @@ inline namespace bounb_box {
 } // namespace norm
 
 } // namespace debug
+} // namespace math
 } // namespace mr
 
 #endif // __debug_hpp_

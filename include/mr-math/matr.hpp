@@ -9,6 +9,8 @@
 
 namespace mr
 {
+inline namespace math
+{
   // forward declarations
   template <ArithmeticT T, std::size_t N>
     struct Matr;
@@ -595,6 +597,7 @@ namespace mr
       constexpr RotateMatr<T> rotate(mr::Roll<T> rad) noexcept {
         return RotateMatr(rad);
       }
+} // namespace math
 } // namespace mr
 
 #ifdef __cpp_lib_format

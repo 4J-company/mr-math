@@ -5,6 +5,7 @@
 #include "vec.hpp"
 
 namespace mr {
+inline namespace math {
   template <std::floating_point T>
     struct Rotation;
 
@@ -152,6 +153,7 @@ namespace mr {
 
         VecT _data;
     };
+} // namespace math
 } // namespace mr
 
 #ifdef __cpp_structured_bindings

@@ -8,6 +8,7 @@
 #include "rot.hpp"
 
 namespace mr {
+inline namespace math {
   template <ArithmeticT T> struct Quat;
 
   using Quatf = Quat<float>;
@@ -180,6 +181,7 @@ namespace mr {
 
     return (q1 * std::sin((1 - t) * angle) + q2 * std::sin(t * angle)) / denom;
   }
+}
 }
 
 #endif // __MR_QUAT_HPP_

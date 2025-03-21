@@ -6,6 +6,8 @@
 #include "matr.hpp"
 
 namespace mr {
+inline namespace math {
+
   using namespace mr::literals;
 
   template <std::floating_point T = float>
@@ -247,6 +249,7 @@ namespace mr {
         mutable std::atomic_bool _perspective_calculated = false;
         mutable MatrT _perspective;
     };
+}
 }
 
 #endif // __MR_CAMERA_HPP_

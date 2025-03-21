@@ -5,6 +5,7 @@
 #include "vec.hpp"
 
 namespace mr {
+inline namespace math {
 
   // color in RGBA float format
   struct [[nodiscard]] Color {
@@ -117,7 +118,7 @@ namespace literals {
   }
 
 } // namespace literals
-
+} // namespace math
 } // namespace mr
 
 #ifdef __cpp_structured_bindings

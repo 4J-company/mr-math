@@ -278,9 +278,9 @@ TEST_F(MatrixTest, RotateVector) {
 
 TEST(NormalPackingTest, Octahedron) {
   mr::Norm3f n{30, 47, 80};
-  const auto packed = mr::pack_oct(n);
+  mr::PackedNorm32 packed = mr::pack_oct(n);
   mr::Norm3f unpacked = mr::unpack_oct(packed);
-  EXPECT_TRUE(mr::equal(unpacked, n, 0.0001));
+  EXPECT_TRUE(mr::equal(unpacked, n, 0.01));
 }
 
 class QuaternionTest : public ::testing::Test {

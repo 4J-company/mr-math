@@ -97,7 +97,7 @@ inline namespace math {
       [[nodiscard]] friend constexpr Quat operator*(const Quat &lhs, const Quat &rhs) noexcept {
         return {
           lhs.w() * rhs.w() - lhs.vec().dot(rhs.vec()),
-          lhs.w() * rhs.vec() + rhs.w() * lhs.vec() + lhs.vec() % rhs.vec()
+          lhs.w() * rhs.vec() + rhs.w() * lhs.vec() + lhs.vec().cross(rhs.vec())
         };
       }
       friend constexpr Quat & operator*=(Quat &lhs, const Quat &rhs) noexcept {

@@ -103,10 +103,6 @@ inline namespace math {
           - _data._data.rotated(-1) * other._data._data.rotated(1));
       }
 
-      constexpr Vec operator%(const Vec &other) const noexcept requires (N == 3) {
-        return cross(other);
-      }
-
       // length methods
       [[nodiscard]] constexpr T length2() const noexcept {
         return (_data._data * _data._data).sum();
@@ -177,10 +173,6 @@ inline namespace math {
       // dot product
       [[nodiscard]] constexpr T dot(const Vec &other) const noexcept {
         return (_data._data * other._data._data).sum();
-      }
-
-      [[nodiscard]] constexpr T operator&(const Vec &other) const noexcept {
-        return dot(other);
       }
 
       template<ArithmeticT R>

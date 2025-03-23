@@ -79,6 +79,47 @@ TEST_F(Vector3DTest, ComponentsProduct) {
   EXPECT_EQ(v1 * v2, mr::Vec3f(4, 10, 18));
 }
 
+TEST_F(Vector3DTest, BitwiseOperators) {
+  mr::Vec3u uv1{ 1, 2, 3 };
+  mr::Vec3u uv2{ 0, 1, 2 };
+
+  EXPECT_EQ(uv1 & uv2, mr::Vec3u(0, 0, 2));
+  EXPECT_EQ(uv1 | uv2, mr::Vec3u(1, 3, 3));
+  EXPECT_EQ(uv1 ^ uv2, mr::Vec3u(1, 3, 1));
+  EXPECT_EQ(~uv1, mr::Vec3u(~1, ~2, ~3));
+
+  EXPECT_EQ(uv1 & 1, mr::Vec3u(1, 0, 1));
+  EXPECT_EQ(uv1 | 2, mr::Vec3u(3, 2, 3));
+  EXPECT_EQ(uv1 ^ 3, mr::Vec3u(2, 1, 0));
+}
+
+TEST_F(Vector3DTest, BitwiseCompoundOperators) {
+  const mr::Vec3u uv0{0, 1, 2};
+  mr::Vec3u uv1, uv2, uv3, uv4, uv5, uv6, uv7, uv8, uv9;
+  uv1 = uv2 = uv3 = uv4 = uv5 = uv6 = uv7 = uv8 = uv9 = mr::Vec3u{1, 2, 3};
+
+  uv1 &= uv0;
+  uv2 &= {0, 1, 2};
+  uv3 &= 1;
+  EXPECT_EQ(uv1, mr::Vec3u(0, 0, 2));
+  EXPECT_EQ(uv2, mr::Vec3u(0, 0, 2));
+  EXPECT_EQ(uv3, mr::Vec3u(1, 0, 1));
+
+  uv4 |= uv0;
+  uv5 |= {0, 1, 2};
+  uv6 |= 2;
+  EXPECT_EQ(uv4, mr::Vec3u(1, 3, 3));
+  EXPECT_EQ(uv5, mr::Vec3u(1, 3, 3));
+  EXPECT_EQ(uv6, mr::Vec3u(3, 2, 3));
+
+  uv7 ^= uv0;
+  uv8 ^={0, 1, 2};
+  uv9 ^= 3;
+  EXPECT_EQ(uv7, mr::Vec3u(1, 3, 1));
+  EXPECT_EQ(uv8, mr::Vec3u(1, 3, 1));
+  EXPECT_EQ(uv9, mr::Vec3u(2, 1, 0));
+}
+
 TEST_F(Vector3DTest, Length) {
   EXPECT_NEAR(v1.length(), std::sqrt(14.0f), 0.0001);
   EXPECT_NEAR(v1.length2(), 14.0f, 0.0001);

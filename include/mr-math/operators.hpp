@@ -82,6 +82,81 @@ inline namespace math {
       operator-(const DerivedT &rhs) noexcept {
         return DerivedT{-rhs._data};
       }
+
+      // bitwise operators
+
+      friend constexpr DerivedT
+      operator&(const DerivedT& lhs, const DerivedT& rhs) noexcept {
+        return DerivedT{lhs._data & rhs._data};
+      }
+
+      friend constexpr DerivedT
+      operator&(const DerivedT& lhs, std::integral auto rhs) noexcept {
+        return DerivedT{lhs._data & rhs};
+      }
+
+      friend constexpr DerivedT &
+      operator&=(DerivedT& lhs, const DerivedT& rhs) noexcept
+      {
+        lhs._data &= rhs._data;
+        return lhs;
+      }
+
+      friend constexpr DerivedT &
+      operator&=(DerivedT& lhs, std::integral auto rhs) noexcept
+      {
+        lhs._data &= rhs;
+        return lhs;
+      }
+
+      friend constexpr DerivedT
+      operator|(const DerivedT& lhs, const DerivedT& rhs) noexcept {
+        return DerivedT{lhs._data | rhs._data};
+      }
+
+      friend constexpr DerivedT
+      operator|(const DerivedT& lhs, std::integral auto rhs) noexcept {
+        return DerivedT{lhs._data | rhs};
+      }
+
+      friend constexpr DerivedT &
+      operator|=(DerivedT& lhs, const DerivedT& rhs) noexcept {
+        lhs._data |= rhs._data;
+        return lhs;
+      }
+
+      friend constexpr DerivedT &
+      operator|=(DerivedT& lhs, std::integral auto rhs) noexcept {
+        lhs._data |= rhs;
+        return lhs;
+      }
+
+      friend constexpr DerivedT
+      operator^(const DerivedT& lhs, const DerivedT& rhs) noexcept {
+        return DerivedT{lhs._data ^ rhs._data};
+      }
+
+      friend constexpr DerivedT
+      operator^(const DerivedT& lhs, std::integral auto rhs) noexcept {
+        return DerivedT{lhs._data ^ rhs};
+      }
+
+      friend constexpr DerivedT &
+      operator^=(DerivedT& lhs, const DerivedT& rhs) noexcept {
+        lhs._data ^= rhs._data;
+        return lhs;
+      }
+
+      friend constexpr DerivedT &
+      operator^=(DerivedT& lhs, std::integral auto rhs) noexcept {
+        lhs._data ^= rhs;
+        return lhs;
+      }
+
+      friend constexpr DerivedT
+      operator~(const DerivedT& rhs) noexcept {
+        return DerivedT{~rhs._data};
+      }
     };
 
   template <typename DerivedT>

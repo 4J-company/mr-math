@@ -48,7 +48,7 @@ inline namespace math {
         return Vec4<T>{w(), x(), y(), z()};
       }
 
-      explicit operator Matr<T, 4>() const noexcept {
+      operator Matr<T, 4>() const noexcept {
         T rad = w();
         mr::Norm n = vec().normalized_unchecked();
 

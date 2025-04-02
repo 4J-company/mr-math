@@ -84,7 +84,7 @@ inline namespace math {
 
       // dot product
       [[nodiscard]] constexpr T dot(const VecT &other) const noexcept {
-        return (_data._data * other._data._data).sum();
+        return (_data._data._data * other._data._data).sum();
       }
 
       [[nodiscard]] constexpr T operator&(const VecT &other) const noexcept {
@@ -146,7 +146,6 @@ inline namespace math {
 
       private:
         friend struct Vec<T, N>;
-        friend struct Rotation<T>;
         constexpr Norm(const VecT &v) noexcept : Norm(unchecked, v) {}
 
         VecT _data;

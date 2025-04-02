@@ -37,8 +37,8 @@ inline namespace math {
     }
 
   template <ArithmeticT T, ArithmeticT U>
-    constexpr bool equal(T a, U b, T epsilon = 0.0001) {
-      return std::abs(a - b) <= epsilon;
+    constexpr bool equal(T a, U b, std::common_type_t<T, U> eps = epsilon<std::common_type_t<T, U>>()) {
+      return std::abs(a - b) <= eps;
     }
 
   template <typename T, typename U>

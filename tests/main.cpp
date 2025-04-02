@@ -287,7 +287,7 @@ TEST_F(QuaternionTest, Normalize) {
   mr::Quat<float> g(3, 4, 0, 0);
   g.normalize();
 
-  EXPECT_TRUE(mr::equal(g.w(), 0.6));
+  EXPECT_TRUE(mr::equal(g.w(), 0.6, 0.00001));
   EXPECT_TRUE(mr::equal(g.vec(), mr::Vec3f(0.8, 0, 0)));
 }
 

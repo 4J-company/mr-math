@@ -113,4 +113,3 @@ inline namespace bounb_box {
 } // namespace mr
 
 #endif // __MR_DEBUG_HPP_
-

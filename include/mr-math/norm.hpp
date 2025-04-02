@@ -45,7 +45,6 @@ inline namespace math {
           _data.normalize();
         }
 
-
       constexpr Norm(UncheckedTag, const VecT &v) noexcept : _data(v) {
           assert(mr::equal(v.length(), 1, 0.1f));
         }

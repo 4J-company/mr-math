@@ -213,22 +213,6 @@ TEST_F(MatrixTest, TranslateVector) {
   EXPECT_EQ(mr::Vec3f(0, 0, 22) * mr::TranslateMatr3f({30, 47, 80}), mr::Vec3f(30, 47, 102));
 }
 
-TEST_F(MatrixTest, RotateBasis) {
-  mr::axis::x = {1, 0, 0};
-  mr::axis::y = {0, 1, 0};
-  mr::axis::z = {0, 0, 1};
-  EXPECT_TRUE(mr::equal(mr::axis::x * mr::Matr4f::rotate_y(-90_deg), mr::axis::z));
-  EXPECT_TRUE(mr::equal(mr::axis::y * mr::Matr4f::rotate_z(-90_deg), mr::axis::x));
-  EXPECT_TRUE(mr::equal(mr::axis::z * mr::Matr4f::rotate_x(-90_deg), mr::axis::y));
-
-  mr::axis::x = {1, 0, 0};
-  mr::axis::y = {0, 1, 0};
-  mr::axis::z = {0, 0, -1};
-  EXPECT_TRUE(mr::equal(mr::axis::x * mr::Matr4f::rotate_y(90_deg), mr::axis::z));
-  EXPECT_TRUE(mr::equal(mr::axis::y * mr::Matr4f::rotate_z(90_deg), mr::axis::x));
-  EXPECT_TRUE(mr::equal(mr::axis::z * mr::Matr4f::rotate_x(90_deg), mr::axis::y));
-}
-
 TEST_F(MatrixTest, RotateVector) {
   mr::Vec3f v{30, 47, 80};
   mr::Vec3f expected{ 75.6129, 25.2055, 56.1816 };

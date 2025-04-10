@@ -256,94 +256,6 @@ inline namespace math
         return _identity;
       }
 
-      static constexpr Matr4<T> rotate_x(const Radians<T> &rad) noexcept {;
-        T co = std::cos(rad._data);
-        T si = std::sin(rad._data);
-
-        if (axis::x.x() < 0) {
-          return Matr4<T> {
-            1,  0,   0, 0,
-            0, co, -si, 0,
-            0, si,  co, 0,
-            0,  0,   0, 1
-          };
-        }
-
-        return Matr4<T> {
-          1,   0,  0, 0,
-          0,  co, si, 0,
-          0, -si, co, 0,
-          0,   0,  0, 1
-        };
-      }
-
-      static constexpr Matr4<T> rotate_y(const Radians<T> &rad) noexcept {
-        T co = std::cos(rad._data);
-        T si = std::sin(rad._data);
-        if (axis::y.y() < 0) {
-          return Matr4<T> {
-             co, 0, si, 0,
-              0, 1,  0, 0,
-            -si, 0, co, 0,
-              0, 0,  0, 1
-          };
-        }
-
-        return Matr4<T> {
-          co, 0, -si, 0,
-           0, 1,   0, 0,
-          si, 0,  co, 0,
-           0, 0,   0, 1
-        };
-      }
-
-      static constexpr Matr4<T> rotate_z(const Radians<T> &rad) noexcept {
-        T co = std::cos(rad._data);
-        T si = std::sin(rad._data);
-
-        // this is required for passing a test with our basis (z = {0, 0, -1})
-        // TODO: consider possibility of swapping axes (maybe we should change these matrices when basis is set or just use quaternions)
-        if (axis::z.z() < 0) {
-          return Matr4<T> {
-            co, -si, 0, 0,
-            si,  co, 0, 0,
-             0,   0, 1, 0,
-             0,   0, 0, 1
-          };
-        }
-
-        return Matr4<T> {
-           co, si, 0, 0,
-          -si, co, 0, 0,
-            0,  0, 1, 0,
-            0,  0, 0, 1
-        };
-      }
-
-      static constexpr Matr4<T> rotate(const Norm<T, 3> &n, const Radians<T> &rad) noexcept {
-        T co = std::cos(rad._data);
-        T si = std::sin(rad._data);
-        T nco = 1 - co;
-
-        Vec<T, 3> tmp0 {n * n * nco + Vec<T, 3>{co}};
-        // TODO: implement using Vec4(Vec3, T) constructor
-        Matr4<T> tmp1 = ScaleMatr<T, 4>({tmp0.x(), tmp0.y(), tmp0.z(), 1});
-        Matr4<T> tmp2 = Matr4<T> {
-                            0, n.x() * n.y() * nco, n.x() * n.z() * nco, 0,
-          n.x() * n.y() * nco,                   0, n.y() * n.z() * nco, 0,
-          n.x() * n.z() * nco, n.y() * n.z() * nco,                   0, 0,
-                            0,                   0,                   0, 0
-        };
-        Matr4<T> tmp3 = Matr4<T> {
-                    0, -n.z() * si,  n.y() * si, 0,
-           n.z() * si,           0, -n.x() * si, 0,
-          -n.y() * si,  n.x() * si,           0, 0,
-                    0,           0,           0, 0
-        };
-
-        return tmp1 + tmp2 + tmp3;
-      }
-
       constexpr bool operator==(const Matr &other) const noexcept {
         for (size_t i = 0; i < N; i++) {
           if (_data[i] != other._data[i]) {
@@ -377,7 +289,7 @@ inline namespace math
 
         std::transform(
           io.begin(), io.end(), id.begin(),
-          [&io](size_t i) -> RowT {
+          [](size_t i) -> RowT {
             return SimdImpl<T, N>([i](size_t j) { return j == i ? 1 : 0; });
           });
 
@@ -525,7 +437,7 @@ inline namespace math
           constexpr RotateMatr(mr::Quat<T> rotate) : _data(rotate) {}
 
           constexpr RotateMatr(mr::Radians<T> rad, mr::Norm3<T> v) noexcept
-            : _data(rad, (mr::Vec3f)v) { }
+            : _data(rad, (mr::Vec3<T>)v) { }
 
           constexpr RotateMatr(mr::Radians<T> rad, mr::Vec3<T> v) noexcept
             : RotateMatr(rad, v.normalized_unchecked()) {}

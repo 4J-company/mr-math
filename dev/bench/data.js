@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1743608400675,
+  "lastUpdate": 1744301696984,
   "repoUrl": "https://github.com/4J-company/mr-math",
   "entries": {
     "Benchmark": [
@@ -10288,6 +10288,492 @@ window.BENCHMARK_DATA = {
             "value": 20.959835737116254,
             "unit": "ns/iter",
             "extra": "iterations: 33412539\ncpu: 20.95928962477224 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "tsukanovWOW@ya.ru",
+            "name": "Michael Tsukanov",
+            "username": "cone-forest"
+          },
+          "committer": {
+            "email": "tsukanovWOW@ya.ru",
+            "name": "Michael Tsukanov",
+            "username": "cone-forest"
+          },
+          "distinct": true,
+          "id": "7e2f8527b62b8e9a9ed684f7c3ade44e4d7fcb30",
+          "message": "Refactor benchmarks",
+          "timestamp": "2025-04-10T18:36:10+03:00",
+          "tree_id": "aa5ada19db5c007fceaead29a23964af4953579c",
+          "url": "https://github.com/4J-company/mr-math/commit/7e2f8527b62b8e9a9ed684f7c3ade44e4d7fcb30"
+        },
+        "date": 1744301696622,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_CameraPerspective<float>",
+            "value": 34.51307662062166,
+            "unit": "ns/iter",
+            "extra": "iterations: 20117430\ncpu: 34.511752694056845 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_CameraOrthographic<float>",
+            "value": 32.627351253285106,
+            "unit": "ns/iter",
+            "extra": "iterations: 21441650\ncpu: 32.6248804546292 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_CameraFrustum<float>",
+            "value": 30.01209293574275,
+            "unit": "ns/iter",
+            "extra": "iterations: 23449062\ncpu: 30.01060332391974 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_CameraRotation<float>",
+            "value": 56.54062080219864,
+            "unit": "ns/iter",
+            "extra": "iterations: 12377759\ncpu: 56.53685752000825 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_CameraPerspective<double>",
+            "value": 35.36699603485319,
+            "unit": "ns/iter",
+            "extra": "iterations: 20110220\ncpu: 35.36561186302285 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_CameraOrthographic<double>",
+            "value": 32.026738937139726,
+            "unit": "ns/iter",
+            "extra": "iterations: 21854384\ncpu: 32.02522798171756 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_CameraFrustum<double>",
+            "value": 31.38919640605352,
+            "unit": "ns/iter",
+            "extra": "iterations: 22275902\ncpu: 31.387458474184346 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_CameraRotation<double>",
+            "value": 86.20198244873804,
+            "unit": "ns/iter",
+            "extra": "iterations: 8122379\ncpu: 86.19771030137841 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_QuaternionVectorRotation<float>",
+            "value": 24.12376177885393,
+            "unit": "ns/iter",
+            "extra": "iterations: 29045801\ncpu: 24.12287297568416 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_QuaternionMultiplication<float>",
+            "value": 3.1706382289534467,
+            "unit": "ns/iter",
+            "extra": "iterations: 220925781\ncpu: 3.170466261698997 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_QuaternionSlerp<float>",
+            "value": 20.756515070762504,
+            "unit": "ns/iter",
+            "extra": "iterations: 33750516\ncpu: 20.755734667878823 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_QuaternionVectorRotation<double>",
+            "value": 1.244801817335659,
+            "unit": "ns/iter",
+            "extra": "iterations: 562825691\ncpu: 1.244727995190257 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_QuaternionMultiplication<double>",
+            "value": 0.9329244896458919,
+            "unit": "ns/iter",
+            "extra": "iterations: 750240926\ncpu: 0.932879145545309 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_QuaternionSlerp<double>",
+            "value": 19.81554461417627,
+            "unit": "ns/iter",
+            "extra": "iterations: 35351421\ncpu: 19.81479516763978 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiply<int, 2>",
+            "value": 0.3128058509328685,
+            "unit": "ns/iter",
+            "extra": "iterations: 2247694632\ncpu: 0.31279343154119355 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixTranspose<int, 2>",
+            "value": 0.3114102617880419,
+            "unit": "ns/iter",
+            "extra": "iterations: 2249139264\ncpu: 0.3113845017113174 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorDotProduct<int, 2>",
+            "value": 0.15582507846328003,
+            "unit": "ns/iter",
+            "extra": "iterations: 4501645062\ncpu: 0.15582190095821485 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorNormalize<int, 2>",
+            "value": 0.3109190578106302,
+            "unit": "ns/iter",
+            "extra": "iterations: 2252271398\ncpu: 0.3109041151176572 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ZeroVectorNormalize<int, 2>",
+            "value": 0.3117113390224451,
+            "unit": "ns/iter",
+            "extra": "iterations: 2234042320\ncpu: 0.3116993338783291 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IdentityMatrixMultiply<int, 2>",
+            "value": 0.31140417534943343,
+            "unit": "ns/iter",
+            "extra": "iterations: 2249465333\ncpu: 0.3113830601095996 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiplyTranspose<int, 2>",
+            "value": 0.31202325874734954,
+            "unit": "ns/iter",
+            "extra": "iterations: 2247005963\ncpu: 0.3120108738225009 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiply<int, 3>",
+            "value": 0.9324273509684318,
+            "unit": "ns/iter",
+            "extra": "iterations: 750501952\ncpu: 0.9323843131056905 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixTranspose<int, 3>",
+            "value": 0.9324474260400544,
+            "unit": "ns/iter",
+            "extra": "iterations: 750326065\ncpu: 0.9324307746126324 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorDotProduct<int, 3>",
+            "value": 0.1560009954561305,
+            "unit": "ns/iter",
+            "extra": "iterations: 4504998112\ncpu: 0.15599524539822973 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorNormalize<int, 3>",
+            "value": 0.6253652839217174,
+            "unit": "ns/iter",
+            "extra": "iterations: 1126497022\ncpu: 0.6253283943435048 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ZeroVectorNormalize<int, 3>",
+            "value": 0.34702519257345216,
+            "unit": "ns/iter",
+            "extra": "iterations: 2014850809\ncpu: 0.347012142475706 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IdentityMatrixMultiply<int, 3>",
+            "value": 8.395429528363074,
+            "unit": "ns/iter",
+            "extra": "iterations: 83462940\ncpu: 8.394746267025846 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiplyTranspose<int, 3>",
+            "value": 0.9320367384800486,
+            "unit": "ns/iter",
+            "extra": "iterations: 749423819\ncpu: 0.9320092533648152 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiply<int, 4>",
+            "value": 1.244618863791443,
+            "unit": "ns/iter",
+            "extra": "iterations: 562946724\ncpu: 1.2445817181804975 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixTranspose<int, 4>",
+            "value": 1.2438528438702523,
+            "unit": "ns/iter",
+            "extra": "iterations: 562716267\ncpu: 1.243828666499167 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorDotProduct<int, 4>",
+            "value": 0.15543055548555865,
+            "unit": "ns/iter",
+            "extra": "iterations: 4396723938\ncpu: 0.1554278093499896 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorNormalize<int, 4>",
+            "value": 5.594133241611707,
+            "unit": "ns/iter",
+            "extra": "iterations: 125178702\ncpu: 5.593990445754911 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ZeroVectorNormalize<int, 4>",
+            "value": 0.31156871198542213,
+            "unit": "ns/iter",
+            "extra": "iterations: 2249017119\ncpu: 0.311566467004736 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IdentityMatrixMultiply<int, 4>",
+            "value": 3.949513593176149,
+            "unit": "ns/iter",
+            "extra": "iterations: 177414349\ncpu: 3.949432568162782 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiplyTranspose<int, 4>",
+            "value": 1.2437690680454379,
+            "unit": "ns/iter",
+            "extra": "iterations: 562929354\ncpu: 1.2437561623407538 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiply<float, 2>",
+            "value": 0.31133310192140934,
+            "unit": "ns/iter",
+            "extra": "iterations: 2249212826\ncpu: 0.3113225346688472 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixTranspose<float, 2>",
+            "value": 0.3110405428654435,
+            "unit": "ns/iter",
+            "extra": "iterations: 2249606410\ncpu: 0.31102327806756086 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorDotProduct<float, 2>",
+            "value": 0.15544750214383948,
+            "unit": "ns/iter",
+            "extra": "iterations: 4504770095\ncpu: 0.15543996679812885 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorNormalize<float, 2>",
+            "value": 0.31094136310352805,
+            "unit": "ns/iter",
+            "extra": "iterations: 2252927507\ncpu: 0.3109297240250689 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ZeroVectorNormalize<float, 2>",
+            "value": 0.3108500934626575,
+            "unit": "ns/iter",
+            "extra": "iterations: 2253387944\ncpu: 0.31083649926547924 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IdentityMatrixMultiply<float, 2>",
+            "value": 0.3111739367204948,
+            "unit": "ns/iter",
+            "extra": "iterations: 2250303857\ncpu: 0.31116314573334286 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiplyTranspose<float, 2>",
+            "value": 0.3112702906724833,
+            "unit": "ns/iter",
+            "extra": "iterations: 2247088042\ncpu: 0.3112555769632834 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiply<float, 3>",
+            "value": 0.9333473330029378,
+            "unit": "ns/iter",
+            "extra": "iterations: 750074847\ncpu: 0.9333126231334569 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixTranspose<float, 3>",
+            "value": 0.9336747789009068,
+            "unit": "ns/iter",
+            "extra": "iterations: 750419074\ncpu: 0.9336075138196709 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorDotProduct<float, 3>",
+            "value": 0.1555472980135874,
+            "unit": "ns/iter",
+            "extra": "iterations: 4492081990\ncpu: 0.155541646513893 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorNormalize<float, 3>",
+            "value": 0.4705344013394063,
+            "unit": "ns/iter",
+            "extra": "iterations: 1495328943\ncpu: 0.4705088277021337 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ZeroVectorNormalize<float, 3>",
+            "value": 0.3468106311260749,
+            "unit": "ns/iter",
+            "extra": "iterations: 2019416930\ncpu: 0.3467984236420171 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IdentityMatrixMultiply<float, 3>",
+            "value": 4.249808786806356,
+            "unit": "ns/iter",
+            "extra": "iterations: 164719282\ncpu: 4.249589619993604 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiplyTranspose<float, 3>",
+            "value": 0.9325864810194645,
+            "unit": "ns/iter",
+            "extra": "iterations: 749984510\ncpu: 0.9325537563435882 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiply<float, 4>",
+            "value": 3.2897508170949417,
+            "unit": "ns/iter",
+            "extra": "iterations: 214047990\ncpu: 3.289565769807058 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixTranspose<float, 4>",
+            "value": 2.490638368360987,
+            "unit": "ns/iter",
+            "extra": "iterations: 281348765\ncpu: 2.4905085046312547 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorDotProduct<float, 4>",
+            "value": 0.1554810699416148,
+            "unit": "ns/iter",
+            "extra": "iterations: 4505447488\ncpu: 0.15547297440835148 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorNormalize<float, 4>",
+            "value": 0.6221923435103179,
+            "unit": "ns/iter",
+            "extra": "iterations: 1125851003\ncpu: 0.6221862387948692 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ZeroVectorNormalize<float, 4>",
+            "value": 0.31111702763667765,
+            "unit": "ns/iter",
+            "extra": "iterations: 2248966308\ncpu: 0.31110835431866285 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IdentityMatrixMultiply<float, 4>",
+            "value": 3.284865400129247,
+            "unit": "ns/iter",
+            "extra": "iterations: 213265658\ncpu: 3.2848312080325557 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiplyTranspose<float, 4>",
+            "value": 5.963153937123865,
+            "unit": "ns/iter",
+            "extra": "iterations: 117328845\ncpu: 5.962921351522667 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiply<double, 2>",
+            "value": 0.6222794653409763,
+            "unit": "ns/iter",
+            "extra": "iterations: 1125300128\ncpu: 0.6222683589706337 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixTranspose<double, 2>",
+            "value": 0.6220457317904509,
+            "unit": "ns/iter",
+            "extra": "iterations: 1125960945\ncpu: 0.6220391765009252 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorDotProduct<double, 2>",
+            "value": 0.15539292739034474,
+            "unit": "ns/iter",
+            "extra": "iterations: 4507135233\ncpu: 0.15538593980323995 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorNormalize<double, 2>",
+            "value": 0.6193622293698897,
+            "unit": "ns/iter",
+            "extra": "iterations: 1130934800\ncpu: 0.6193319650257442 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ZeroVectorNormalize<double, 2>",
+            "value": 0.31141697268987495,
+            "unit": "ns/iter",
+            "extra": "iterations: 2248291758\ncpu: 0.31139642508977095 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IdentityMatrixMultiply<double, 2>",
+            "value": 0.6219597914911895,
+            "unit": "ns/iter",
+            "extra": "iterations: 1125698448\ncpu: 0.6219535491444551 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiplyTranspose<double, 2>",
+            "value": 0.6220351228148854,
+            "unit": "ns/iter",
+            "extra": "iterations: 1125423008\ncpu: 0.6220066606280001 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiply<double, 3>",
+            "value": 1.9686800919601115,
+            "unit": "ns/iter",
+            "extra": "iterations: 356190254\ncpu: 1.968592543242335 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixTranspose<double, 3>",
+            "value": 2.1780527784737758,
+            "unit": "ns/iter",
+            "extra": "iterations: 321619873\ncpu: 2.1779789895010686 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorDotProduct<double, 3>",
+            "value": 0.45047237938644263,
+            "unit": "ns/iter",
+            "extra": "iterations: 1553916240\ncpu: 0.4504624541410277 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorNormalize<double, 3>",
+            "value": 5.5424620720902125,
+            "unit": "ns/iter",
+            "extra": "iterations: 126334473\ncpu: 5.542271720245334 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ZeroVectorNormalize<double, 3>",
+            "value": 0.31122208425503983,
+            "unit": "ns/iter",
+            "extra": "iterations: 2247585237\ncpu: 0.3112073795846874 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IdentityMatrixMultiply<double, 3>",
+            "value": 4.0894195952377785,
+            "unit": "ns/iter",
+            "extra": "iterations: 171109106\ncpu: 4.08920123748411 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiplyTranspose<double, 3>",
+            "value": 2.30291935778757,
+            "unit": "ns/iter",
+            "extra": "iterations: 303856966\ncpu: 2.302794983479164 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiply<double, 4>",
+            "value": 5.308904158343084,
+            "unit": "ns/iter",
+            "extra": "iterations: 132408865\ncpu: 5.308697435024544 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixTranspose<double, 4>",
+            "value": 2.494115667278484,
+            "unit": "ns/iter",
+            "extra": "iterations: 281177931\ncpu: 2.4935634653347285 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorDotProduct<double, 4>",
+            "value": 0.1557896426339766,
+            "unit": "ns/iter",
+            "extra": "iterations: 4503961073\ncpu: 0.15578195029395506 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorNormalize<double, 4>",
+            "value": 1.5538408652997697,
+            "unit": "ns/iter",
+            "extra": "iterations: 450526591\ncpu: 1.5536917997366384 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ZeroVectorNormalize<double, 4>",
+            "value": 0.31203654490424443,
+            "unit": "ns/iter",
+            "extra": "iterations: 2247964953\ncpu: 0.3120173898013609 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IdentityMatrixMultiply<double, 4>",
+            "value": 5.3245729724706035,
+            "unit": "ns/iter",
+            "extra": "iterations: 132386137\ncpu: 5.32422507350599 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiplyTranspose<double, 4>",
+            "value": 5.476055740626548,
+            "unit": "ns/iter",
+            "extra": "iterations: 129476191\ncpu: 5.4756932106536444 ns\nthreads: 1"
           }
         ]
       }

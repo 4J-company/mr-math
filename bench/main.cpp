@@ -77,6 +77,34 @@ void BM_MatrixTranspose(benchmark::State& state) {
     }
 }
 
+// Benchmark for random matrices
+template <typename T, int N>
+static void BM_RandomInverse(benchmark::State& state) {
+    MatrixBench<T, N> fixture;
+    auto mat = fixture.m1;
+    for (auto _ : state) {
+        auto inv = mat.inversed();
+        benchmark::DoNotOptimize(inv);
+    }
+}
+
+// Benchmark for worst-case scenario (near-singular matrices)
+template <typename T, int N>
+static void BM_NearSingularInverse(benchmark::State& state) {
+    MatrixBench<T, N> fixture;
+    auto mat = fixture.m2;
+
+    // Make matrix nearly singular
+    for (int i = 1; i < N; ++i) {
+      mat[i] = mat[0] * static_cast<T>(0.999);
+    }
+
+    for (auto _ : state) {
+      auto inv = mat.inversed();
+      benchmark::DoNotOptimize(inv);
+    }
+}
+
 // ====================== Vector Benchmarks ======================
 template <typename T, int N>
 void BM_VectorDotProduct(benchmark::State& state) {
@@ -464,6 +492,8 @@ static void BM_ColorLiteral(benchmark::State& state) {
     BENCHMARK_TEMPLATE(BM_MatrixTranspose, Type, Size); \
     BENCHMARK_TEMPLATE(BM_VectorDotProduct, Type, Size); \
     BENCHMARK_TEMPLATE(BM_VectorNormalize, Type, Size); \
+    BENCHMARK_TEMPLATE(BM_RandomInverse, Type, Size); \
+    BENCHMARK_TEMPLATE(BM_NearSingularInverse, Type, Size); \
     BENCHMARK_TEMPLATE(BM_ZeroVectorNormalize, Type, Size); \
     BENCHMARK_TEMPLATE(BM_IdentityMatrixMultiply, Type, Size); \
     BENCHMARK_TEMPLATE(BM_MatrixMultiplyTranspose, Type, Size)

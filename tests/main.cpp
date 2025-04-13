@@ -179,7 +179,7 @@ TEST_F(MatrixTest, Multiplication) {
     1354, 1412, 1470, 1528
   };
 
-   EXPECT_EQ(result, expected);
+  EXPECT_EQ(result, expected);
 }
 
 TEST_F(MatrixTest, Transposition) {
@@ -203,6 +203,54 @@ TEST_F(MatrixTest, Identity) {
     0, 0, 0, 1
   };
   EXPECT_EQ(mr::Matr4f::identity(), expected);
+}
+
+TEST_F(MatrixTest, InverseIdentity) {
+  const auto id = mr::Matr4f::identity();
+  const auto inv = id.inversed();
+
+  ASSERT_TRUE(inv.has_value());
+  EXPECT_TRUE(equal(id, inv.value()));
+}
+
+TEST_F(MatrixTest, Inverse2x2) {
+  mr::Matr<float, 2> m = {
+    mr::Matr<float, 2>::RowT(1.f, 2.f),
+    mr::Matr<float, 2>::RowT(3.f, 4.f),
+  };
+
+  const auto inv = m.inversed();
+  ASSERT_TRUE(inv.has_value());
+
+  mr::Matr<float, 2> expected = {
+    mr::Matr<float, 2>::RowT(-2.f, 1.f),
+    mr::Matr<float, 2>::RowT(1.5f, -0.5f),
+  };
+
+  const auto res = m * inv.value();
+  const auto id = mr::Matr<float, 2>::identity();
+
+  EXPECT_TRUE(equal(inv.value(), expected, 0.000001));
+  EXPECT_TRUE(equal(res, id, 0.000001));
+}
+
+TEST_F(MatrixTest, Inverse3x3) {
+  mr::Matr3f m = {
+    mr::Matr3f::RowT{2.f, 5.f, 7.f},
+    mr::Matr3f::RowT{6.f, 3.f, 4.f},
+    mr::Matr3f::RowT{5.f, -2.f, -3.f}
+  };
+
+  const auto inv = m.inversed();
+  ASSERT_TRUE(inv.has_value());
+
+  mr::Matr3f expected = {
+    mr::Matr3f::RowT{1.f, -1.f, 1.f},
+    mr::Matr3f::RowT{-38.f, 41.f, -34.f},
+    mr::Matr3f::RowT{27.f, -29.f, 24.f}
+  };
+
+  EXPECT_TRUE(equal(inv.value(), expected, 0.001));
 }
 
 TEST_F(MatrixTest, ScaleVector) {

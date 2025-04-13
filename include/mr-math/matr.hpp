@@ -203,49 +203,50 @@ inline namespace math
         return *this;
       }
 
-// TODO: implement this using Vc library
-#if 0
-      constexpr Matr inversed() const noexcept {
-        constexpr auto io = std::ranges::iota_view{(size_t)0, N};
+      constexpr std::optional<Matr> inversed() const noexcept {
+        Matr<T, N> mat = *this;
+        Matr<T, N> inv = identity();
 
-        std::array<Row<T, 2 * N>, N> tmp;
-        std::for_each(io.begin(), io.end(),
-                      [&tmp, this](auto i) {
-                        // adding temporary variable here brings performance down 2.5 times (reason unknown)
-                        tmp[i] += stdx::simd_cast<SimdImpl<T, 2 * N>>(stdx::concat(_data[i]._data, identity[i]._data));
-                      });
+        for (size_t col = 0; col < N; ++col) {
+          // Partial pivoting - find maximum in current column
+          size_t pivot_row = col;
+          T max_val = std::abs(mat[col][col]);
+          for (size_t row = col + 1; row < N; ++row) {
+            const T current_val = std::abs(mat[row][col]);
+            if (current_val > max_val) {
+              max_val = current_val;
+              pivot_row = row;
+            }
+          }
 
-        // null bottom triangle
-        for (size_t i = 1; i < N; i++) {
-          tmp[i - 1] /= tmp[i - 1][i - 1];
-          for (size_t j = i; j < N; j++) {
-            tmp[j] -= std::abs(tmp[i - 1][i - 1]) <= _epsilon ? static_cast<T>(0) : tmp[i - 1] * tmp[j][i - 1];
+          // Check for singular matrix
+          if (max_val < _epsilon) {
+            return std::nullopt;
+          }
+
+          // Swap rows in both matrices
+          if (pivot_row != col) {
+            std::swap(mat[col], mat[pivot_row]);
+            std::swap(inv[col], inv[pivot_row]);
+          }
+
+          // Normalize pivot row
+          const T pivot_inv = T(1) / mat[col][col];
+          mat[col] *= pivot_inv;
+          inv[col] *= pivot_inv;
+
+          // Eliminate other rows
+          for (size_t row = 0; row < N; ++row) {
+            if (row != col) {
+              const T factor = mat[row][col];
+              mat[row] -= factor * mat[col];
+              inv[row] -= factor * inv[col];
+            }
           }
         }
-        tmp[N - 1] /= tmp[N - 1][N - 1];
 
-        // null top triangle
-        for (int i = N - 2; i >= 0; i--) {
-          for (int j = i; j >= 0; j--) {
-            tmp[j] -= std::abs(tmp[i + 1][i + 1]) <= _epsilon ? static_cast<T>(0) : tmp[i + 1] * tmp[j][i + 1];
-          }
-        }
-
-        std::array<RowT, N> res;
-        std::for_each(io.begin(), io.end(),
-          [&tmp, &res](auto i) {
-            auto [a, b] = stdx::split<N, N>(tmp[i]._data);
-            res[i] = stdx::simd_cast<SimdImpl<T, N>>(b);
-          });
-
-        return res;
+        return inv;
       }
-#else
-      // dummy
-      constexpr Matr inversed() const noexcept {
-        return {};
-      }
-#endif
 
       constexpr Matr & inverse() noexcept {
         *this = inversed();

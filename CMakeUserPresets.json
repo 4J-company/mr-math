@@ -1,0 +1,49 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "custom-base",
+      "hidden": true,
+      "inherits": [ "base" ],
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CPM_SOURCE_CACHE": "D:/Cache/CPM"
+      }
+    },
+    {
+      "name": "gcc-base",
+      "hidden": true,
+      "inherits": [ "custom-base" ],
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++"
+      }
+    },
+    {
+      "name": "gcc-release",
+      "displayName": "GCC Release",
+      "inherits": [ "gcc-base", "release", "build-all" ]
+    },
+    {
+      "name": "gcc-debug",
+      "displayName": "GCC Debug",
+      "inherits": [ "gcc-base", "debug", "build-all" ]
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "gcc-debug",
+      "displayName": "GCC Debug",
+      "configurePreset": "gcc-debug"
+    },
+    {
+      "name": "gcc-release",
+      "displayName": "GCC Release",
+      "configurePreset": "gcc-release"
+    }
+  ]
+}

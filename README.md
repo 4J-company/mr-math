@@ -28,10 +28,24 @@ target_link_libraries(<your-project>
 ```
 
 ## Benchmarking
-To build projects benchmarks you have to generate CMake with `-D MR_MATH_ENABLE_BENCHMARK=ON`. \
+#### Easiest way:
+```bash
+bash run-bench-viz.sh
+```
+NOTE: requires `python`, `pandas`, `matplotlib`, `numpy`
+
+#### With console output:
+```bash
+cmake --preset=benchmark
+cmake --build build/benchmark
+./build/benchmark/mr-math-bench
+```
+
+#### More advanced benchmark configuration
+To build benchmarks you have to generate CMake with `-D MR_MATH_ENABLE_BENCHMARK=ON`. \
 Note that this will not modify `CMAKE_BUILD_TYPE` or add any optimizations to compiler flags. \
 In order to add tested compiler flags please specify the preset. \
-**Note that specifying preset doesn't affect** `CMAKE_BUILD_TYPE`
+**Note that specifying preset doesn't affect `CMAKE_BUILD_TYPE` either**.
 #### Available presets:
 - `MR_MATH_PRESET_OPTIMIZED` \
     Adds `-ffast-math`, this hurts accuracy a little but increases perf a lot

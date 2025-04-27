@@ -66,7 +66,7 @@ endif()
 
 if (MR_MATH_ENABLE_TESTING)
   include(GoogleTest)
-  add_executable(${MR_MATH_TESTS_NAME} "tests/main.cpp")
+  add_executable(${MR_MATH_TESTS_NAME} "tests/misc.cpp" "tests/matr.cpp" "tests/vec.cpp" "tests/quat.cpp")
   target_link_libraries(${MR_MATH_TESTS_NAME} PRIVATE gtest_main ${MR_MATH_LIB_NAME})
   gtest_discover_tests(${MR_MATH_TESTS_NAME})
 endif()

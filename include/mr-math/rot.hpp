@@ -49,21 +49,21 @@ inline namespace math {
 
         // angle in radians
         constexpr Rotation & operator+=(Pitch<T> angle_rad) noexcept {
-          _data *= mr::rotate(angle_rad.value, right());
+          _data *= mr::rotate(right(), angle_rad.value);
 
           return *this;
         }
 
         // angle in radians
         constexpr Rotation & operator+=(Yaw<T> angle_rad) noexcept {
-          _data *= mr::rotate(angle_rad.value, up());
+          _data *= mr::rotate(up(), angle_rad.value);
 
           return *this;
         }
 
         // angle in radians
         constexpr Rotation & operator+=(Roll<T> angle_rad) noexcept {
-          _data *= mr::rotate(angle_rad.value, direction());
+          _data *= mr::rotate(direction(), angle_rad.value);
 
           return *this;
         }

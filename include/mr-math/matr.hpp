@@ -437,20 +437,20 @@ inline namespace math
           constexpr RotateMatr() = default;
           constexpr RotateMatr(mr::Quat<T> rotate) : _data(rotate) {}
 
-          constexpr RotateMatr(mr::Radians<T> rad, mr::Norm3<T> v) noexcept
-            : _data(rad, (mr::Vec3<T>)v) { }
+          constexpr RotateMatr(mr::Norm3<T> axis, mr::Radians<T> angle) noexcept
+            : _data(angle, (mr::Vec3<T>)axis) { }
 
-          constexpr RotateMatr(mr::Radians<T> rad, mr::Vec3<T> v) noexcept
-            : RotateMatr(rad, v.normalized_unchecked()) {}
+          constexpr RotateMatr(mr::Vec3<T> axis, mr::Radians<T> angle) noexcept
+            : RotateMatr(angle, axis.normalized_unchecked()) {}
 
           constexpr RotateMatr(mr::Yaw<T> angle) noexcept
-            : RotateMatr(angle.value, mr::Norm3<T>(mr::unchecked, mr::axis::y)) { }
+            : RotateMatr(mr::Norm3<T>(mr::unchecked, mr::axis::y), angle.value) { }
 
           constexpr RotateMatr(mr::Pitch<T> angle) noexcept
-            : RotateMatr(angle.value, mr::Norm3<T>(mr::unchecked, mr::axis::x)) { }
+            : RotateMatr(mr::Norm3<T>(mr::unchecked, mr::axis::x), angle.value) { }
 
           constexpr RotateMatr(mr::Roll<T> angle) noexcept
-            : RotateMatr(angle.value, mr::Norm3<T>(mr::unchecked, mr::axis::z)) { }
+            : RotateMatr(mr::Norm3<T>(mr::unchecked, mr::axis::z), angle.value) { }
 
           constexpr RotateMatr &inverse() noexcept {
             _data.inverse();
@@ -496,7 +496,7 @@ inline namespace math
       }
 
     template <typename T, std::size_t N>
-      constexpr ScaleMatr<T, N> translate(mr::Vec<T, N> v) noexcept {
+      constexpr TranslateMatr<T, N> translate(mr::Vec<T, N> v) noexcept {
         return TranslateMatr<T, N>(v);
       }
 
@@ -506,13 +506,24 @@ inline namespace math
       }
 
     template <typename T>
-      constexpr RotateMatr<T> rotate(mr::Radians<T> rad, mr::Vec3<T> v) noexcept {
-        return RotateMatr(rad, v);
+      constexpr RotateMatr<T> rotate(mr::Vec3<T> axis, mr::Radians<T> angle) noexcept {
+        return RotateMatr(axis, angle);
       }
 
     template <typename T>
-      constexpr RotateMatr<T> rotate(mr::Radians<T> rad, mr::Norm3<T> v) noexcept {
-        return RotateMatr(rad, v);
+      constexpr RotateMatr<T> rotate(mr::Norm3<T> axis, mr::Radians<T> angle) noexcept {
+        return RotateMatr(axis, angle);
+      }
+
+    // mr::Degrees overload are required because T argument for mr::Radians cannot be deduced from mr::Degrees value
+    template <typename T>
+      constexpr RotateMatr<T> rotate(mr::Vec3<T> axis, mr::Degrees<T> angle) noexcept {
+        return RotateMatr(axis, mr::Radians<T>(angle));
+      }
+
+    template <typename T>
+      constexpr RotateMatr<T> rotate(mr::Norm3<T> axis, mr::Degrees<T> angle) noexcept {
+        return RotateMatr(axis, mr::Radians<T>(angle));
       }
 
     template <typename T>

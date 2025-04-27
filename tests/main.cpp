@@ -253,18 +253,28 @@ TEST_F(MatrixTest, Inverse3x3) {
   EXPECT_TRUE(equal(inv.value(), expected, 0.001));
 }
 
-TEST_F(MatrixTest, ScaleVector) {
-  EXPECT_EQ(mr::Vec3f(1, -1, 0) * mr::ScaleMatr3f({30, 47, 80}), mr::Vec3f(30, -47, 0));
+TEST(TransformTest, ScaleVector) {
+  EXPECT_EQ(mr::Vec3f(1, -1, 0) * mr::scale(mr::Vec3f{30, 47, 80}), mr::Vec3f(30, -47, 0));
 }
 
-TEST_F(MatrixTest, TranslateVector) {
-  EXPECT_EQ(mr::Vec3f(0, 0, 22) * mr::TranslateMatr3f({30, 47, 80}), mr::Vec3f(30, 47, 102));
+TEST(TransformTest, TranslateVector) {
+  EXPECT_EQ(mr::Vec3f(0, 0, 22) * mr::translate(mr::Vec3f{30, 47, 80}), mr::Vec3f(30, 47, 102));
 }
 
-TEST_F(MatrixTest, RotateVector) {
+TEST(TransformTest, RotateVector) {
   mr::Vec3f v{30, 47, 80};
-  mr::Vec3f expected{ 75.6129, 25.2055, 56.1816 };
-  EXPECT_TRUE(mr::equal(v * mr::rotate(mr::Radiansf(102_deg), mr::Norm3f(1, 1, 1)), expected, 0.001));
+  mr::Vec3f expected{69.0185819718,23.0733671242,64.908050904};
+  EXPECT_TRUE(mr::equal(v * mr::rotate(mr::Norm3f(1, 1, 1), 102_rad), expected, 0.0001));
+
+  EXPECT_TRUE(mr::equal(mr::axis::x * mr::rotate(mr::Yaw(90_deg)), mr::axis::z));
+  EXPECT_TRUE(mr::equal(mr::axis::y * mr::rotate(mr::Pitch(90_deg)), -mr::axis::z));
+  EXPECT_TRUE(mr::equal(mr::axis::z * mr::rotate(mr::Roll(90_deg)), mr::axis::z));
+}
+
+TEST(TransformTest, TransformVector) {
+  mr::Vec3f v = mr::axis::x;
+  mr::Vec3f expected{0};
+  EXPECT_TRUE(mr::equal(v * mr::scale(mr::Vec3f{2}) * mr::rotate(mr::Yaw(90_deg)) * mr::translate(mr::Vec3f{0, 0, 2}), expected, 0.001));
 }
 
 class QuaternionTest : public ::testing::Test {

@@ -7,130 +7,79 @@
   },
   "configurePresets": [
     {
-      "name": "default",
-      "displayName": "Default Configuration",
-      "description": "Standard build with no special optimizations",
+      "name": "base",
+      "description": "Base parameters for every preset",
       "hidden": true,
+      "binaryDir": "${sourceDir}/build/${presetName}",
       "cacheVariables": {
         "MR_MATH_ENABLE_BENCHMARK": "OFF",
         "MR_MATH_ENABLE_TESTING": "OFF",
         "MR_MATH_PRESET_OPTIMIZED": "OFF",
         "MR_MATH_PRESET_BENCHMARK": "OFF",
         "MR_MATH_PRESET_PROFILING": "OFF"
-      },
-      "binaryDir": "${sourceDir}/build/default"
+      }
     },
     {
       "name": "debug",
-      "displayName": "Debug",
-      "inherits": "default",
+      "description": "Base parameters for debug builds",
+      "hidden": true,
+      "inherits": [ "base" ],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
-      },
-      "binaryDir": "${sourceDir}/build/debug"
+      }
     },
     {
       "name": "release",
-      "displayName": "Release",
-      "inherits": "default",
+      "description": "Base parameters for release builds",
+      "hidden": true,
+      "inherits": [ "base" ],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
-      },
-      "binaryDir": "${sourceDir}/build/release"
+      }
     },
     {
       "name": "optimized",
-      "displayName": "Optimized Build",
-      "description": "Build with -ffast-math for better performance (may affect accuracy)",
-      "inherits": "release",
+      "description": "Base parameters for optimized builds (extra persomance with less accuracy)",
+      "hidden": true,
+      "inherits": [ "release" ],
       "cacheVariables": {
         "MR_MATH_PRESET_OPTIMIZED": "ON"
-      },
-      "binaryDir": "${sourceDir}/build/optimized"
+      }
     },
     {
-      "name": "benchmark",
-      "displayName": "Benchmark Build",
-      "description": "Maximum optimization for benchmarking (-march=native, -ffast-math). Not portable!",
-      "inherits": "optimized",
+      "name": "testing",
+      "description": "Base parameters for testing builds",
+      "hidden": true,
+      "inherits": [ "base" ],
       "cacheVariables": {
-        "MR_MATH_PRESET_BENCHMARK": "ON",
+        "MR_MATH_ENABLE_TESTING": "ON"
+      }
+    },
+    {
+      "name": "benchmarking",
+      "description": "Configuration for not portable benchmarking builds",
+      "hidden": true,
+      "inherits": [ "optimized" ],
+      "cacheVariables": {
         "MR_MATH_ENABLE_BENCHMARK": "ON",
+        "MR_MATH_PRESET_BENCHMARK": "ON",
         "BENCHMARK_ENABLE_LIBPFM": "ON"
-      },
-      "binaryDir": "${sourceDir}/build/benchmark"
+      }
     },
     {
       "name": "profiling",
-      "displayName": "Profiling Build",
-      "description": "Build with profiling tools enabled (-lprofiler -ltcmalloc)",
-      "inherits": "release",
+      "description": "Base parameters for profiling builds",
+      "hidden": true,
+      "inherits": [ "base" ],
       "cacheVariables": {
         "MR_MATH_PRESET_PROFILING": "ON"
-      },
-      "binaryDir": "${sourceDir}/build/profiling"
+      }
     },
     {
-      "name": "test",
-      "displayName": "Test Build",
-      "description": "Build with tests enabled",
-      "inherits": "debug",
-      "cacheVariables": {
-        "MR_MATH_ENABLE_TESTING": "ON"
-      },
-      "binaryDir": "${sourceDir}/build/test"
-    },
-    {
-      "name": "test-release",
-      "displayName": "Release Test Build",
-      "description": "Build with tests enabled in release mode",
-      "inherits": "release",
-      "cacheVariables": {
-        "MR_MATH_ENABLE_TESTING": "ON"
-      },
-      "binaryDir": "${sourceDir}/build/test-release"
-    }
-  ],
-  "buildPresets": [
-    {
-      "name": "default",
-      "configurePreset": "default",
-      "configuration": "Release"
-    },
-    {
-      "name": "debug",
-      "configurePreset": "debug",
-      "configuration": "Debug"
-    },
-    {
-      "name": "release",
-      "configurePreset": "release",
-      "configuration": "Release"
-    },
-    {
-      "name": "optimized",
-      "configurePreset": "optimized",
-      "configuration": "Release"
-    },
-    {
-      "name": "benchmark",
-      "configurePreset": "benchmark",
-      "configuration": "Release"
-    },
-    {
-      "name": "profiling",
-      "configurePreset": "profiling",
-      "configuration": "Release"
-    },
-    {
-      "name": "test",
-      "configurePreset": "test",
-      "configuration": "Debug"
-    },
-    {
-      "name": "test-release",
-      "configurePreset": "test-release",
-      "configuration": "Release"
+      "name": "build-all",
+      "description": "Configuration for building all targets",
+      "hidden": true,
+      "inherits": [ "testing", "benchmarking" ]
     }
   ]
 }

@@ -149,6 +149,52 @@ inline namespace math {
     using ValueT = float;
 
     HSLAColor() = default;
+
+    template <std::floating_point T>
+      HSLAColor(T h, T s, T l, T a = 1) noexcept
+        : _data(h, s, l, a) {}
+
+    HSLAColor(Vec4f hsla) noexcept
+      : _data(hsla) {}
+
+    template <std::integral T>
+      HSLAColor(T h, T s, T l, T a = 255) noexcept
+        : _data(h, s, l, a) {
+        assert(h <= 255);
+        assert(s <= 255);
+        assert(l <= 255);
+        assert(a <= 255);
+        _data /= 255;
+      }
+
+    explicit HSLAColor(uint32_t hsla) noexcept
+      : HSLAColor(
+        uint8_t((hsla & 0xFF'00'00'00) >> 24),
+        uint8_t((hsla & 0x00'FF'00'00) >> 16),
+        uint8_t((hsla & 0x00'00'FF'00) >> 8),
+        uint8_t((hsla & 0x00'00'00'FF))
+      ) {}
+
+    // setters
+    void h(ValueT h) noexcept { _data.x(h); }
+    void s(ValueT s) noexcept { _data.y(s); }
+    void l(ValueT l) noexcept { _data.z(l); }
+    void a(ValueT a) noexcept { _data.w(a); }
+    void set(size_t i, ValueT value) noexcept {
+      assert(i < 4);
+      _data.set(i, value);
+    }
+
+    // getters
+    [[nodiscard]] constexpr ValueT h() const noexcept { return _data.x(); }
+    [[nodiscard]] constexpr ValueT s() const noexcept { return _data.y(); }
+    [[nodiscard]] constexpr ValueT l() const noexcept { return _data.z(); }
+    [[nodiscard]] constexpr ValueT a() const noexcept { return _data.w(); }
+    [[nodiscard]] constexpr ValueT operator[](size_t i) const {
+      assert(i < 4);
+      return _data[i];
+    }
+
   };
 
   struct HSVAColor {
@@ -161,6 +207,52 @@ inline namespace math {
     using ValueT = float;
 
     HSVAColor() = default;
+
+    template <std::floating_point T>
+      HSVAColor(T h, T s, T v, T a = 1) noexcept
+        : _data(h, s, v, a) {}
+
+    HSVAColor(Vec4f hsva) noexcept
+      : _data(hsva) {}
+
+    template <std::integral T>
+      HSVAColor(T h, T s, T v, T a = 255) noexcept
+        : _data(h, s, v, a) {
+        assert(h <= 255);
+        assert(s <= 255);
+        assert(v <= 255);
+        assert(a <= 255);
+        _data /= 255;
+      }
+
+    explicit HSVAColor(uint32_t hsva) noexcept
+      : HSVAColor(
+        uint8_t((hsva & 0xFF'00'00'00) >> 24),
+        uint8_t((hsva & 0x00'FF'00'00) >> 16),
+        uint8_t((hsva & 0x00'00'FF'00) >> 8),
+        uint8_t((hsva & 0x00'00'00'FF))
+      ) {}
+
+    // setters
+    void h(ValueT h) noexcept { _data.x(h); }
+    void s(ValueT s) noexcept { _data.y(s); }
+    void v(ValueT v) noexcept { _data.z(v); }
+    void a(ValueT a) noexcept { _data.w(a); }
+    void set(size_t i, ValueT value) noexcept {
+      assert(i < 4);
+      _data.set(i, value);
+    }
+
+    // getters
+    [[nodiscard]] constexpr ValueT h() const noexcept { return _data.x(); }
+    [[nodiscard]] constexpr ValueT s() const noexcept { return _data.y(); }
+    [[nodiscard]] constexpr ValueT v() const noexcept { return _data.z(); }
+    [[nodiscard]] constexpr ValueT a() const noexcept { return _data.w(); }
+    [[nodiscard]] constexpr ValueT operator[](size_t i) const {
+      assert(i < 4);
+      return _data[i];
+    }
+
   };
 
   struct CMYKColor {
@@ -173,6 +265,52 @@ inline namespace math {
     using ValueT = float;
 
     CMYKColor() = default;
+
+    template <std::floating_point T>
+      CMYKColor(T c, T m, T y, T k) noexcept
+        : _data(c, m, y, k) {}
+
+    CMYKColor(Vec4f cmyk) noexcept
+      : _data(cmyk) {}
+
+    template <std::integral T>
+      CMYKColor(T c, T m, T y, T k) noexcept
+        : _data(c, m, y, k) {
+        assert(c <= 255);
+        assert(m <= 255);
+        assert(y <= 255);
+        assert(k <= 255);
+        _data /= 255;
+      }
+
+    explicit CMYKColor(uint32_t cmyk) noexcept
+      : CMYKColor(
+        uint8_t((cmyk & 0xFF'00'00'00) >> 24),
+        uint8_t((cmyk & 0x00'FF'00'00) >> 16),
+        uint8_t((cmyk & 0x00'00'FF'00) >> 8),
+        uint8_t((cmyk & 0x00'00'00'FF))
+      ) {}
+
+    // setters
+    void c(ValueT c) noexcept { _data.x(c); }
+    void m(ValueT m) noexcept { _data.y(m); }
+    void y(ValueT y) noexcept { _data.z(y); }
+    void k(ValueT k) noexcept { _data.w(k); }
+    void set(size_t i, ValueT value) noexcept {
+      assert(i < 4);
+      _data.set(i, value);
+    }
+
+    // getters
+    [[nodiscard]] constexpr ValueT c() const noexcept { return _data.x(); }
+    [[nodiscard]] constexpr ValueT m() const noexcept { return _data.y(); }
+    [[nodiscard]] constexpr ValueT y() const noexcept { return _data.z(); }
+    [[nodiscard]] constexpr ValueT k() const noexcept { return _data.w(); }
+    [[nodiscard]] constexpr ValueT operator[](size_t i) const {
+      assert(i < 4);
+      return _data[i];
+    }
+
   };
 
   struct OKLABColor {
@@ -187,29 +325,49 @@ inline namespace math {
     OKLABColor() = default;
 
     template <std::floating_point T>
-      OKLABColor(T r, T g, T b, T a = 1) noexcept
-        : _data(r, g, b, a) {}
+      OKLABColor(T l, T m, T s, T a = 1) noexcept
+        : _data(l, m, s, a) {}
 
-    OKLABColor(Vec4f rgba) noexcept
-      : _data(rgba) {}
+    OKLABColor(Vec4f lmsa) noexcept
+      : _data(lmsa) {}
 
     template <std::integral T>
-      OKLABColor(T r, T g, T b, T a = 255) noexcept
-        : _data(r, g, b, a) {
-        assert(r <= 255);
-        assert(g <= 255);
-        assert(b <= 255);
+      OKLABColor(T l, T m, T s, T a = 255) noexcept
+        : _data(l, m, s, a) {
+        assert(l <= 255);
+        assert(m <= 255);
+        assert(s <= 255);
         assert(a <= 255);
         _data /= 255;
       }
 
-    explicit OKLABColor(uint32_t rgba) noexcept
+    explicit OKLABColor(uint32_t lmsa) noexcept
       : OKLABColor(
-        uint8_t((rgba & 0xFF'00'00'00) >> 24),
-        uint8_t((rgba & 0x00'FF'00'00) >> 16),
-        uint8_t((rgba & 0x00'00'FF'00) >> 8),
-        uint8_t((rgba & 0x00'00'00'FF))
+        uint8_t((lmsa & 0xFF'00'00'00) >> 24),
+        uint8_t((lmsa & 0x00'FF'00'00) >> 16),
+        uint8_t((lmsa & 0x00'00'FF'00) >> 8),
+        uint8_t((lmsa & 0x00'00'00'FF))
       ) {}
+
+    // setters
+    void l(ValueT l) noexcept { _data.x(l); }
+    void m(ValueT m) noexcept { _data.y(m); }
+    void s(ValueT s) noexcept { _data.z(s); }
+    void a(ValueT a) noexcept { _data.w(a); }
+    void set(size_t i, ValueT value) noexcept {
+      assert(i < 4);
+      _data.set(i, value);
+    }
+
+    // getters
+    [[nodiscard]] constexpr ValueT l() const noexcept { return _data.x(); }
+    [[nodiscard]] constexpr ValueT m() const noexcept { return _data.y(); }
+    [[nodiscard]] constexpr ValueT s() const noexcept { return _data.z(); }
+    [[nodiscard]] constexpr ValueT a() const noexcept { return _data.w(); }
+    [[nodiscard]] constexpr ValueT operator[](size_t i) const {
+      assert(i < 4);
+      return _data[i];
+    }
   };
 
   template <>

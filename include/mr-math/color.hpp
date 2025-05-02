@@ -8,25 +8,25 @@ namespace mr {
 inline namespace math {
 
   // color in RGBA float format
-  struct alignas(float) [[nodiscard]] Color {
+  struct alignas(float) [[nodiscard]] RGBAColor {
   public:
     using ValueT = float;
 
-    Color() = default;
-    Color(const Color &) = default;
-    Color& operator=(const Color &) = default;
-    Color(Color &&) = default;
-    Color& operator=(Color &&) = default;
+    RGBAColor() = default;
+    RGBAColor(const RGBAColor &) = default;
+    RGBAColor& operator=(const RGBAColor &) = default;
+    RGBAColor(RGBAColor &&) = default;
+    RGBAColor& operator=(RGBAColor &&) = default;
 
     template <std::floating_point T>
-      Color(T r, T g, T b, T a = 1) noexcept
+      RGBAColor(T r, T g, T b, T a = 1) noexcept
         : _data{Vec4f{r, g, b, a}} {}
 
-    Color(Vec4f rgba) noexcept
+    RGBAColor(Vec4f rgba) noexcept
       : _data{rgba} {}
 
     template <std::integral T>
-      Color(T r, T g, T b, T a = 255) noexcept
+      RGBAColor(T r, T g, T b, T a = 255) noexcept
         : _data{r, g, b, a} {
         assert(r <= 255);
         assert(g <= 255);
@@ -35,8 +35,8 @@ inline namespace math {
         _data /= 255;
       }
 
-    explicit Color(uint32_t rgba) noexcept
-      : Color(
+    explicit RGBAColor(uint32_t rgba) noexcept
+      : RGBAColor(
         uint8_t((rgba & 0xFF'00'00'00) >> 24),
         uint8_t((rgba & 0x00'FF'00'00) >> 16),
         uint8_t((rgba & 0x00'00'FF'00) >> 8),
@@ -85,25 +85,25 @@ inline namespace math {
       return {a(), b(), g(), r()};
     }
 
-    friend Color operator+(Color lhs, const Color &rhs) noexcept {
+    friend RGBAColor operator+(RGBAColor lhs, const RGBAColor &rhs) noexcept {
       lhs += rhs;
       return lhs;
     }
 
-    Color &operator+=(const Color &other) noexcept {
+    RGBAColor &operator+=(const RGBAColor &other) noexcept {
       _data += other._data;;
       return *this;
     }
 
-    bool operator==(const Color &other) const noexcept {
+    bool operator==(const RGBAColor &other) const noexcept {
       return _data == other._data;
     }
 
-    bool equal(const Color &other, ValueT eps = epsilon<ValueT>()) const noexcept {
+    bool equal(const RGBAColor &other, ValueT eps = epsilon<ValueT>()) const noexcept {
       return _data.equal(other._data, eps);
     }
 
-    friend std::ostream & operator<<(std::ostream &s, const Color &color) noexcept {
+    friend std::ostream & operator<<(std::ostream &s, const RGBAColor &color) noexcept {
       Vec4u comps = color._data * 255;
       comps.clamp(0, 256);
       s << '#' << std::hex << std::uppercase << comps[0] << comps[1] << comps[2] << comps[3] << std::nouppercase << std::dec;
@@ -116,9 +116,9 @@ inline namespace math {
 
 namespace literals {
 
-  inline Color operator""_rgba(unsigned long long value) {
+  inline RGBAColor operator""_rgba(unsigned long long value) {
     assert(value <= 0xFF'FF'FF'FF);
-    return Color{static_cast<uint32_t>(value)};
+    return RGBAColor{static_cast<uint32_t>(value)};
   }
 
 } // namespace literals
@@ -130,12 +130,12 @@ namespace literals {
 namespace std
 {
   template <>
-    struct tuple_size<mr::Color>
+    struct tuple_size<mr::RGBAColor>
       : std::integral_constant<size_t, 4> {};
 
   template <size_t I>
-    struct tuple_element<I, mr::Color> {
-      using type = mr::Color::ValueT;
+    struct tuple_element<I, mr::RGBAColor> {
+      using type = mr::RGBAColor::ValueT;
     };
 }
 #endif // __cpp_structured_bindings

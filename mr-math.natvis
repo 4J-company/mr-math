@@ -104,8 +104,8 @@
     <DisplayString>{_data} deg</DisplayString>
   </Type>
 
-  <!-- mr::Color -->
-  <Type Name="mr::Color">
+  <!-- mr::RGBAColor -->
+  <Type Name="mr::RGBAColor">
     <DisplayString>R={r()}, G={g()}, B={b()}, A={a()}}</DisplayString>
     <Expand>
       <Item Name="R">r()</Item>

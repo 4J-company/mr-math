@@ -11,13 +11,6 @@
       "description": "Base parameters for every preset",
       "hidden": true,
       "binaryDir": "${sourceDir}/build/${presetName}",
-      "cacheVariables": {
-        "MR_MATH_ENABLE_BENCHMARK": "OFF",
-        "MR_MATH_ENABLE_TESTING": "OFF",
-        "MR_MATH_PRESET_OPTIMIZED": "OFF",
-        "MR_MATH_PRESET_BENCHMARK": "OFF",
-        "MR_MATH_PRESET_PROFILING": "OFF"
-      }
     },
     {
       "name": "debug",

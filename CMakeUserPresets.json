@@ -3,16 +3,9 @@
   "configurePresets": [
     {
       "name": "custom-base",
+      "description": "Put here parameters for your custom confiurations",
       "hidden": true,
-      "inherits": [ "base" ],
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
-      },
-      "generator": "Ninja",
-      "cacheVariables": {
-        "CPM_SOURCE_CACHE": "D:/Cache/CPM"
-      }
+      "inherits": [ "base" ]
     },
     {
       "name": "gcc-base",
@@ -32,18 +25,47 @@
       "name": "gcc-debug",
       "displayName": "GCC Debug",
       "inherits": [ "gcc-base", "debug", "build-all" ]
+    },
+    {
+      "name": "msvc-base",
+      "hidden": true,
+      "inherits": [ "custom-base" ],
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "cl",
+        "CMAKE_CXX_COMPILER": "cl"
+      }
+    },
+    {
+      "name": "msvc-release",
+      "displayName": "MSVC Release",
+      "inherits": [ "msvc-base", "release", "build-all" ]
+    },
+    {
+      "name": "msvc-debug",
+      "displayName": "MSVC Debug",
+      "inherits": [ "msvc-base", "debug", "build-all" ]
     }
   ],
   "buildPresets": [
+    {
+      "name": "gcc-release",
+      "displayName": "GCC Release",
+      "configurePreset": "gcc-release"
+    },
     {
       "name": "gcc-debug",
       "displayName": "GCC Debug",
       "configurePreset": "gcc-debug"
     },
     {
-      "name": "gcc-release",
-      "displayName": "GCC Release",
-      "configurePreset": "gcc-release"
+      "name": "msvc-release",
+      "displayName": "MSVC Release",
+      "configurePreset": "msvc-release"
+    },
+    {
+      "name": "msvc-debug",
+      "displayName": "MSVC Debug",
+      "configurePreset": "msvc-debug"
     }
   ]
 }

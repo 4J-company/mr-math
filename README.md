@@ -28,64 +28,16 @@ target_link_libraries(<your-project>
 ```
 
 ## Building
-We provide comprehensive set of configurations via CMake presets (see [CMakePresets.json](CMakePresets.json)).
-To enable presets use `cmake --preset <configure_preset_name_> ...` or `cmake --build --preset <build_preset_name> ...`
+We provide comprehensive set of configurations via CMake presets.
+To enable presets, use `cmake --preset <configure_preset_name_> ...` or `cmake --build --preset <build_preset_name> ...`.
 
-You can also create custom presets with additional settings in `CMakeUserPresets.json`.
-Custom presets for GCC & Ninja may look like this:
-```json
-{
-  "version": 3,
-  "configurePresets": [
-    {
-      "name": "custom-base",
-      "hidden": true,
-      "inherits": [ "base" ],
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
-      },
-      "generator": "Ninja",
-      "cacheVariables": {
-        "CPM_SOURCE_CACHE": "D:/Cache/CPM"
-      }
-    },
-    {
-      "name": "gcc-base",
-      "hidden": true,
-      "inherits": [ "custom-base" ],
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "gcc",
-        "CMAKE_CXX_COMPILER": "g++"
-      }
-    },
-    {
-      "name": "gcc-release",
-      "displayName": "GCC Release",
-      "inherits": [ "gcc-base", "release", "build-all" ]
-    },
-    {
-      "name": "gcc-debug",
-      "displayName": "GCC Debug",
-      "inherits": [ "gcc-base", "debug", "build-all" ]
-    }
-  ],
-  "buildPresets": [
-    {
-      "name": "gcc-debug",
-      "displayName": "GCC Debug",
-      "configurePreset": "gcc-debug"
-    },
-    {
-      "name": "gcc-release",
-      "displayName": "GCC Release",
-      "configurePreset": "gcc-release"
-    }
-  ]
-}
-
-```
+You can found some ready-to-use configurations (e.g. GCC/MSVC debug/release) in [CMakeUserPresets.json](CMakeUserPresets.json).
+This file can be changed to fit your needs. To see basic available configuration options, check [CMakePresets.json](CMakePresets.json).
+If you modify [CMakeUserPresets.json](CMakeUserPresets.json) and don't want git to track your changes, use
 ```bash
+ git update-index --assume-unchanged CMakeUserPresets.json
+```
+
 
 ## Benchmarking
 #### Easiest way:

@@ -1,4 +1,5 @@
 #include "mr-math/math.hpp"
+#include "bench_options.hpp"
 #include <benchmark/benchmark.h>
 #include <typeinfo>
 
@@ -487,14 +488,16 @@ static void BM_ColorLiteral(benchmark::State& state) {
 }
 
 // ====================== Registration ======================
-#define REGISTER_BENCHMARKS(Type, Size) \
-    BENCHMARK_TEMPLATE(BM_MatrixMultiply, Type, Size); \
-    BENCHMARK_TEMPLATE(BM_MatrixTranspose, Type, Size); \
+#define REGISTER_VEC_BENCHMARKS(Type, Size) \
     BENCHMARK_TEMPLATE(BM_VectorDotProduct, Type, Size); \
     BENCHMARK_TEMPLATE(BM_VectorNormalize, Type, Size); \
+    BENCHMARK_TEMPLATE(BM_ZeroVectorNormalize, Type, Size)
+
+#define REGISTER_MATR_BENCHMARKS(Type, Size) \
+    BENCHMARK_TEMPLATE(BM_MatrixMultiply, Type, Size); \
+    BENCHMARK_TEMPLATE(BM_MatrixTranspose, Type, Size); \
     BENCHMARK_TEMPLATE(BM_RandomInverse, Type, Size); \
     BENCHMARK_TEMPLATE(BM_NearSingularInverse, Type, Size); \
-    BENCHMARK_TEMPLATE(BM_ZeroVectorNormalize, Type, Size); \
     BENCHMARK_TEMPLATE(BM_IdentityMatrixMultiply, Type, Size); \
     BENCHMARK_TEMPLATE(BM_MatrixMultiplyTranspose, Type, Size)
 
@@ -520,26 +523,52 @@ static void BM_ColorLiteral(benchmark::State& state) {
     BENCHMARK_TEMPLATE(BM_AABBEmptyContains, Type)
 
 // Register benchmarks for different types and sizes
-REGISTER_BENCHMARKS(int, 2);
-REGISTER_BENCHMARKS(int, 3);
-REGISTER_BENCHMARKS(int, 4);
-REGISTER_BENCHMARKS(float, 2);
-REGISTER_BENCHMARKS(float, 3);
-REGISTER_BENCHMARKS(float, 4);
-REGISTER_BENCHMARKS(double, 2);
-REGISTER_BENCHMARKS(double, 3);
-REGISTER_BENCHMARKS(double, 4);
+#if MR_MATH_ENABLE_VEC_BENCH
+REGISTER_VEC_BENCHMARKS(int, 2);
+REGISTER_VEC_BENCHMARKS(int, 3);
+REGISTER_VEC_BENCHMARKS(int, 4);
+REGISTER_VEC_BENCHMARKS(float, 2);
+REGISTER_VEC_BENCHMARKS(float, 3);
+REGISTER_VEC_BENCHMARKS(float, 4);
+REGISTER_VEC_BENCHMARKS(double, 2);
+REGISTER_VEC_BENCHMARKS(double, 3);
+REGISTER_VEC_BENCHMARKS(double, 4);
+#endif
 
+#if MR_MATH_ENABLE_MATR_BENCH
+REGISTER_MATR_BENCHMARKS(int, 2);
+REGISTER_MATR_BENCHMARKS(int, 3);
+REGISTER_MATR_BENCHMARKS(int, 4);
+REGISTER_MATR_BENCHMARKS(float, 2);
+REGISTER_MATR_BENCHMARKS(float, 3);
+REGISTER_MATR_BENCHMARKS(float, 4);
+REGISTER_MATR_BENCHMARKS(double, 2);
+REGISTER_MATR_BENCHMARKS(double, 3);
+REGISTER_MATR_BENCHMARKS(double, 4);
+#endif
+
+#if MR_MATH_ENABLE_CAM_BENCH
 REGISTER_CAMERA_BENCHMARKS(float);
 REGISTER_CAMERA_BENCHMARKS(double);
+#endif
 
+#if MR_MATH_ENABLE_QUAT_BENCH
 REGISTER_QUATERNION_BENCHMARKS(float);
 REGISTER_QUATERNION_BENCHMARKS(double);
+#endif
 
+#if MR_MATH_ENABLE_AABB_BENCH
 REGISTER_AABB_BENCHMARKS(float);
 REGISTER_AABB_BENCHMARKS(double);
 REGISTER_AABB_BENCHMARKS(int);
 REGISTER_AABB_BENCHMARKS(uint32_t);
+#endif
+
+#if MR_MATH_ENABLE_COLOR_BENCH
+BENCHMARK(BM_ColorConstructFromFloats);
+BENCHMARK(BM_ColorConstructFromIntegers);
+BENCHMARK(BM_ColorConstructFromPacked);
+BENCHMARK(BM_ColorLiteral);
 
 BENCHMARK_REGISTER_F(ColorBench, OperatorPlus);
 BENCHMARK_REGISTER_F(ColorBench, OperatorPlusAssign);
@@ -553,9 +582,6 @@ BENCHMARK_REGISTER_F(ColorBench, EqualWithEpsilon);
 BENCHMARK_REGISTER_F(ColorBench, MaxValueColor);
 BENCHMARK_REGISTER_F(ColorBench, ZeroValueColor);
 
-BENCHMARK(BM_ColorConstructFromFloats);
-BENCHMARK(BM_ColorConstructFromIntegers);
-BENCHMARK(BM_ColorConstructFromPacked);
-BENCHMARK(BM_ColorLiteral);
+#endif
 
 BENCHMARK_MAIN();

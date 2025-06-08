@@ -1,0 +1,12 @@
+#ifndef __MR_BENCH_OPTIONS_HPP_
+#define __MR_BENCH_OPTIONS_HPP_
+
+/* These macros are defined if corresponding CMake options are enabled. */
+#cmakedefine01 MR_MATH_ENABLE_VEC_BENCH
+#cmakedefine01 MR_MATH_ENABLE_MATR_BENCH
+#cmakedefine01 MR_MATH_ENABLE_QUAT_BENCH
+#cmakedefine01 MR_MATH_ENABLE_CAM_BENCH
+#cmakedefine01 MR_MATH_ENABLE_AABB_BENCH
+#cmakedefine01 MR_MATH_ENABLE_COLOR_BENCH
+
+#endif // __MR_BENCH_OPTIONS_HPP_

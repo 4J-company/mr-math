@@ -85,7 +85,6 @@ Custom presets for GCC & Ninja may look like this:
 }
 
 ```
-```bash
 
 ## Benchmarking
 #### Easiest way:
@@ -102,11 +101,16 @@ cmake --build build/benchmark
 ```
 
 #### More advanced benchmark configuration
-To build benchmarks you have to generate CMake with `-D MR_MATH_ENABLE_BENCHMARK=ON`. \
-Note that this will not modify `CMAKE_BUILD_TYPE` or add any optimizations to compiler flags. \
-In order to add tested compiler flags please specify the preset. \
-**Note that specifying preset doesn't affect `CMAKE_BUILD_TYPE` either**.
-#### Available presets:
+To build benchmarks, you can generate CMake with `benchmarking` preset. \
+If you are interested in specific results, you can disable particular benchmarks with the following options:
+- `MR_MATH_ENABLE_VEC_BENCH`
+- `MR_MATH_ENABLE_MATR_BENCH`
+- `MR_MATH_ENABLE_QUAT_BENCH`
+- `MR_MATH_ENABLE_AABB_BENCH`
+- `MR_MATH_ENABLE_CAM_BENCH`
+- `MR_MATH_ENABLE_COLOR_BENCH`
+
+#### Available options:
 - `MR_MATH_PRESET_OPTIMIZED` \
     Adds `-ffast-math`, this hurts accuracy a little but increases perf a lot
 - `MR_MATH_PRESET_BENCHMARK` \

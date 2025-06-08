@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1749297434546,
+  "lastUpdate": 1749386936167,
   "repoUrl": "https://github.com/4J-company/mr-math",
   "entries": {
     "Benchmark": [
@@ -20066,6 +20066,878 @@ window.BENCHMARK_DATA = {
             "value": 0.31184892864341957,
             "unit": "ns/iter",
             "extra": "iterations: 2250431900\ncpu: 0.31184131232765616 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "4J-company",
+            "username": "4J-company"
+          },
+          "committer": {
+            "name": "4J-company",
+            "username": "4J-company"
+          },
+          "id": "9138a5f856bb83fc0923a46fda1c260c5d467769",
+          "message": "Refactor CMake",
+          "timestamp": "2025-05-02T14:26:58Z",
+          "url": "https://github.com/4J-company/mr-math/pull/36/commits/9138a5f856bb83fc0923a46fda1c260c5d467769"
+        },
+        "date": 1749386935616,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_VectorDotProduct<int, 2>",
+            "value": 0.16093359232738505,
+            "unit": "ns/iter",
+            "extra": "iterations: 4323946461\ncpu: 0.1609173825984614 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorNormalize<int, 2>",
+            "value": 0.3150846289392351,
+            "unit": "ns/iter",
+            "extra": "iterations: 2190723725\ncpu: 0.31504272863069493 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ZeroVectorNormalize<int, 2>",
+            "value": 0.31590386705764323,
+            "unit": "ns/iter",
+            "extra": "iterations: 2251357866\ncpu: 0.3158624507188854 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorDotProduct<int, 3>",
+            "value": 0.155520870199793,
+            "unit": "ns/iter",
+            "extra": "iterations: 4503791839\ncpu: 0.15550211356027108 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorNormalize<int, 3>",
+            "value": 0.4664048949323195,
+            "unit": "ns/iter",
+            "extra": "iterations: 1494564979\ncpu: 0.4663907684136896 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ZeroVectorNormalize<int, 3>",
+            "value": 0.34658010847608606,
+            "unit": "ns/iter",
+            "extra": "iterations: 2024062489\ncpu: 0.34655219481220273 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorDotProduct<int, 4>",
+            "value": 0.15552308278491056,
+            "unit": "ns/iter",
+            "extra": "iterations: 4503511964\ncpu: 0.15552198408681747 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorNormalize<int, 4>",
+            "value": 5.592731822176075,
+            "unit": "ns/iter",
+            "extra": "iterations: 125179601\ncpu: 5.59258343537938 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ZeroVectorNormalize<int, 4>",
+            "value": 0.31107430846047057,
+            "unit": "ns/iter",
+            "extra": "iterations: 2248174420\ncpu: 0.3110628969793189 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorDotProduct<float, 2>",
+            "value": 0.15757800075287612,
+            "unit": "ns/iter",
+            "extra": "iterations: 4495787855\ncpu: 0.15757623376559443 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorNormalize<float, 2>",
+            "value": 0.31116218754539665,
+            "unit": "ns/iter",
+            "extra": "iterations: 2245922898\ncpu: 0.3111539063172244 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ZeroVectorNormalize<float, 2>",
+            "value": 0.3108974000806559,
+            "unit": "ns/iter",
+            "extra": "iterations: 2249339936\ncpu: 0.31088375296600784 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorDotProduct<float, 3>",
+            "value": 0.1554139294407071,
+            "unit": "ns/iter",
+            "extra": "iterations: 4491654355\ncpu: 0.15540249957635038 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorNormalize<float, 3>",
+            "value": 0.46660115120325446,
+            "unit": "ns/iter",
+            "extra": "iterations: 1498376031\ncpu: 0.4665588474032389 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ZeroVectorNormalize<float, 3>",
+            "value": 0.34684315074901156,
+            "unit": "ns/iter",
+            "extra": "iterations: 2022100928\ncpu: 0.34681374816123917 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorDotProduct<float, 4>",
+            "value": 0.15547352789114466,
+            "unit": "ns/iter",
+            "extra": "iterations: 4499017122\ncpu: 0.15546645323480499 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorNormalize<float, 4>",
+            "value": 0.6229971468130721,
+            "unit": "ns/iter",
+            "extra": "iterations: 1125357385\ncpu: 0.6229740368212002 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ZeroVectorNormalize<float, 4>",
+            "value": 0.31129765999785114,
+            "unit": "ns/iter",
+            "extra": "iterations: 2247575401\ncpu: 0.31128929809816913 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorDotProduct<double, 2>",
+            "value": 0.15559419995474416,
+            "unit": "ns/iter",
+            "extra": "iterations: 4501373298\ncpu: 0.155582524851064 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorNormalize<double, 2>",
+            "value": 0.6190611707283646,
+            "unit": "ns/iter",
+            "extra": "iterations: 1130617091\ncpu: 0.6190501493135486 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ZeroVectorNormalize<double, 2>",
+            "value": 0.3116341201923608,
+            "unit": "ns/iter",
+            "extra": "iterations: 2244458882\ncpu: 0.3116000580847344 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorDotProduct<double, 3>",
+            "value": 0.4506409202200819,
+            "unit": "ns/iter",
+            "extra": "iterations: 1553065684\ncpu: 0.45062464724447737 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorNormalize<double, 3>",
+            "value": 5.545369509706349,
+            "unit": "ns/iter",
+            "extra": "iterations: 126272028\ncpu: 5.544924446766608 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ZeroVectorNormalize<double, 3>",
+            "value": 0.6228566522395014,
+            "unit": "ns/iter",
+            "extra": "iterations: 1124169066\ncpu: 0.622838982299483 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorDotProduct<double, 4>",
+            "value": 0.15553631348156952,
+            "unit": "ns/iter",
+            "extra": "iterations: 4505028352\ncpu: 0.1555280305148229 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_VectorNormalize<double, 4>",
+            "value": 1.5543369956994066,
+            "unit": "ns/iter",
+            "extra": "iterations: 449862459\ncpu: 1.5542877095241299 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ZeroVectorNormalize<double, 4>",
+            "value": 0.3116694743602605,
+            "unit": "ns/iter",
+            "extra": "iterations: 2246180504\ncpu: 0.3116541732747584 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiply<int, 2>",
+            "value": 0.31110565892882763,
+            "unit": "ns/iter",
+            "extra": "iterations: 2245702201\ncpu: 0.31110140235374867 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixTranspose<int, 2>",
+            "value": 0.31140107676948836,
+            "unit": "ns/iter",
+            "extra": "iterations: 2248246619\ncpu: 0.3113817630520363 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_RandomInverse<int, 2>",
+            "value": 19.026924312094764,
+            "unit": "ns/iter",
+            "extra": "iterations: 36727995\ncpu: 19.02638167425152 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_NearSingularInverse<int, 2>",
+            "value": 16.164522243231698,
+            "unit": "ns/iter",
+            "extra": "iterations: 43287393\ncpu: 16.164005395289138 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IdentityMatrixMultiply<int, 2>",
+            "value": 0.31125133384161546,
+            "unit": "ns/iter",
+            "extra": "iterations: 2246507388\ncpu: 0.311249161135633 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiplyTranspose<int, 2>",
+            "value": 0.31129346747355596,
+            "unit": "ns/iter",
+            "extra": "iterations: 2247403046\ncpu: 0.3112835395703212 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiply<int, 3>",
+            "value": 0.9335364533766128,
+            "unit": "ns/iter",
+            "extra": "iterations: 749705433\ncpu: 0.9334656669081361 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixTranspose<int, 3>",
+            "value": 0.9334165834081849,
+            "unit": "ns/iter",
+            "extra": "iterations: 749954081\ncpu: 0.933384413438502 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_RandomInverse<int, 3>",
+            "value": 37.00721985551673,
+            "unit": "ns/iter",
+            "extra": "iterations: 18915891\ncpu: 37.004406823871186 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_NearSingularInverse<int, 3>",
+            "value": 33.35194075124684,
+            "unit": "ns/iter",
+            "extra": "iterations: 20994602\ncpu: 33.350686238300845 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IdentityMatrixMultiply<int, 3>",
+            "value": 8.388582799038,
+            "unit": "ns/iter",
+            "extra": "iterations: 83441730\ncpu: 8.388118822560356 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiplyTranspose<int, 3>",
+            "value": 0.9329829803353509,
+            "unit": "ns/iter",
+            "extra": "iterations: 750678130\ncpu: 0.9329849412290689 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiply<int, 4>",
+            "value": 1.2438593906433908,
+            "unit": "ns/iter",
+            "extra": "iterations: 562792192\ncpu: 1.2437864898452629 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixTranspose<int, 4>",
+            "value": 1.2438720789298767,
+            "unit": "ns/iter",
+            "extra": "iterations: 562838475\ncpu: 1.2438475656803643 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_RandomInverse<int, 4>",
+            "value": 37.371312710397845,
+            "unit": "ns/iter",
+            "extra": "iterations: 18741171\ncpu: 37.36904012027854 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_NearSingularInverse<int, 4>",
+            "value": 28.83591872751042,
+            "unit": "ns/iter",
+            "extra": "iterations: 24270058\ncpu: 28.834324046526724 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IdentityMatrixMultiply<int, 4>",
+            "value": 3.955830425690565,
+            "unit": "ns/iter",
+            "extra": "iterations: 177452446\ncpu: 3.9553073278009077 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiplyTranspose<int, 4>",
+            "value": 1.2436739967683772,
+            "unit": "ns/iter",
+            "extra": "iterations: 562736434\ncpu: 1.2436371962367059 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiply<float, 2>",
+            "value": 0.31128159756901747,
+            "unit": "ns/iter",
+            "extra": "iterations: 2246689491\ncpu: 0.31126413988286983 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixTranspose<float, 2>",
+            "value": 0.31128442255288846,
+            "unit": "ns/iter",
+            "extra": "iterations: 2250950315\ncpu: 0.3112827481489748 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_RandomInverse<float, 2>",
+            "value": 22.456575326882707,
+            "unit": "ns/iter",
+            "extra": "iterations: 31179659\ncpu: 22.455517457711824 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_NearSingularInverse<float, 2>",
+            "value": 12.12127812453043,
+            "unit": "ns/iter",
+            "extra": "iterations: 57720698\ncpu: 12.121205568234823 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IdentityMatrixMultiply<float, 2>",
+            "value": 0.3111203496371684,
+            "unit": "ns/iter",
+            "extra": "iterations: 2246774950\ncpu: 0.3111069936043216 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiplyTranspose<float, 2>",
+            "value": 0.31113102220032945,
+            "unit": "ns/iter",
+            "extra": "iterations: 2250302699\ncpu: 0.3111255718224598 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiply<float, 3>",
+            "value": 0.9344894770411312,
+            "unit": "ns/iter",
+            "extra": "iterations: 749682582\ncpu: 0.9344481008630378 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixTranspose<float, 3>",
+            "value": 0.9329779695572984,
+            "unit": "ns/iter",
+            "extra": "iterations: 750749189\ncpu: 0.9329506275364055 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_RandomInverse<float, 3>",
+            "value": 39.85517720859274,
+            "unit": "ns/iter",
+            "extra": "iterations: 17567884\ncpu: 39.854361003294294 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_NearSingularInverse<float, 3>",
+            "value": 17.442739898168842,
+            "unit": "ns/iter",
+            "extra": "iterations: 40132674\ncpu: 17.44185593015812 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IdentityMatrixMultiply<float, 3>",
+            "value": 4.249071362086162,
+            "unit": "ns/iter",
+            "extra": "iterations: 164087636\ncpu: 4.248761740951624 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiplyTranspose<float, 3>",
+            "value": 1.0402191782986692,
+            "unit": "ns/iter",
+            "extra": "iterations: 750173904\ncpu: 1.0401431106033188 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiply<float, 4>",
+            "value": 3.2931865097842983,
+            "unit": "ns/iter",
+            "extra": "iterations: 212690949\ncpu: 3.2930678916665928 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixTranspose<float, 4>",
+            "value": 2.4888467951694846,
+            "unit": "ns/iter",
+            "extra": "iterations: 280976728\ncpu: 2.48877490665349 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_RandomInverse<float, 4>",
+            "value": 21.903567029075383,
+            "unit": "ns/iter",
+            "extra": "iterations: 31936297\ncpu: 21.90310113285821 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_NearSingularInverse<float, 4>",
+            "value": 8.232129398578977,
+            "unit": "ns/iter",
+            "extra": "iterations: 85034813\ncpu: 8.23162040704436 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IdentityMatrixMultiply<float, 4>",
+            "value": 3.29455127554445,
+            "unit": "ns/iter",
+            "extra": "iterations: 212205372\ncpu: 3.294363193595308 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiplyTranspose<float, 4>",
+            "value": 5.9539927297818025,
+            "unit": "ns/iter",
+            "extra": "iterations: 117666077\ncpu: 5.953720102353732 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiply<double, 2>",
+            "value": 0.6221203050792738,
+            "unit": "ns/iter",
+            "extra": "iterations: 1125532162\ncpu: 0.6221088758190498 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixTranspose<double, 2>",
+            "value": 0.6219953754365511,
+            "unit": "ns/iter",
+            "extra": "iterations: 1125399631\ncpu: 0.6219735396376721 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_RandomInverse<double, 2>",
+            "value": 10.819876701406143,
+            "unit": "ns/iter",
+            "extra": "iterations: 64696439\ncpu: 10.819182165497539 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_NearSingularInverse<double, 2>",
+            "value": 4.463340926502844,
+            "unit": "ns/iter",
+            "extra": "iterations: 156654832\ncpu: 4.46314427760518 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IdentityMatrixMultiply<double, 2>",
+            "value": 0.6223111459431803,
+            "unit": "ns/iter",
+            "extra": "iterations: 1125312284\ncpu: 0.6222787407162094 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiplyTranspose<double, 2>",
+            "value": 0.6221128954764571,
+            "unit": "ns/iter",
+            "extra": "iterations: 1125506229\ncpu: 0.6220897956487499 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiply<double, 3>",
+            "value": 1.8675112664786546,
+            "unit": "ns/iter",
+            "extra": "iterations: 374926597\ncpu: 1.8673192155529985 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixTranspose<double, 3>",
+            "value": 2.176589630932972,
+            "unit": "ns/iter",
+            "extra": "iterations: 321642379\ncpu: 2.1765101016119517 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_RandomInverse<double, 3>",
+            "value": 48.13476907130294,
+            "unit": "ns/iter",
+            "extra": "iterations: 14544576\ncpu: 48.132230736736844 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_NearSingularInverse<double, 3>",
+            "value": 9.870720447588292,
+            "unit": "ns/iter",
+            "extra": "iterations: 71750202\ncpu: 9.870249940202262 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IdentityMatrixMultiply<double, 3>",
+            "value": 4.09625130155095,
+            "unit": "ns/iter",
+            "extra": "iterations: 170830812\ncpu: 4.0960081252789475 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiplyTranspose<double, 3>",
+            "value": 2.30264803717903,
+            "unit": "ns/iter",
+            "extra": "iterations: 303998413\ncpu: 2.302485444225024 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiply<double, 4>",
+            "value": 5.299550127527162,
+            "unit": "ns/iter",
+            "extra": "iterations: 130062859\ncpu: 5.29901467874082 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixTranspose<double, 4>",
+            "value": 2.49140748720286,
+            "unit": "ns/iter",
+            "extra": "iterations: 281180553\ncpu: 2.491218967764065 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_RandomInverse<double, 4>",
+            "value": 49.67598467073751,
+            "unit": "ns/iter",
+            "extra": "iterations: 14096438\ncpu: 49.67130554541543 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_NearSingularInverse<double, 4>",
+            "value": 8.898276572601578,
+            "unit": "ns/iter",
+            "extra": "iterations: 78801985\ncpu: 8.897794389316568 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IdentityMatrixMultiply<double, 4>",
+            "value": 5.291683096522565,
+            "unit": "ns/iter",
+            "extra": "iterations: 132254150\ncpu: 5.291226347150513 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_MatrixMultiplyTranspose<double, 4>",
+            "value": 5.425319152046154,
+            "unit": "ns/iter",
+            "extra": "iterations: 128144173\ncpu: 5.425022798344487 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_CameraPerspective<float>",
+            "value": 34.510327470347086,
+            "unit": "ns/iter",
+            "extra": "iterations: 20286478\ncpu: 34.50755759575383 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_CameraOrthographic<float>",
+            "value": 32.63616923326061,
+            "unit": "ns/iter",
+            "extra": "iterations: 21450275\ncpu: 32.63421951466792 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_CameraFrustum<float>",
+            "value": 29.83034965922019,
+            "unit": "ns/iter",
+            "extra": "iterations: 23465476\ncpu: 29.829091555611555 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_CameraRotation<float>",
+            "value": 56.55870622460901,
+            "unit": "ns/iter",
+            "extra": "iterations: 12377759\ncpu: 56.55537977431997 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_CameraPerspective<double>",
+            "value": 34.80244758539386,
+            "unit": "ns/iter",
+            "extra": "iterations: 20110759\ncpu: 34.801720959412684 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_CameraOrthographic<double>",
+            "value": 32.01903214995118,
+            "unit": "ns/iter",
+            "extra": "iterations: 21864792\ncpu: 32.01671637214775 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_CameraFrustum<double>",
+            "value": 31.389451764761418,
+            "unit": "ns/iter",
+            "extra": "iterations: 22295028\ncpu: 31.387572556536043 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_CameraRotation<double>",
+            "value": 86.25136707115598,
+            "unit": "ns/iter",
+            "extra": "iterations: 8125400\ncpu: 86.24634639525381 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_QuaternionVectorRotation<float>",
+            "value": 24.16316650388769,
+            "unit": "ns/iter",
+            "extra": "iterations: 29041316\ncpu: 24.161897346524782 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_QuaternionMultiplication<float>",
+            "value": 3.184352334140385,
+            "unit": "ns/iter",
+            "extra": "iterations: 218146785\ncpu: 3.1841935740652816 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_QuaternionSlerp<float>",
+            "value": 20.728683379270127,
+            "unit": "ns/iter",
+            "extra": "iterations: 33682684\ncpu: 20.728331952406332 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_QuaternionVectorRotation<double>",
+            "value": 27.03449496896931,
+            "unit": "ns/iter",
+            "extra": "iterations: 25913576\ncpu: 27.032797441773322 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_QuaternionMultiplication<double>",
+            "value": 3.119573806701542,
+            "unit": "ns/iter",
+            "extra": "iterations: 223594412\ncpu: 3.119495893305217 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_QuaternionSlerp<double>",
+            "value": 19.950531415709886,
+            "unit": "ns/iter",
+            "extra": "iterations: 35100863\ncpu: 19.949904422577823 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBDimensions<float>",
+            "value": 0.7779669247454994,
+            "unit": "ns/iter",
+            "extra": "iterations: 900391560\ncpu: 0.7779435926742788 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBContainsPointInside<float>",
+            "value": 2.153199002539733,
+            "unit": "ns/iter",
+            "extra": "iterations: 324805744\ncpu: 2.1530923203131445 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBContainsPointOutside<float>",
+            "value": 0.9342944060089098,
+            "unit": "ns/iter",
+            "extra": "iterations: 745957947\ncpu: 0.934263869434988 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBContainsAABBInside<float>",
+            "value": 2.0064411095649892,
+            "unit": "ns/iter",
+            "extra": "iterations: 348872190\ncpu: 2.0063171300641502 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBContainsAABBOutside<float>",
+            "value": 0.9362707837568592,
+            "unit": "ns/iter",
+            "extra": "iterations: 749968175\ncpu: 0.9362067570400477 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBIntersectsOverlapping<float>",
+            "value": 2.0165701836014263,
+            "unit": "ns/iter",
+            "extra": "iterations: 347346966\ncpu: 2.016418905469864 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBIntersectsNonOverlapping<float>",
+            "value": 0.9337757805163471,
+            "unit": "ns/iter",
+            "extra": "iterations: 750122680\ncpu: 0.9337247222014403 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBEmptyContains<float>",
+            "value": 2.239893189504965,
+            "unit": "ns/iter",
+            "extra": "iterations: 317272942\ncpu: 2.2388757343196315 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBDimensions<double>",
+            "value": 0.6221062507728001,
+            "unit": "ns/iter",
+            "extra": "iterations: 1124878011\ncpu: 0.6220691303032337 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBContainsPointInside<double>",
+            "value": 2.055781088825056,
+            "unit": "ns/iter",
+            "extra": "iterations: 340522808\ncpu: 2.055744471600879 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBContainsPointOutside<double>",
+            "value": 0.9352965842202358,
+            "unit": "ns/iter",
+            "extra": "iterations: 721603681\ncpu: 0.9351969838413274 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBContainsAABBInside<double>",
+            "value": 2.0164649149097484,
+            "unit": "ns/iter",
+            "extra": "iterations: 347342700\ncpu: 2.0163368569427087 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBContainsAABBOutside<double>",
+            "value": 1.2451353327901011,
+            "unit": "ns/iter",
+            "extra": "iterations: 560624886\ncpu: 1.245074315163394 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBIntersectsOverlapping<double>",
+            "value": 1.9656904232132477,
+            "unit": "ns/iter",
+            "extra": "iterations: 356010104\ncpu: 1.965584931825417 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBIntersectsNonOverlapping<double>",
+            "value": 0.9341941242084073,
+            "unit": "ns/iter",
+            "extra": "iterations: 749466433\ncpu: 0.934165876112033 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBEmptyContains<double>",
+            "value": 2.357162515549086,
+            "unit": "ns/iter",
+            "extra": "iterations: 297469979\ncpu: 2.3569760429505244 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBDimensions<int>",
+            "value": 0.622829146151892,
+            "unit": "ns/iter",
+            "extra": "iterations: 1125742874\ncpu: 0.6228138815649393 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBContainsPointInside<int>",
+            "value": 1.2573662324442667,
+            "unit": "ns/iter",
+            "extra": "iterations: 563215868\ncpu: 1.2572313037174623 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBContainsPointOutside<int>",
+            "value": 0.621725240992163,
+            "unit": "ns/iter",
+            "extra": "iterations: 1126947278\ncpu: 0.6216963407936813 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBContainsAABBInside<int>",
+            "value": 1.2477638945103817,
+            "unit": "ns/iter",
+            "extra": "iterations: 562199550\ncpu: 1.247747877066075 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBContainsAABBOutside<int>",
+            "value": 0.9327238261680482,
+            "unit": "ns/iter",
+            "extra": "iterations: 750385272\ncpu: 0.9326534569830941 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBIntersectsOverlapping<int>",
+            "value": 1.268162796765804,
+            "unit": "ns/iter",
+            "extra": "iterations: 541719779\ncpu: 1.26811508759771 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBIntersectsNonOverlapping<int>",
+            "value": 0.9341091553028014,
+            "unit": "ns/iter",
+            "extra": "iterations: 750961977\ncpu: 0.9340227381445626 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBEmptyContains<int>",
+            "value": 1.2437191487811252,
+            "unit": "ns/iter",
+            "extra": "iterations: 562792188\ncpu: 1.2436750046004357 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBDimensions<uint32_t>",
+            "value": 0.6226384620688327,
+            "unit": "ns/iter",
+            "extra": "iterations: 1125048624\ncpu: 0.6226169963299297 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBContainsPointInside<uint32_t>",
+            "value": 1.2438071702317288,
+            "unit": "ns/iter",
+            "extra": "iterations: 563445328\ncpu: 1.2436908696845204 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBContainsPointOutside<uint32_t>",
+            "value": 0.6223957038821382,
+            "unit": "ns/iter",
+            "extra": "iterations: 1125283087\ncpu: 0.622358061798542 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBContainsAABBInside<uint32_t>",
+            "value": 1.2470239676898536,
+            "unit": "ns/iter",
+            "extra": "iterations: 561947192\ncpu: 1.2469053569004986 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBContainsAABBOutside<uint32_t>",
+            "value": 0.9327567596206934,
+            "unit": "ns/iter",
+            "extra": "iterations: 749525673\ncpu: 0.9327242323826312 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBIntersectsOverlapping<uint32_t>",
+            "value": 1.272760957774619,
+            "unit": "ns/iter",
+            "extra": "iterations: 550492432\ncpu: 1.2727011059073048 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBIntersectsNonOverlapping<uint32_t>",
+            "value": 0.9335204783909437,
+            "unit": "ns/iter",
+            "extra": "iterations: 749939121\ncpu: 0.9334594627715188 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AABBEmptyContains<uint32_t>",
+            "value": 1.2437917534916922,
+            "unit": "ns/iter",
+            "extra": "iterations: 562852328\ncpu: 1.2437594945862986 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ColorConstructFromFloats",
+            "value": 0.6593499138753448,
+            "unit": "ns/iter",
+            "extra": "iterations: 1073026686\ncpu: 0.6593007846218666 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ColorConstructFromIntegers",
+            "value": 1.8593014538142558,
+            "unit": "ns/iter",
+            "extra": "iterations: 376289908\ncpu: 1.85921440391113 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ColorConstructFromPacked",
+            "value": 1.9961999834870656,
+            "unit": "ns/iter",
+            "extra": "iterations: 350876370\ncpu: 1.9960730527393271 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ColorLiteral",
+            "value": 0.3115130606669246,
+            "unit": "ns/iter",
+            "extra": "iterations: 2249332723\ncpu: 0.3115028705337524 ns\nthreads: 1"
+          },
+          {
+            "name": "ColorBench/OperatorPlus",
+            "value": 0.31135905223840654,
+            "unit": "ns/iter",
+            "extra": "iterations: 2248749153\ncpu: 0.31133115317286275 ns\nthreads: 1"
+          },
+          {
+            "name": "ColorBench/OperatorPlusAssign",
+            "value": 0.6221355208305026,
+            "unit": "ns/iter",
+            "extra": "iterations: 1124728069\ncpu: 0.6220926286849958 ns\nthreads: 1"
+          },
+          {
+            "name": "ColorBench/ConvertToARGB",
+            "value": 0.6227504640762603,
+            "unit": "ns/iter",
+            "extra": "iterations: 1124094907\ncpu: 0.622723770600633 ns\nthreads: 1"
+          },
+          {
+            "name": "ColorBench/ConvertToBGRA",
+            "value": 0.3115520985925686,
+            "unit": "ns/iter",
+            "extra": "iterations: 2248975456\ncpu: 0.31154152800145 ns\nthreads: 1"
+          },
+          {
+            "name": "ColorBench/ConvertToABGR",
+            "value": 0.3112251427515525,
+            "unit": "ns/iter",
+            "extra": "iterations: 2246089663\ncpu: 0.3112087596121907 ns\nthreads: 1"
+          },
+          {
+            "name": "ColorBench/ComponentAccess",
+            "value": 14.911415528480193,
+            "unit": "ns/iter",
+            "extra": "iterations: 46940744\ncpu: 14.910378923691807 ns\nthreads: 1"
+          },
+          {
+            "name": "ColorBench/ComponentSet",
+            "value": 1.2446036588443856,
+            "unit": "ns/iter",
+            "extra": "iterations: 562345701\ncpu: 1.2445879994377336 ns\nthreads: 1"
+          },
+          {
+            "name": "ColorBench/OperatorEqual",
+            "value": 0.6229129147770746,
+            "unit": "ns/iter",
+            "extra": "iterations: 1125471231\ncpu: 0.6228598525589492 ns\nthreads: 1"
+          },
+          {
+            "name": "ColorBench/EqualWithEpsilon",
+            "value": 0.6221285340987834,
+            "unit": "ns/iter",
+            "extra": "iterations: 1125755402\ncpu: 0.62210031748975 ns\nthreads: 1"
+          },
+          {
+            "name": "ColorBench/MaxValueColor",
+            "value": 0.31151257256496845,
+            "unit": "ns/iter",
+            "extra": "iterations: 2244958132\ncpu: 0.31148593465172136 ns\nthreads: 1"
+          },
+          {
+            "name": "ColorBench/ZeroValueColor",
+            "value": 0.3115285647727597,
+            "unit": "ns/iter",
+            "extra": "iterations: 2245956744\ncpu: 0.31151702937694437 ns\nthreads: 1"
           }
         ]
       }

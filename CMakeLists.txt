@@ -14,11 +14,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(mr-math VERSION 1.0.0)
 
-option(MR_MATH_ENABLE_BENCHMARK "Whether benchmarks are downloaded and build"    OFF)
-option(MR_MATH_ENABLE_TESTING   "Whether tests are downloaded and build"         OFF)
-option(MR_MATH_PRESET_OPTIMIZED "Whether optimization flags are enabled at all"  OFF)
-option(MR_MATH_PRESET_BENCHMARK "Whether maximum optimization flags are enabled" OFF)
-option(MR_MATH_PRESET_PROFILING "Whether profiling flags are enabled"            OFF)
+option(MR_MATH_ENABLE_BENCHMARK "Whether benchmarks are downloaded and built"    OFF)
+option(MR_MATH_ENABLE_TESTING   "Whether tests are downloaded and built"         OFF)
+option(MR_MATH_ENABLE_PROFILING "Whether profiling is enabled"                   OFF)
+option(MR_MATH_EXTRA_OPTIMIZED  "Whether extra optimization flags are enabled"   OFF)
 
 include(cmake/dependencies.cmake)
 
@@ -43,7 +42,7 @@ target_include_directories(${MR_MATH_LIB_NAME} INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
-target_link_libraries(${MR_MATH_LIB_NAME} INTERFACE Vc)
+target_link_libraries(${MR_MATH_LIB_NAME} INTERFACE Vc::Vc)
 target_compile_features(${MR_MATH_LIB_NAME} INTERFACE cxx_std_23)
 
 if (MR_MATH_ENABLE_BENCHMARK)
@@ -61,13 +60,13 @@ if (MR_MATH_ENABLE_BENCHMARK)
     endif()
   endif()
   set_property(TARGET ${MR_MATH_BENCH_NAME} PROPERTY COMPILE_FLAGS "${MR_MATH_BENCH_CXX_FLAGS}")
-  target_link_libraries(${MR_MATH_BENCH_NAME} PRIVATE benchmark ${MR_MATH_LIB_NAME})
+  target_link_libraries(${MR_MATH_BENCH_NAME} PRIVATE benchmark::benchmark ${MR_MATH_LIB_NAME})
 endif()
 
 if (MR_MATH_ENABLE_TESTING)
   include(GoogleTest)
   add_executable(${MR_MATH_TESTS_NAME} "tests/misc.cpp" "tests/matr.cpp" "tests/vec.cpp" "tests/quat.cpp")
-  target_link_libraries(${MR_MATH_TESTS_NAME} PRIVATE gtest_main ${MR_MATH_LIB_NAME})
+  target_link_libraries(${MR_MATH_TESTS_NAME} PRIVATE GTest::gtest_main ${MR_MATH_LIB_NAME})
   gtest_discover_tests(${MR_MATH_TESTS_NAME})
 endif()
 

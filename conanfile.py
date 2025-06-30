@@ -1,9 +1,12 @@
+import os
+
 from conan import ConanFile
 from conan.tools.cmake import cmake_layout
 from conan.tools.cmake import CMakeDeps
 from conan.tools.cmake import CMakeToolchain
 from conan.tools.cmake import CMake
 from conan.tools.build import check_min_cppstd
+from conan.tools.files import copy, rmdir
 from conan.api.conan_api import ConanAPI
 
 class MrMath(ConanFile):
@@ -87,3 +90,9 @@ class MrMath(ConanFile):
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
+
+    def package(self):
+        copy(self, "LICENSE", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
+        cmake = CMake(self)
+        cmake.install()
+        rmdir(self, os.path.join(self.package_folder, "lib", "cmake"))

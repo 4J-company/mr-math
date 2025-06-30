@@ -4,6 +4,7 @@ from conan.tools.cmake import CMakeDeps
 from conan.tools.cmake import CMakeToolchain
 from conan.tools.cmake import CMake
 from conan.tools.build import check_min_cppstd
+from conan.api.conan_api import ConanAPI
 
 class MrMath(ConanFile):
     name = "mr-math"
@@ -45,6 +46,9 @@ class MrMath(ConanFile):
         return self.options.profiling
 
     def validate(self):
+        if not any(remote.name.lower() == "4j-company" for remote in ConanAPI().remotes.list()):
+            raise Exception("Required remote '4J-company' is missing. Please add it manually. For details, see https://github.com/4J-company/conan-center-index")
+
         check_min_cppstd(self, "20")
 
     def configure(self):

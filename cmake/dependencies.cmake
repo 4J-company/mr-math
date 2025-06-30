@@ -12,18 +12,18 @@ CPMFindPackage(
   GIT_TAG 1.4.1
 )
 
-if (MR_MATH_ENABLE_BENCHMARK)
-  CPMFindPackage(
-    NAME benchmark
-    GITHUB_REPOSITORY google/benchmark
-    GIT_TAG 1.14.0
-  )
-endif()
-
 if (MR_MATH_ENABLE_TESTING)
   CPMFindPackage(
     NAME GTest
     GITHUB_REPOSITORY google/googletest
+    GIT_TAG 1.14.1
+  )
+endif()
+
+if (MR_MATH_ENABLE_BENCHMARK)
+  CPMFindPackage(
+    NAME benchmark
+    GITHUB_REPOSITORY google/benchmark
     GIT_TAG 1.9.1
   )
 endif()

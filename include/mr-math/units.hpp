@@ -157,27 +157,27 @@ inline namespace math {
       using DegreesLiteral = Degrees<float>;
     }
 
-    constexpr details::RadiansLiteral operator"" _rad(unsigned long long value) {
+    constexpr details::RadiansLiteral operator""_rad(unsigned long long value) {
       return details::RadiansLiteral{static_cast<float>(value)};
     }
 
-    constexpr details::DegreesLiteral operator"" _deg(unsigned long long value) {
+    constexpr details::DegreesLiteral operator""_deg(unsigned long long value) {
       return details::DegreesLiteral{static_cast<float>(value)};
     }
 
-    constexpr details::RadiansLiteral operator"" _pi(unsigned long long value) {
+    constexpr details::RadiansLiteral operator""_pi(unsigned long long value) {
       return value * pi;
     }
 
-    constexpr details::RadiansLiteral operator"" _rad(long double value) {
+    constexpr details::RadiansLiteral operator""_rad(long double value) {
       return details::RadiansLiteral{static_cast<float>(value)};
     }
 
-    constexpr details::DegreesLiteral operator"" _deg(long double value) {
+    constexpr details::DegreesLiteral operator""_deg(long double value) {
       return details::DegreesLiteral{static_cast<float>(value)};
     }
 
-    constexpr details::RadiansLiteral operator"" _pi(long double value) {
+    constexpr details::RadiansLiteral operator""_pi(long double value) {
       return value * pi;
     }
   }

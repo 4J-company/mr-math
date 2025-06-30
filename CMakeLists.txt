@@ -47,7 +47,7 @@ target_compile_features(${MR_MATH_LIB_NAME} INTERFACE cxx_std_23)
 
 if (MR_MATH_ENABLE_BENCHMARK)
   add_executable(${MR_MATH_BENCH_NAME} "bench/main.cpp")
-  
+
   if (NOT MSVC)
     set(MR_MATH_BENCH_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra -march=native")
     if (MR_MATH_EXTRA_OPTIMIZED)

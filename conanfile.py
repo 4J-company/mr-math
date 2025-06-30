@@ -7,18 +7,16 @@ from conan.tools.build import check_min_cppstd
 
 class MrMath(ConanFile):
     name = "mr-math"
-
     version = "1.0.0"
-
     license = "MIT"
 
     description = "Linear algebra library for computer graphics"
 
+    author = "4J-Company"
+    homepage = "https://4j-company.github.io/subprojects/mr-math/"
+    url = "https://github.com/4J-company/mr-math"
+
     topics = ("math", "linear algebra", "computer graphics", "SIMD")
-
-    homepage = "https://github.com/4J-company/mr-math"
-
-    package_type = "header-library"
 
     settings = ("os", "compiler", "build_type", "arch")
 
@@ -27,16 +25,17 @@ class MrMath(ConanFile):
         "profiling": [True, False],
         "extra_optimized": [True, False],
     }
-    
     default_options = {
         "target": "library",
         "profiling": False,
         "extra_optimized": False,
     }
 
+    package_type = "header-library"
+
     def _tests_enabled(self):
-        return self.options.target in ("tests", "all")    
-    
+        return self.options.target in ("tests", "all")
+
     def _benchmark_enabled(self):
         return self.options.target in ("benchmark", "all")
 
@@ -61,7 +60,7 @@ class MrMath(ConanFile):
 
         if self._tests_enabled():
             self.test_requires("gtest/1.14.0")
-            
+
         if self._benchmark_enabled():
             self.test_requires("benchmark/1.9.1")
 
@@ -79,7 +78,7 @@ class MrMath(ConanFile):
 
     def layout(self):
         cmake_layout(self)
-        
+
     def build(self):
         cmake = CMake(self)
         cmake.configure()

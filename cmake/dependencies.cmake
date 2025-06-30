@@ -6,15 +6,26 @@ file(
 )
 include(${CMAKE_CURRENT_BINARY_DIR}/cmake/CPM.cmake)
 
-find_package(Vc REQUIRED)
+CPMFindPackage(
+  NAME Vc
+  GITHUB_REPOSITORY 4J-company/Vc
+  GIT_TAG 1.4.1
+)
 
 if (MR_MATH_ENABLE_BENCHMARK)
-  find_package(benchmark REQUIRED)  
-  set_target_properties(benchmark::benchmark PROPERTIES CXX_STANDARD 17)
+  CPMFindPackage(
+    NAME benchmark
+    GITHUB_REPOSITORY google/benchmark
+    GIT_TAG 1.14.0
+  )
 endif()
 
 if (MR_MATH_ENABLE_TESTING)
-  find_package(GTest REQUIRED)
+  CPMFindPackage(
+    NAME GTest
+    GITHUB_REPOSITORY google/googletest
+    GIT_TAG 1.9.1
+  )
 endif()
 
 CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")

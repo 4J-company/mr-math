@@ -14,6 +14,11 @@
 - **Useful utilities**.
 
 
+## Dependencies
+- `Vc`               for simd wrappers
+- `Google Test`      for tests only
+- `Google Benchmark` for benchmarks only
+
 
 ## Usage
 For functionality and usage examples see [usage](USAGE.md).
@@ -26,7 +31,14 @@ target_link_libraries(<your-project>
             PUBLIC/INTERFACE/PRIVATE
             mr-math-lib)
 ```
+
 #### Using Conan
+Add special 4j remote to your machine:
+```sh
+git clone https://github.com/4J-company/conan-center-index.git cci-4j
+conan remote add 4J-company ./cci-4j --type local-recipes-index
+```
+
 Add `"mr-math/1.0.0"` to your conanfile.
 
 

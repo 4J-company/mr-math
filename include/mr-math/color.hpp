@@ -112,7 +112,7 @@ inline namespace math {
 
 namespace literals {
 
-  inline Color operator"" _rgba(unsigned long long value) {
+  inline Color operator""_rgba(unsigned long long value) {
     assert(value <= 0xFF'FF'FF'FF);
     return Color{static_cast<uint32_t>(value)};
   }

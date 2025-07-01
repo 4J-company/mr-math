@@ -28,6 +28,3 @@ endif()
 
 set_property(TARGET ${MR_MATH_BENCH_NAME} PROPERTY COMPILE_FLAGS "${MR_MATH_BENCH_CXX_FLAGS}")
 target_link_libraries(${MR_MATH_BENCH_NAME} PRIVATE benchmark::benchmark ${MR_MATH_LIB_NAME})
-
-set_property(TARGET ${MR_MATH_BENCH_NAME} PROPERTY COMPILE_FLAGS "${MR_MATH_BENCH_CXX_FLAGS}")
-target_link_libraries(${MR_MATH_BENCH_NAME} PRIVATE benchmark ${MR_MATH_LIB_NAME})

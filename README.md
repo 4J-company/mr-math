@@ -91,13 +91,12 @@ To build benchmarks you have to generate CMake with `-D MR_MATH_ENABLE_BENCHMARK
 Note that this will not modify `CMAKE_BUILD_TYPE` or add any optimizations to compiler flags. \
 In order to add tested compiler flags please specify the preset. \
 **Note that specifying preset doesn't affect `CMAKE_BUILD_TYPE` either**.
-#### Available presets:
-- `MR_MATH_PRESET_OPTIMIZED` \
+#### Available options:
+- `MR_MATH_EXTRA_OPTIMIZED` \
     Adds `-ffast-math`, this hurts accuracy a little but increases perf a lot
-- `MR_MATH_PRESET_BENCHMARK` \
+- `MR_MATH_ENABLE_BENCHMARK` \
     Adds `-march=native`, this makes the library only usable on host PC, but increases perf a lot. \
-    Includes `MR_MATH_PRESET_OPTIMIZED`
-- `MR_MATH_PRESET_PROFILING` \
+- `MR_MATH_ENABLE_PROFILING` \
     Makes changes suggested by profiling tools used by me \
     Adds `-lprofiler -ltcmalloc` \
     **DOES NOT** include any optimization

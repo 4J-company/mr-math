@@ -38,7 +38,7 @@ jobs:
       id: strings
       shell: bash
       run: |
-        echo "build-output-dir=${{ github.workspace }}/build/${{ matrix.build_type }}" >> "$GITHUB_OUTPUT"
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
     - name: Set up cache
       id: cache-cpm
@@ -94,8 +94,8 @@ jobs:
 
     - name: Run tests
       if: ${{ matrix.os != 'windows-latest' }}
-      run: ${{ steps.strings.outputs.build-output-dir }}/tests/mr-math-tests
+      run: ${{ steps.strings.outputs.build-output-dir }}/${{ matrix.build_type }}/tests/mr-math-tests
 
     - name: Run tests (Windows)
       if: ${{ matrix.os == 'windows-latest' }}
-      run: iex "${{ steps.strings.outputs.build-output-dir }}/tests/mr-math-tests.exe".Replace('/', '\')
+      run: iex "${{ steps.strings.outputs.build-output-dir }}/tests/${{ matrix.build_type }}/mr-math-tests.exe".Replace('/', '\')

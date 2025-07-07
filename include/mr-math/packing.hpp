@@ -51,47 +51,53 @@ namespace details {
     return (Vec2f{1} - std::abs(Vec2f{v.y(), v.x()})) * sign_non_zero(v);
   }
 
-  PackedNorm32 quantize32(const Vec2f& norm)
+  constexpr inline float max_value16 = (1 << 16) - 1;
+  constexpr inline auto mask16 = 0xFFFF;
+
   inline PackedNorm32 quantize32(const Vec2f& norm)
   {
-    const auto norm_trans = (norm * 0.5f + Vec2f{ 0.5 }) * 1023.f;
-    const auto norm_masked = static_cast<Vec2u>(norm_trans) & 0x3FF;
-    return norm_masked.x() << 10 | norm_masked.y();
+    const auto norm_trans = (norm * 0.5f + Vec2f{ 0.5 }) * max_value16;
+    const auto norm_masked = static_cast<Vec2u>(norm_trans) & mask16;
+    return norm_masked.x() << 16 | norm_masked.y();
   }
 
   inline Vec2f dequantize32(const PackedNorm32& norm)
   {
-    const mr::Vec2f norm_masked{ (norm >> 10) & 0x3FF, norm & 0x3FF };
-    return norm_masked / 1023.0f * 2.0f - Vec2f{ 1.0f };
+    const mr::Vec2f norm_masked{ (norm >> 16) & mask16, norm & mask16 };
+    return norm_masked / max_value16 * 2.0f - Vec2f{ 1.0f };
   }
 
-  PackedNorm24 quantize24(const Vec2f& norm)
+  constexpr inline float max_value12 = (1 << 12) - 1;
+  constexpr inline auto mask12 = 0xFFF;
+  
   inline PackedNorm24 quantize24(const Vec2f& norm)
   {
-    const auto norm_trans = (norm * 0.5f + Vec2f{ 0.5 }) * 511.f;
-    const auto norm_masked = static_cast<Vec2u>(norm_trans) & 0x1FF;
-    return PackedNorm24(norm_masked.x() << 9 | norm_masked.y());
+    const auto norm_trans = (norm * 0.5f + Vec2f{ 0.5 }) * max_value12;
+    const auto norm_masked = static_cast<Vec2u>(norm_trans) & mask12;
+    return PackedNorm24(norm_masked.x() << 12 | norm_masked.y());
   }
 
   inline Vec2f dequantize24(const PackedNorm24& norm)
   {
     const uint32_t norm32 = static_cast<uint32_t>(norm);
-    const mr::Vec2f norm_masked{ (norm32 >> 9) & 0x1FF, norm32 & 0x1FF };
-    return norm_masked / 511.0f * 2.0f - Vec2f{ 1.0f };
+    const mr::Vec2f norm_masked{ (norm32 >> 12) & mask12, norm32 & mask12 };
+    return norm_masked / max_value12 * 2.0f - Vec2f{ 1.0f };
   }
 
-  PackedNorm16 quantize16(const Vec2f& norm)
+  constexpr inline float max_value8 = (1 << 8) - 1;
+  constexpr inline auto mask8 = 0xFF;
+  
   inline PackedNorm16 quantize16(const Vec2f& norm)
   {
-    const auto norm_trans = (norm * 0.5f + Vec2f{ 0.5 }) * 31.f;
-    const auto norm_masked = static_cast<Vec2u>(norm_trans) & 0x1F;
-    return norm_masked.x() << 5 | norm_masked.y();
+    const auto norm_trans = (norm * 0.5f + Vec2f{ 0.5 }) * max_value8;
+    const auto norm_masked = static_cast<Vec2u>(norm_trans) & mask8;
+    return norm_masked.x() << 8 | norm_masked.y();
   }
 
   inline Vec2f dequantize16(const PackedNorm16& norm)
   {
-    const mr::Vec2f norm_masked{ (norm >> 5) & 0x1F, norm & 0x1F };
-    return norm_masked / 31.0f * 2.0f - Vec2f{ 1.0f };
+    const mr::Vec2f norm_masked{ (norm >> 8) & mask8, norm & mask8 };
+    return norm_masked / max_value8 * 2.0f - Vec2f{ 1.0f };
   }
 
   // octahedron encoding

@@ -58,7 +58,7 @@ inline namespace math {
           _rotation(
               direction.normalized_unchecked(),
               up.normalized_unchecked(),
-              (direction % up).normalized_unchecked()) {}
+              (direction.cross(up)).normalized_unchecked()) {}
 
         // copy semantics
         constexpr Camera(const Camera &other) noexcept {
@@ -191,10 +191,10 @@ inline namespace math {
           const auto right = _rotation.right();
           const auto up = _rotation.up();
           _perspective = MatrT{
-                       right.x(),            up.x(),           direction.x(), 0,
-                       right.y(),            up.y(),           direction.y(), 0,
-                       right.z(),            up.z(),           direction.z(), 0,
-            -(_position & right), -(_position & up), -(_position & direction), 1
+                          right.x(),               up.x(),               direction.x(), 0,
+                          right.y(),               up.y(),               direction.y(), 0,
+                          right.z(),               up.z(),               direction.z(), 0,
+            -(_position.dot(right)), -(_position.dot(up)), -(_position.dot(direction)), 1
           };
           _perspective_calculated = true;
           return _perspective;

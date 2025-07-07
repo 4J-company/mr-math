@@ -37,8 +37,8 @@ inline namespace math {
     }
 
   template <ArithmeticT T, ArithmeticT U>
-    constexpr bool equal(T a, U b, T epsilon = 0.0001) {
-      return std::abs(a - b) <= epsilon;
+    constexpr bool equal(T a, U b, std::common_type_t<T, U> eps = epsilon<std::common_type_t<T, U>>()) {
+      return std::abs(a - b) <= eps;
     }
 
   template <typename T, typename U>
@@ -54,6 +54,7 @@ inline namespace math {
 
   // fast 1 / sqrt implementation for floats
   // use 1 / std::sqrt() for higher precision
+  // NOTE: for further info on this function refer to https://hllmn.net/blog/2023-04-20_rsqrt/
   constexpr float fast_rsqrt(float number) {
     // evil floating point bit level hacking
     // what the fuck?
@@ -62,10 +63,19 @@ inline namespace math {
 
   // fast 1 / sqrt implementation for doubles
   // use 1 / std::sqrt() for higher precision
+  // NOTE: for further info on this function refer to https://hllmn.net/blog/2023-04-20_rsqrt/
   constexpr double fast_rsqrt(double number) {
     // evil floating point bit level hacking
     // what the fuck?
-    return std::bit_cast<double>(0x5fe6f7ced9168800 - (std::bit_cast<unsigned long long>(number) >> 1));
+    return std::bit_cast<double>(0x5fe6eb50c7b537a9 - (std::bit_cast<unsigned long long>(number) >> 1));
+  }
+
+  // fast 1 / sqrt implementation for floats
+  // use 1 / std::sqrt() for higher precision
+  // NOTE: for further info on this function refer to https://hllmn.net/blog/2023-04-20_rsqrt/
+  template <std::integral T>
+  constexpr float fast_rsqrt(T number) {
+    return fast_rsqrt((float)number);
   }
 
   inline struct UncheckedTag {} unchecked;

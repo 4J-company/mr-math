@@ -38,7 +38,7 @@ jobs:
       id: strings
       shell: bash
       run: |
-        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "build-output-dir=${{ github.workspace }}/build/${{ matrix.build_type }}" >> "$GITHUB_OUTPUT"
 
     - name: Set up cache
       id: cache-cpm
@@ -49,41 +49,48 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-cpm-a
 
-    - name: Configure CMake (Clang)
+    - name: Install Conan
+      uses: conan-io/setup-conan@v1
+      with:
+        cache_packages: true
+ 
+    - name: Setup local Conan index
+      run: >
+        git clone https://github.com/4J-company/conan-center-index.git &&
+        conan remote add 4J-company ./conan-center-index --type local-recipes-index
+
+    - name: Build (Clang)
       if: ${{ matrix.c_compiler == 'clang' }}
       run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCPM_SOURCE_CACHE=~/cpm-cache
-        -DCMAKE_CXX_COMPILER=clang++
-        -DCMAKE_C_COMPILER=clang
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -DMR_MATH_ENABLE_TESTING=ON
-        -S ${{ github.workspace }}
-
-    - name: Configure CMake (GCC)
+        conan build .
+        -b missing
+        -o '&:target=tests'
+        -s compiler=clang
+        -s compiler.version=15
+        -s compiler.cppstd=23
+        -s build_type=${{ matrix.build_type }}
+    
+    - name: Build (GCC)
       if: ${{ matrix.c_compiler == 'gcc' }}
       run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCPM_SOURCE_CACHE=~/cpm-cache
-        -DCMAKE_CXX_COMPILER=g++
-        -DCMAKE_C_COMPILER=gcc
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -DMR_MATH_ENABLE_TESTING=ON
-        -S ${{ github.workspace }}
+        conan build .
+        -b missing
+        -o '&:target=tests'
+        -s compiler=gcc
+        -s compiler.version=13
+        -s compiler.cppstd=23
+        -s build_type=${{ matrix.build_type }}
 
-    - name: Configure CMake (MSVC)
+    - name: Build (MSVC)
       if: ${{ matrix.c_compiler == 'cl' }}
       run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCPM_SOURCE_CACHE=~/cpm-cache
-        -DCMAKE_CXX_COMPILER=cl
-        -DCMAKE_C_COMPILER=cl
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -DMR_MATH_ENABLE_TESTING=ON
-        -S ${{ github.workspace }}
-
-    - name: Build
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+        conan build .
+        -b missing
+        -o '&:target=tests'
+        -s compiler=msvc
+        -s compiler.version=193
+        -s compiler.cppstd=23
+        -s build_type=${{ matrix.build_type }}
 
     - name: Run tests
       if: ${{ matrix.os != 'windows-latest' }}
@@ -91,4 +98,4 @@ jobs:
 
     - name: Run tests (Windows)
       if: ${{ matrix.os == 'windows-latest' }}
-      run: iex "${{ steps.strings.outputs.build-output-dir }}/${{ matrix.build_type }}/mr-math-tests.exe".Replace('/', '\')
+      run: iex "${{ steps.strings.outputs.build-output-dir }}/mr-math-tests.exe".Replace('/', '\')

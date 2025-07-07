@@ -58,12 +58,10 @@ inline namespace math {
       template <typename U>
         constexpr Radians(const Radians<U> &other) noexcept : _data(other._data) {}
 
-      // conversation operators
       template <typename U>
-        constexpr operator Degrees<U>() const noexcept {
-          return Degrees<U>{static_cast<U>(_data) *
-            std::numbers::inv_pi_v<U> * static_cast<U>(180.)};
-        }
+        constexpr Radians(const Degrees<U>& deg) noexcept
+          : _data(static_cast<T>(deg.value()) * std::numbers::pi_v<T> / static_cast<T>(180.)) {}
+
       explicit constexpr operator T() const noexcept { return _data; };
 
       constexpr T value() const noexcept { return _data; }
@@ -90,12 +88,10 @@ inline namespace math {
         constexpr Degrees(const Degrees<U> &other) noexcept
           : _data(other._data) {}
 
-      // conversation operators
       template <typename U>
-        constexpr operator Radians<U>() const noexcept {
-          return Radians<U>{static_cast<U>(_data) / static_cast<U>(180.) * std::numbers::pi_v<U>};
+        constexpr Degrees(const Radians<U>& rad) noexcept
+          : _data(static_cast<T>(rad.value()) * static_cast<T>(180.) / std::numbers::pi_v<T>) {
         }
-
       explicit constexpr operator T() const noexcept { return _data; };
 
       constexpr T value() const noexcept { return _data; }
@@ -109,6 +105,41 @@ inline namespace math {
       }
     };
 
+    template<typename T>
+      Degrees(Radians<T>) -> Degrees<T>;
+
+  template <std::floating_point T = float>
+    struct Yaw {
+      const mr::Radians<T> value = 0;
+      Yaw() noexcept = default;
+      Yaw(const mr::Radians<T> &v) : value(v) {}
+      operator mr::Radians<T>() const {return value;}
+    };
+
+  template<typename T>
+    Yaw(const Degrees<T>&) -> Yaw<T>;
+
+  template <std::floating_point T = float>
+    struct Pitch {
+      const mr::Radians<T> value = 0;
+      Pitch() noexcept = default;
+      Pitch(const mr::Radians<T> &v) : value(v) {}
+      operator mr::Radians<T>() const {return value;}
+    };
+
+  template<typename T>
+    Pitch(const Degrees<T>&) -> Pitch<T>;
+
+  template <std::floating_point T = float>
+    struct Roll {
+      const mr::Radians<T> value = 0;
+      Roll() noexcept = default;
+      Roll(const mr::Radians<T> &v) : value(v) {}
+      operator mr::Radians<T>() const {return value;}
+    };
+
+    template<typename T>
+      Roll(const Degrees<T>&) -> Roll<T>;
 
   inline const auto pi = mr::Radiansf(std::numbers::pi_v<float>);
 
@@ -126,27 +157,27 @@ inline namespace math {
       using DegreesLiteral = Degrees<float>;
     }
 
-    constexpr details::RadiansLiteral operator"" _rad(unsigned long long value) {
+    constexpr details::RadiansLiteral operator""_rad(unsigned long long value) {
       return details::RadiansLiteral{static_cast<float>(value)};
     }
 
-    constexpr details::DegreesLiteral operator"" _deg(unsigned long long value) {
+    constexpr details::DegreesLiteral operator""_deg(unsigned long long value) {
       return details::DegreesLiteral{static_cast<float>(value)};
     }
 
-    constexpr details::RadiansLiteral operator"" _pi(unsigned long long value) {
+    constexpr details::RadiansLiteral operator""_pi(unsigned long long value) {
       return value * pi;
     }
 
-    constexpr details::RadiansLiteral operator"" _rad(long double value) {
+    constexpr details::RadiansLiteral operator""_rad(long double value) {
       return details::RadiansLiteral{static_cast<float>(value)};
     }
 
-    constexpr details::DegreesLiteral operator"" _deg(long double value) {
+    constexpr details::DegreesLiteral operator""_deg(long double value) {
       return details::DegreesLiteral{static_cast<float>(value)};
     }
 
-    constexpr details::RadiansLiteral operator"" _pi(long double value) {
+    constexpr details::RadiansLiteral operator""_pi(long double value) {
       return value * pi;
     }
   }

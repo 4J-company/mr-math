@@ -2,7 +2,7 @@
 #define __MR_QUAT_HPP_
 
 #include "def.hpp"
-#include "mr-math/operators.hpp"
+#include "operators.hpp"
 #include "vec.hpp"
 #include "matr.hpp"
 #include "rot.hpp"
@@ -46,6 +46,33 @@ inline namespace math {
 
       [[nodiscard]] explicit constexpr operator Vec4<T>() const noexcept {
         return Vec4<T>{w(), x(), y(), z()};
+      }
+
+      operator Matr<T, 4>() const noexcept {
+        T rad = w();
+        mr::Norm n = vec().normalized_unchecked();
+
+        T co = std::cos(rad);
+        T si = std::sin(rad);
+        T nco = 1 - co;
+        Vec<T, 3> tmp0 {n * n * nco + Vec<T, 3>{co}};
+
+        // TODO: implement using Vec4(Vec3, T) constructor
+        Matr4<T> tmp1 = ScaleMatr<T, 4>({tmp0.x(), tmp0.y(), tmp0.z(), 1});
+        Matr4<T> tmp2 = Matr4<T> {
+          0, n.x() * n.y() * nco, n.x() * n.z() * nco, 0,
+            n.x() * n.y() * nco,                   0, n.y() * n.z() * nco, 0,
+            n.x() * n.z() * nco, n.y() * n.z() * nco,                   0, 0,
+            0,                   0,                   0, 0
+        };
+        Matr4<T> tmp3 = Matr4<T> {
+          0, -n.z() * si,  n.y() * si, 0,
+            n.z() * si,           0, -n.x() * si, 0,
+            -n.y() * si,  n.x() * si,           0, 0,
+            0,           0,           0, 0
+        };
+
+        return tmp1 + tmp2 + tmp3;
       }
 
       [[nodiscard]] constexpr T length2()          const noexcept { return w() * w() + vec().length2(); }

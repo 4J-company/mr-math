@@ -76,7 +76,7 @@ v.z(80) // set component
 ```
 
 ### Normals
-Normals support most of vectors' functionality and their intent is to carry additional knowledge about a value.
+Normals support most of the vectors' functionality and their intent is to carry additional knowledge about a value.
 This prevents bugs when a vector is accidentally not normalized, as well as brings some performance improvement
 by eliminating need to normalize/check vectors multiple times.
 
@@ -107,7 +107,7 @@ mr::Norm3f n{30, 47, 80};
 mr::PackedNorm32 packed = mr::pack_oct32(n);
 mr::Norm3f unpacked = mr::unpack_oct32(packed);
 
-bool is_near = _mr::equal(unpacked, n, 0.01); // true
+bool is_near = mr::equal(unpacked, n, 0.01); // true
 ```
 Packing allows reduce normals memory footprint that is useful for optimizing GPU data transfers.
 We provide 32/24/16-bit versions of octahedron packing algorithm.

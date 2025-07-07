@@ -15,20 +15,28 @@ inline namespace math {
     PackedNorm24() = default;
 
     constexpr explicit PackedNorm24(uint32_t value) noexcept {
-      data[0] = value & 0xFF;
-      data[1] = (value >> 8) & 0xFF;
-      data[2] = (value >> 16) & 0xFF;
+      _data[0] = value & 0xFF;
+      _data[1] = (value >> 8) & 0xFF;
+      _data[2] = (value >> 16) & 0xFF;
     }
 
     constexpr explicit operator uint32_t() const noexcept {
       return
-        (static_cast<uint32_t>(data[2]) << 16) |
-        (static_cast<uint32_t>(data[1]) << 8) |
-         static_cast<uint32_t>(data[0]);
+        (static_cast<uint32_t>(_data[2]) << 16) |
+        (static_cast<uint32_t>(_data[1]) << 8) |
+         static_cast<uint32_t>(_data[0]);
+    }
+
+    constexpr explicit operator const uint8_t* () const noexcept {
+      return _data.data();
+    }
+
+    constexpr explicit operator uint8_t* () noexcept {
+      return _data.data();
     }
 
   private:
-    std::array<uint8_t, 3> data;
+    std::array<uint8_t, 3> _data;
   };
 
 namespace details {

@@ -40,7 +40,7 @@ jobs:
         -s build_type=${{env.BUILD_TYPE}}
     
     - name: Run benchmark
-      run: ./build/Release/mr-math-bench --benchmark_format=json | tee benchmark_result.json
+      run: ./build/Release/bench/mr-math-bench --benchmark_format=json | tee benchmark_result.json
 
     - name: Download previous results
       uses: actions/cache@v4

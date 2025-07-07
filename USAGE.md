@@ -78,7 +78,7 @@ v.z(80) // set component
 ### Normals
 Normals support most of the vectors' functionality and their intent is to carry additional knowledge about a value.
 This prevents bugs when a vector is accidentally not normalized, as well as brings some performance improvement
-by eliminating need to normalize/check vectors multiple times.
+by eliminating the need to normalize/check vectors multiple times.
 
 Example:
 ```cpp
@@ -99,7 +99,7 @@ mr::Norm3f n {2, 0, 0}; // normalize at compile time
 std::optional<mr::Norm3f> on = v.normalized(); // does not change v; returns std::nullopt if v.length2() near to zero
 mr::Vec3f &rv = v.normalize();                 // changes v
 ```
-We also provide `*_fast` versions when less precision is acceptable and `*_unchecked` ones when you are sure that vector's length greater than 0.
+We also provide `*_fast` versions when less precision is acceptable and `*_unchecked` ones when you are sure that the vector's length greater than 0.
 
 Packing:
 ```cpp
@@ -109,8 +109,8 @@ mr::Norm3f unpacked = mr::unpack_oct32(packed);
 
 bool is_near = mr::equal(unpacked, n, 0.01); // true
 ```
-Packing allows reduce normals memory footprint that is useful for optimizing GPU data transfers.
-We provide 32/24/16-bit versions of octahedron packing algorithm.
+Packing reduces normals memory footprint that is useful for optimizing GPU data transfers.
+We provide 32/24/16-bit versions of the octahedron packing algorithm.
 
 ### Matrices
 Initialization

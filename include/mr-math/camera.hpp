@@ -1,12 +1,21 @@
 #ifndef __MR_CAMERA_HPP_
 #define __MR_CAMERA_HPP_
 
+#include "def.hpp"
 #include "vec.hpp"
 #include "rot.hpp"
 #include "matr.hpp"
 
 namespace mr {
 inline namespace math {
+
+namespace details {
+#ifdef MR_MATH_SINGLE_THREDED
+  using CacheFlag = bool;
+#else
+  using CacheFlag = std::atomic_bool;
+#endif
+}
 
   using namespace mr::literals;
 
@@ -43,11 +52,11 @@ inline namespace math {
 
         private:
           // cached frustum matrix
-          mutable bool frustum_calculated = false;
+          mutable details::CacheFlag frustum_calculated = false;
           mutable MatrT frustum;
 
           // cached orthographics matrix
-          mutable bool orthographic_calculated = false;
+          mutable details::CacheFlag orthographic_calculated = false;
           mutable MatrT orthographic;
         };
 
@@ -189,8 +198,9 @@ inline namespace math {
         }
 
         constexpr MatrT calculate_perspective() const noexcept {
+#ifndef MR_MATH_SINGLE_THREDED
           std::lock_guard lg(_perspective_mutex);
-
+#endif
           const auto direction = -_rotation.direction();
           const auto right = _rotation.right();
           const auto up = _rotation.up();
@@ -205,8 +215,9 @@ inline namespace math {
         }
 
         constexpr MatrT calculate_orthographic() const noexcept {
+#ifndef MR_MATH_SINGLE_THREDED
           std::lock_guard lg(_perspective_mutex);
-
+#endif
           const T l = -_projection.height / 2; // left
           const T r = _projection.height / 2;  // right
           const T b = -_projection.width / 2;  // bottom
@@ -225,7 +236,9 @@ inline namespace math {
         }
 
         constexpr MatrT calculate_frustum() const noexcept {
+#ifndef MR_MATH_SINGLE_THREDED
           std::lock_guard lg(_perspective_mutex);
+#endif
 
           const T l = -_projection.height / 2; // left
           const T r = _projection.height / 2;  // right
@@ -249,8 +262,10 @@ inline namespace math {
         Rotation<T> _rotation;
         Projection _projection;
 
+#ifndef MR_MATH_SINGLE_THREDED
         mutable std::mutex _perspective_mutex;
-        mutable std::atomic_bool _perspective_calculated = false;
+#endif
+        mutable details::CacheFlag _perspective_calculated = false;
         mutable MatrT _perspective;
     };
 }

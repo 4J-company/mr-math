@@ -39,7 +39,7 @@ git clone https://github.com/4J-company/conan-center-index.git cci-4j
 conan remote add 4J-company ./cci-4j --type local-recipes-index
 ```
 
-Add `"mr-math/1.1.0"` to your conanfile.
+Add `"mr-math/1.1.1"` to your conanfile.
 
 
 ## Building

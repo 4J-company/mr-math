@@ -41,6 +41,15 @@ inline namespace math {
 
 namespace details {
 
+  constexpr inline float max_value16 = (1 << 16) - 1;
+  constexpr inline uint32_t mask16 = 0xFFFF;
+
+  constexpr inline float max_value12 = (1 << 12) - 1;
+  constexpr inline uint32_t mask12 = 0xFFF;
+
+  constexpr inline float max_value8 = (1 << 8) - 1;
+  constexpr inline uint32_t mask8 = 0xFF;
+
   inline Vec2f sign_non_zero(const Vec2f& v)
   {
     return Vec2f{v.x() >= 0, v.y() >= 0} * 2 - Vec2f{1};
@@ -50,9 +59,6 @@ namespace details {
   {
     return (Vec2f{1} - std::abs(Vec2f{v.y(), v.x()})) * sign_non_zero(v);
   }
-
-  constexpr inline float max_value16 = (1 << 16) - 1;
-  constexpr inline auto mask16 = 0xFFFF;
 
   inline PackedNorm32 quantize32(const Vec2f& norm)
   {
@@ -67,9 +73,6 @@ namespace details {
     return norm_masked / max_value16 * 2.0f - Vec2f{ 1.0f };
   }
 
-  constexpr inline float max_value12 = (1 << 12) - 1;
-  constexpr inline auto mask12 = 0xFFF;
-  
   inline PackedNorm24 quantize24(const Vec2f& norm)
   {
     const auto norm_trans = (norm * 0.5f + Vec2f{ 0.5 }) * max_value12;
@@ -83,9 +86,6 @@ namespace details {
     const mr::Vec2f norm_masked{ (norm32 >> 12) & mask12, norm32 & mask12 };
     return norm_masked / max_value12 * 2.0f - Vec2f{ 1.0f };
   }
-
-  constexpr inline float max_value8 = (1 << 8) - 1;
-  constexpr inline auto mask8 = 0xFF;
   
   inline PackedNorm16 quantize16(const Vec2f& norm)
   {

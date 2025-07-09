@@ -342,7 +342,7 @@ inline namespace math
 
           friend inline constexpr ScaleMatr operator*(const ScaleMatr &lhs, const ScaleMatr &rhs) noexcept {
             ScaleMatr res = lhs;
-            lhs._scale *= rhs._scale;
+            res._scale *= rhs._scale;
             return res;
           }
           friend inline constexpr ScaleMatr & operator*=(ScaleMatr &lhs, const ScaleMatr &rhs) noexcept {

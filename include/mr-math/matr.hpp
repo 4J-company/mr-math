@@ -400,11 +400,11 @@ inline namespace math
 
           friend inline constexpr Matr<T, N> operator*(const Matr<T, N> &lhs, const TranslateMatr &rhs) noexcept {
             Matr<T, N> res = lhs;
-            res[N - 1] += rhs._data;
+            res[N - 1] += rhs._data._data;
             return res;
           }
           friend inline constexpr Matr<T, N> & operator*=(Matr<T, N> &lhs, const TranslateMatr &rhs) noexcept {
-            lhs[N - 1] += rhs._data;
+            lhs[N - 1] += rhs._data._data;
             return lhs;
           }
 

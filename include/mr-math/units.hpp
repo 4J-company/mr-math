@@ -66,6 +66,9 @@ inline namespace math {
 
       constexpr T value() const noexcept { return _data; }
 
+      constexpr const T& as_underlying() const noexcept { return _data; }
+      constexpr       T& as_underlying()       noexcept { return _data; }
+      
       // comparison operator
       [[nodiscard]] friend constexpr auto operator<=>(Radians lhs, Radians rhs) = default;
 
@@ -95,6 +98,9 @@ inline namespace math {
       explicit constexpr operator T() const noexcept { return _data; };
 
       constexpr T value() const noexcept { return _data; }
+
+      constexpr const T& as_underlying() const noexcept { return _data; }
+      constexpr       T& as_underlying()       noexcept { return _data; }
 
       // comparison operator
       [[nodiscard]] friend constexpr auto operator<=>(Degrees lhs, Degrees rhs) = default;

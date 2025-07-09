@@ -83,10 +83,10 @@ inline namespace math
         requires (std::is_same_v<Args, RowT> && ...) &&
                  (sizeof...(Args) == N)
         constexpr Matr(Args... args) noexcept {
-          _data = std::array<RowT, N>({args...});
+          rows = std::array<RowT, N>({args...});
         }
 
-      constexpr Matr(std::array<RowT, N> rows) : _data(std::move(rows)) {}
+      constexpr Matr(std::array<RowT, N> rows) : rows(std::move(rows)) {}
 
       template <typename... Args>
         requires (std::is_convertible_v<Args, T> && ...) &&
@@ -94,7 +94,7 @@ inline namespace math
         constexpr Matr(Args... args) noexcept {
           std::array<T, N * N> tmp {static_cast<T>(args)...};
           for (size_t i = 0; i < N; i++) {
-            _data[i] = RowT {
+            rows[i] = RowT {
               tmp[N * i + 0],
               tmp[N * i + 1],
               tmp[N * i + 2],
@@ -118,7 +118,7 @@ inline namespace math
         std::array<RowT, N> tmp {};
         for (size_t i = 0; i < N; i++) {
           for (size_t j = 0; j < N; j++) {
-            tmp[j] += other._data[i] * _data[j][i];
+            tmp[j] += other.rows[i] * rows[j][i];
           }
         }
         *this = tmp;
@@ -127,14 +127,14 @@ inline namespace math
 
       constexpr Matr & operator+=(const Matr &other) noexcept {
         for (int i = 0; i < N; i++) {
-          _data[i] += other._data[i];
+          rows[i] += other.rows[i];
         }
         return *this;
       }
 
       constexpr Matr & operator-=(const Matr &other) noexcept {
         for (int i = 0; i < N; i++) {
-          _data[i] -= other._data[i];
+          rows[i] -= other.rows[i];
         }
         return *this;
       }
@@ -143,7 +143,7 @@ inline namespace math
         std::array<RowT, N> tmp{};
         for (size_t i = 0; i < N; i++) {
           for (size_t j = 0; j < N; j++) {
-            tmp[j] += other._data[i] * _data[j][i];
+            tmp[j] += other.rows[i] * rows[j][i];
           }
         }
         return {tmp};
@@ -152,7 +152,7 @@ inline namespace math
       constexpr Matr operator+(const Matr &other) const noexcept {
         std::array<RowT, N> tmp;
         for (size_t i = 0; i < N; i++) {
-          tmp[i] = static_cast<RowT>(_data[i] + other._data[i]);
+          tmp[i] = static_cast<RowT>(rows[i] + other.rows[i]);
         }
         return {tmp};
       }
@@ -160,23 +160,23 @@ inline namespace math
       constexpr Matr operator-(const Matr &other) const noexcept {
         std::array<RowT, N> tmp;
         for (size_t i = 0; i < N; i++) {
-          tmp[i] = _data[i] - other._data[i];
+          tmp[i] = rows[i] - other.rows[i];
         }
         return {tmp};
       }
 
       // matrix related operations
       [[nodiscard]] constexpr const RowT & operator[](size_t i) const noexcept {
-        return _data[i];
+        return rows[i];
       }
 
       [[nodiscard]] constexpr RowT & operator[](size_t i) noexcept {
-        return _data[i];
+        return rows[i];
       }
 
       // TODO: fix (or remove as it's neved used)
       [[nodiscard]] constexpr T determinant() const noexcept {
-        std::array<RowT, N> tmp = _data;
+        std::array<RowT, N> tmp = rows;
         T det = 1;
 
         tmp[N - 1] /= tmp[N - 1][N - 1];
@@ -193,7 +193,7 @@ inline namespace math
       constexpr Matr transposed() const noexcept {
         Matr transposed;
         for (size_t i = 0; i < N; i++) {
-          transposed[i] = SimdImpl<T, N>([this, i](size_t j) { return _data[j][i]; });
+          transposed[i] = SimdImpl<T, N>([this, i](size_t j) { return rows[j][i]; });
         }
         return transposed;
       }
@@ -259,7 +259,7 @@ inline namespace math
 
       constexpr bool operator==(const Matr &other) const noexcept {
         for (size_t i = 0; i < N; i++) {
-          if (_data[i] != other._data[i]) {
+          if (rows[i] != other.rows[i]) {
             return false;
           }
         }
@@ -268,7 +268,7 @@ inline namespace math
 
       constexpr bool equal(const Matr &other, ValueT eps = epsilon<ValueT>()) const noexcept {
         for (size_t i = 0; i < N; i++) {
-          if (not _data[i].equal(other._data[i], eps)) {
+          if (not rows[i].equal(other.rows[i], eps)) {
             return false;
           }
         }
@@ -298,7 +298,7 @@ inline namespace math
       }
 
     public:
-      std::array<RowT, N> _data;
+      std::array<RowT, N> rows;
 
     private:
       static const Matr _identity;
@@ -312,50 +312,50 @@ inline namespace math
     template <ArithmeticT T, std::size_t N>
       struct ScaleMatr {
         private:
-          mr::Vec<T, N> _data = 1;
+          mr::Vec<T, N> _scale = 1;
 
         public:
           constexpr ScaleMatr() = default;
-          constexpr ScaleMatr(mr::Vec<T, N> scale) : _data(scale) { }
+          constexpr ScaleMatr(mr::Vec<T, N> scale) : _scale(scale) { }
 
           constexpr ScaleMatr &inverse() noexcept {
-            _data = 1 / _data;
+            _scale = 1 / _scale;
             return *this;
           }
           constexpr ScaleMatr inversed() const noexcept {
-            return ScaleMatr(1 / _data);
+            return ScaleMatr(1 / _scale);
           }
 
           friend constexpr Matr<T, N> operator*(const Matr<T, N> &lhs, const ScaleMatr &rhs) noexcept {
             Matr<T, N> res = lhs;
             for (size_t i = 0; i < N; i++) {
-              res[i] *= rhs._data[i];
+              res[i] *= rhs._scale[i];
             }
             return res;
           }
           friend constexpr Matr<T, N> & operator*=(Matr<T, N> &lhs, const ScaleMatr &rhs) noexcept {
             for (size_t i = 0; i < N; i++) {
-              lhs[i] *= rhs._data[i];
+              lhs[i] *= rhs._scale[i];
             }
             return lhs;
           }
 
           friend inline constexpr ScaleMatr operator*(const ScaleMatr &lhs, const ScaleMatr &rhs) noexcept {
             ScaleMatr res = lhs;
-            lhs._data *= rhs._data;
+            lhs._scale *= rhs._scale;
             return res;
           }
           friend inline constexpr ScaleMatr & operator*=(ScaleMatr &lhs, const ScaleMatr &rhs) noexcept {
-            lhs._data *= rhs._data;
+            lhs._scale *= rhs._scale;
             return lhs;
           }
 
           friend inline constexpr Vec<T, N> operator*(const Vec<T, N> &lhs, const ScaleMatr &rhs) noexcept {
-            Vec<T, N> res = lhs * rhs._data;
+            Vec<T, N> res = lhs * rhs._scale;
             return res;
           }
           friend constexpr Vec<T, N> & operator*=(Vec<T, N> &lhs, const ScaleMatr &rhs) noexcept {
-            lhs *= rhs._data;
+            lhs *= rhs._scale;
             return lhs;
           }
 
@@ -368,62 +368,62 @@ inline namespace math
     template <ArithmeticT T, std::size_t N>
       struct TranslateMatr {
         private:
-          mr::Vec<T, N> _data {};
+          mr::Vec<T, N> _offset {};
 
         public:
           constexpr TranslateMatr() = default;
-          constexpr TranslateMatr(mr::Vec<T, N> translate) : _data(translate) { }
+          constexpr TranslateMatr(mr::Vec<T, N> offset) : _offset(offset) { }
 
           operator Matr<T, N>() {
             Matr<T, N> res = Matr<T, N>::identity();
-            res[N - 1] += _data;
+            res[N - 1] += _offset;
             return res;
           }
 
           constexpr TranslateMatr &inverse() noexcept {
-            _data = -_data;
+            _offset = -_offset;
             return *this;
           }
           constexpr TranslateMatr inversed() const noexcept {
-            return TranslateMatr(-_data);
+            return TranslateMatr(-_offset);
           }
 
           friend inline constexpr TranslateMatr operator*(const TranslateMatr &lhs, const TranslateMatr &rhs) noexcept {
             TranslateMatr res = lhs;
-            res._data += rhs._data;
+            res._offset += rhs._offset;
             return res;
           }
           friend inline constexpr TranslateMatr & operator*=(TranslateMatr &lhs, const TranslateMatr &rhs) noexcept {
-            lhs._data += rhs._data;
+            lhs._offset += rhs._offset;
             return lhs;
           }
 
           friend inline constexpr Matr<T, N> operator*(const Matr<T, N> &lhs, const TranslateMatr &rhs) noexcept {
             Matr<T, N> res = lhs;
-            res[N - 1] += rhs._data._data;
+            res[N - 1] += rhs._offset.row;
             return res;
           }
           friend inline constexpr Matr<T, N> & operator*=(Matr<T, N> &lhs, const TranslateMatr &rhs) noexcept {
-            lhs[N - 1] += rhs._data._data;
+            lhs[N - 1] += rhs._offset.row;
             return lhs;
           }
 
           friend inline constexpr Vec<T, N> operator*(const Vec<T, N> &lhs, const TranslateMatr &rhs) noexcept {
-            Vec<T, N> res = lhs + rhs._data;
+            Vec<T, N> res = lhs + rhs._offset;
             return res;
           }
           friend inline constexpr Vec<T, N> & operator*=(Vec<T, N> &lhs, const TranslateMatr &rhs) noexcept {
-            lhs += rhs._data;
+            lhs += rhs._offset;
             return lhs;
           }
 
           friend inline constexpr TranslateMatr operator*(const TranslateMatr &lhs, const ScaleMatr<T, N> &rhs) noexcept {
             TranslateMatr res = lhs;
-            res._data *= rhs._data;
+            res._offset *= rhs._scale;
             return res;
           }
           friend inline constexpr TranslateMatr & operator*=(TranslateMatr &lhs, const ScaleMatr<T, N> &rhs) noexcept {
-            lhs._data *= rhs._data;
+            lhs._offset *= rhs._scale;
             return lhs;
           }
       };
@@ -431,14 +431,14 @@ inline namespace math
     template <ArithmeticT T>
       struct RotateMatr {
         private:
-          mr::Quat<T> _data {};
+          mr::Quat<T> _rotation {};
 
         public:
           constexpr RotateMatr() = default;
-          constexpr RotateMatr(mr::Quat<T> rotate) : _data(rotate) {}
+          constexpr RotateMatr(mr::Quat<T> quat) : _rotation(quat) {}
 
           constexpr RotateMatr(mr::Norm3<T> axis, mr::Radians<T> angle) noexcept
-            : _data(angle, (mr::Vec3<T>)axis) { }
+            : _rotation(angle, (mr::Vec3<T>)axis) { }
 
           constexpr RotateMatr(mr::Vec3<T> axis, mr::Radians<T> angle) noexcept
             : RotateMatr(angle, axis.normalized_unchecked()) {}
@@ -453,26 +453,26 @@ inline namespace math
             : RotateMatr(mr::Norm3<T>(mr::unchecked, mr::axis::z), angle.value) { }
 
           constexpr RotateMatr &inverse() noexcept {
-            _data.inverse();
+            _rotation.inverse();
             return *this;
           }
           constexpr RotateMatr inversed() const noexcept {
-            return RotateMatr(_data.inversed());
+            return RotateMatr(_rotation.inversed());
           }
 
           friend constexpr RotateMatr operator*(const RotateMatr &lhs, const RotateMatr &rhs) noexcept {
             RotateMatr res = lhs;
-            res._data *= rhs._data;
+            res._rotation *= rhs._rotation;
             return res;
           }
           friend constexpr RotateMatr & operator*=(RotateMatr &lhs, const RotateMatr &rhs) noexcept {
-            lhs._data *= rhs._data;
+            lhs._rotation *= rhs._rotation;
             return lhs;
           }
 
           template <std::size_t N>
             friend constexpr Matr<T, N> operator*(const Matr<T, N> &lhs, const RotateMatr &rhs) noexcept {
-              return lhs * rhs._data;
+              return lhs * rhs._rotation;
             }
           template <std::size_t N>
             friend constexpr Matr<T, N> & operator*=(Matr<T, N> &lhs, const RotateMatr &rhs) noexcept {
@@ -481,7 +481,7 @@ inline namespace math
             }
 
           friend constexpr Vec3<T> operator*(const Vec3<T> &lhs, const RotateMatr &rhs) noexcept {
-            return lhs * rhs._data;
+            return lhs * rhs._rotation;
           }
 
           friend constexpr Vec3<T> & operator*=(Vec3<T> &lhs, const RotateMatr &rhs) noexcept {

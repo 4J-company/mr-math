@@ -9,153 +9,153 @@ inline namespace math {
     struct UnitOperators {
       friend constexpr DerivedT
       operator+(const DerivedT &lhs, const DerivedT &rhs) noexcept {
-        return DerivedT{lhs._data + rhs._data};
+        return DerivedT{lhs.as_underlying() + rhs.as_underlying()};
       }
 
       friend constexpr DerivedT
       operator-(const DerivedT &lhs, const DerivedT &rhs) noexcept {
-        return DerivedT{lhs._data - rhs._data};
+        return DerivedT{lhs.as_underlying() - rhs.as_underlying()};
       }
 
       friend constexpr DerivedT &
       operator+=(DerivedT &lhs, const DerivedT &rhs) noexcept {
-        lhs._data += rhs._data;
+        lhs.as_underlying() += rhs.as_underlying();
         return lhs;
       }
 
       friend constexpr DerivedT &
       operator-=(DerivedT &lhs, const DerivedT &rhs) noexcept {
-        lhs._data -= rhs._data;
+        lhs.as_underlying() -= rhs.as_underlying();
         return lhs;
       }
 
       friend constexpr DerivedT &
       operator+(const DerivedT &lhs, const ArithmeticT auto rhs) noexcept {
-        return DerivedT{lhs._data + rhs};
+        return DerivedT{lhs.as_underlying() + rhs};
       }
 
       friend constexpr DerivedT
       operator-(const DerivedT &lhs, const ArithmeticT auto rhs) noexcept {
-        return DerivedT{lhs._data - rhs};
+        return DerivedT{lhs.as_underlying() - rhs};
       }
 
       friend constexpr DerivedT &
       operator+=(DerivedT &lhs, const ArithmeticT auto rhs) noexcept {
-        lhs._data += rhs;
+        lhs.as_underlying() += rhs;
         return lhs;
       }
 
       friend constexpr DerivedT &
       operator-=(DerivedT &lhs, const ArithmeticT auto rhs) noexcept {
-        lhs._data -= rhs;
+        lhs.as_underlying() -= rhs;
         return lhs;
       }
 
       friend constexpr DerivedT
       operator*(const DerivedT &lhs, const ArithmeticT auto rhs) noexcept {
-        return DerivedT{lhs._data * static_cast<DerivedT::ValueT>(rhs)};
+        return DerivedT{lhs.as_underlying() * static_cast<DerivedT::ValueT>(rhs)};
       }
 
       friend constexpr DerivedT
       operator/(const DerivedT &lhs, const ArithmeticT auto rhs) noexcept {
-        return DerivedT{lhs._data / static_cast<DerivedT::ValueT>(rhs)};
+        return DerivedT{lhs.as_underlying() / static_cast<DerivedT::ValueT>(rhs)};
       }
 
       friend constexpr DerivedT
       operator*(const ArithmeticT auto lhs, const DerivedT &rhs) noexcept {
-        return DerivedT{rhs._data * static_cast<DerivedT::ValueT>(lhs)};
+        return DerivedT{rhs.as_underlying() * static_cast<DerivedT::ValueT>(lhs)};
       }
 
       friend constexpr DerivedT &
       operator*=(DerivedT &lhs, const ArithmeticT auto x) noexcept {
-        lhs._data *= static_cast<DerivedT::ValueT>(x);
+        lhs.as_underlying() *= static_cast<DerivedT::ValueT>(x);
         return lhs;
       }
 
       friend constexpr DerivedT &
       operator/=(DerivedT &lhs, const ArithmeticT auto x) noexcept {
-        lhs._data /= static_cast<DerivedT::ValueT>(x);
+        lhs.as_underlying() /= static_cast<DerivedT::ValueT>(x);
         return lhs;
       }
 
       friend constexpr DerivedT
       operator-(const DerivedT &rhs) noexcept {
-        return DerivedT{-rhs._data};
+        return DerivedT{-rhs.as_underlying()};
       }
 
       // bitwise operators
 
       friend constexpr DerivedT
       operator&(const DerivedT& lhs, const DerivedT& rhs) noexcept {
-        return DerivedT{lhs._data & rhs._data};
+        return DerivedT{lhs.as_underlying() & rhs.as_underlying()};
       }
 
       friend constexpr DerivedT
       operator&(const DerivedT& lhs, std::integral auto rhs) noexcept {
-        return DerivedT{lhs._data & rhs};
+        return DerivedT{lhs.as_underlying() & rhs};
       }
 
       friend constexpr DerivedT &
       operator&=(DerivedT& lhs, const DerivedT& rhs) noexcept
       {
-        lhs._data &= rhs._data;
+        lhs.as_underlying() &= rhs.as_underlying();
         return lhs;
       }
 
       friend constexpr DerivedT &
       operator&=(DerivedT& lhs, std::integral auto rhs) noexcept
       {
-        lhs._data &= rhs;
+        lhs.as_underlying() &= rhs;
         return lhs;
       }
 
       friend constexpr DerivedT
       operator|(const DerivedT& lhs, const DerivedT& rhs) noexcept {
-        return DerivedT{lhs._data | rhs._data};
+        return DerivedT{lhs.as_underlying() | rhs.as_underlying()};
       }
 
       friend constexpr DerivedT
       operator|(const DerivedT& lhs, std::integral auto rhs) noexcept {
-        return DerivedT{lhs._data | rhs};
+        return DerivedT{lhs.as_underlying() | rhs};
       }
 
       friend constexpr DerivedT &
       operator|=(DerivedT& lhs, const DerivedT& rhs) noexcept {
-        lhs._data |= rhs._data;
+        lhs.as_underlying() |= rhs.as_underlying();
         return lhs;
       }
 
       friend constexpr DerivedT &
       operator|=(DerivedT& lhs, std::integral auto rhs) noexcept {
-        lhs._data |= rhs;
+        lhs.as_underlying() |= rhs;
         return lhs;
       }
 
       friend constexpr DerivedT
       operator^(const DerivedT& lhs, const DerivedT& rhs) noexcept {
-        return DerivedT{lhs._data ^ rhs._data};
+        return DerivedT{lhs.as_underlying() ^ rhs.as_underlying()};
       }
 
       friend constexpr DerivedT
       operator^(const DerivedT& lhs, std::integral auto rhs) noexcept {
-        return DerivedT{lhs._data ^ rhs};
+        return DerivedT{lhs.as_underlying() ^ rhs};
       }
 
       friend constexpr DerivedT &
       operator^=(DerivedT& lhs, const DerivedT& rhs) noexcept {
-        lhs._data ^= rhs._data;
+        lhs.as_underlying() ^= rhs.as_underlying();
         return lhs;
       }
 
       friend constexpr DerivedT &
       operator^=(DerivedT& lhs, std::integral auto rhs) noexcept {
-        lhs._data ^= rhs;
+        lhs.as_underlying() ^= rhs;
         return lhs;
       }
 
       friend constexpr DerivedT
       operator~(const DerivedT& rhs) noexcept {
-        return DerivedT{~rhs._data};
+        return DerivedT{~rhs.as_underlying()};
       }
     };
 
@@ -163,45 +163,45 @@ inline namespace math {
     struct RowOperators : UnitOperators<DerivedT> {
       friend constexpr DerivedT
       operator*(const DerivedT &lhs, const DerivedT &rhs) noexcept {
-        return DerivedT{lhs._data * rhs._data};
+        return DerivedT{lhs.as_underlying() * rhs.as_underlying()};
       }
 
       friend constexpr DerivedT
       operator/(const DerivedT &lhs, const DerivedT &rhs) noexcept {
-        return DerivedT{lhs._data / rhs._data};
+        return DerivedT{lhs.as_underlying() / rhs.as_underlying()};
       }
 
       friend constexpr DerivedT
       operator<<(const DerivedT &lhs, const DerivedT &rhs) noexcept {
-        return DerivedT{lhs._data << rhs._data};
+        return DerivedT{lhs.as_underlying() << rhs.as_underlying()};
       }
 
       friend constexpr DerivedT
       operator>>(const DerivedT &lhs, const DerivedT &rhs) noexcept {
-        return DerivedT{lhs._data >> rhs._data};
+        return DerivedT{lhs.as_underlying() >> rhs.as_underlying()};
       }
 
       friend constexpr DerivedT &
       operator*=(DerivedT &lhs, const DerivedT &rhs) noexcept {
-        lhs._data *= rhs._data;
+        lhs.as_underlying() *= rhs.as_underlying();
         return lhs;
       }
 
       friend constexpr DerivedT &
       operator/=(DerivedT &lhs, const DerivedT &rhs) noexcept {
-        lhs._data /= rhs._data;
+        lhs.as_underlying() /= rhs.as_underlying();
         return lhs;
       }
 
       friend constexpr DerivedT &
       operator<<=(DerivedT &lhs, const DerivedT &rhs) noexcept {
-        lhs._data <<= rhs._data;
+        lhs.as_underlying() <<= rhs.as_underlying();
         return lhs;
       }
 
       friend constexpr DerivedT &
       operator>>=(DerivedT &lhs, const DerivedT &rhs) noexcept {
-        lhs._data >>= rhs._data;
+        lhs.as_underlying() >>= rhs.as_underlying();
         return lhs;
       }
 

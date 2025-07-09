@@ -42,38 +42,38 @@ inline namespace math {
       // from elements constructor
       template <ArithmeticT... Args>
       requires (sizeof...(Args) >= 2) && (sizeof...(Args) <= N)
-        constexpr Norm(Args... args) : _data(args...) {
-          _data.normalize();
+        constexpr Norm(Args... args) : _vec(args...) {
+          _vec.normalize();
         }
 
-      constexpr Norm(UncheckedTag, const VecT &v) noexcept : _data(v) {
+      constexpr Norm(UncheckedTag, const VecT &v) noexcept : _vec(v) {
           assert(mr::equal(v.length(), 1, 0.1f));
         }
 
       constexpr operator const VecT &() const noexcept { return as_vec(); }
 
-      constexpr const VecT &as_vec() const noexcept { return _data; }
-      constexpr const RowT& as_row() const noexcept { return as_vec().as_row(); }
+      constexpr const VecT &as_vec() const noexcept { return _vec; }
+      constexpr const RowT &as_row() const noexcept { return as_vec().row; }
 
-      // getters
-      [[nodiscard]] constexpr T x() const noexcept requires (N >= 1) { return _data[0]; }
-      [[nodiscard]] constexpr T y() const noexcept requires (N >= 2) { return _data[1]; }
-      [[nodiscard]] constexpr T z() const noexcept requires (N >= 3) { return _data[2]; }
-      [[nodiscard]] constexpr T w() const noexcept requires (N >= 4) { return _data[3]; }
-      [[nodiscard]] constexpr T operator[](std::size_t i) const { return _data[i]; }
+      // getters  
+      [[nodiscard]] constexpr T x() const noexcept requires (N >= 1) { return _vec[0]; }
+      [[nodiscard]] constexpr T y() const noexcept requires (N >= 2) { return _vec[1]; }
+      [[nodiscard]] constexpr T z() const noexcept requires (N >= 3) { return _vec[2]; }
+      [[nodiscard]] constexpr T w() const noexcept requires (N >= 4) { return _vec[3]; }
+      [[nodiscard]] constexpr T operator[](std::size_t i) const { return _vec[i]; }
 
       // structured binding support
-      template <size_t I> requires (I < N) constexpr T get() const { return _data[I]; }
+      template <size_t I> requires (I < N) constexpr T get() const { return _vec[I]; }
 
       // cross product
       constexpr VecT cross(const VecT &other) const noexcept requires (N == 3) {
-        return RowT(as_row()._data.shifted(-1) * other.as_row()._data.shifted(1)
-          - as_row()._data.shifted(1) * other.as_row()._data.shifted(-1));
+        return RowT(as_row().simd.shifted(-1) * other.row.simd.shifted(1)
+          - as_row().simd.shifted(1) * other.row.simd.shifted(-1));
 #if 0
         std::array<T, 3> arr {
-          _data[1] * other._data[2] - _data[2] * other._data[1],
-          _data[2] * other._data[0] - _data[0] * other._data[2],
-          _data[0] * other._data[1] - _data[1] * other._data[0]
+          _vec[1] * other._vec[2] - _vec[2] * other._vec[1],
+          _vec[2] * other._vec[0] - _vec[0] * other._vec[2],
+          _vec[0] * other._vec[1] - _vec[1] * other._vec[0]
         };
 
         SimdImpl<T, 3> ans;
@@ -88,15 +88,11 @@ inline namespace math {
 
       // dot product
       [[nodiscard]] constexpr T dot(const VecT &other) const noexcept {
-        return (_data._data._data * other._data._data).sum();
-      }
-
-      [[nodiscard]] constexpr T operator&(const VecT &other) const noexcept {
-        return dot(other);
+        return (as_row() * other.row).sum();
       }
 
       [[nodiscard]] constexpr VecT operator*(const Norm &other) const noexcept {
-        return _data * other._data;
+        return _vec * other._vec;
       }
 
       // matrix multiplication
@@ -104,7 +100,7 @@ inline namespace math {
         constexpr VecT operator*(const Matr<R, N> &other) const noexcept {
           VecT tmp {};
           for (size_t i = 0; i < N; i++) {
-            tmp._data += (other._data[i] * _data[i])._data;
+            tmp.row += (other.rows[i] * _vec[i]).row;
           }
           return tmp;
         }
@@ -115,9 +111,9 @@ inline namespace math {
           Vec<T, N + 1> tmp {};
 
           for (size_t i = 0; i < N; i++) {
-            tmp._data += (other._data[i] * copy._data[i])._data;
+            tmp.row += (other.rows[i] * copy.row[i]).row;
           }
-          tmp._data += other._data[N]._data;
+          tmp.row += other.rows[N];
           return {tmp};
         }
 
@@ -131,28 +127,28 @@ inline namespace math {
         }
 
         constexpr friend Norm operator-(const Norm &n) noexcept {
-          return {unchecked, -n._data};
+          return {unchecked, -n._vec};
         }
 
         constexpr bool operator==(const Norm &other) const noexcept {
-          return _data == other._data;
+          return _vec == other._vec;
         }
         constexpr bool operator==(const VecT &other) const noexcept {
-          return _data == other;
+          return _vec == other;
         }
 
         constexpr bool equal(const Norm &other, ValueT eps = epsilon<ValueT>()) const noexcept {
-          return _data.equal(other._data, eps);
+          return _vec.equal(other._vec, eps);
         }
         constexpr bool equal(const VecT &other, ValueT eps = epsilon<ValueT>()) const noexcept {
-          return _data.equal(other, eps);
+          return _vec.equal(other, eps);
         }
 
       private:
         friend struct Vec<T, N>;
         constexpr Norm(const VecT &v) noexcept : Norm(unchecked, v) {}
 
-        VecT _data;
+        VecT _vec;
     };
 } // namespace math
 } // namespace mr

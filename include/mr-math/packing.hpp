@@ -1,6 +1,7 @@
 #ifndef __MR_PACKING_HPP_
 #define __MR_PACKING_HPP_
 
+#include "def.hpp"
 #include "norm.hpp"
 #include "vec.hpp"
 

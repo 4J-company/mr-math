@@ -8,9 +8,11 @@
 #include <sstream>
 #include <numeric>
 #include <optional>
+#include <cstdint>
 #include <numbers>
 #include <ranges>
 #include <atomic>
+#include <array>
 #include <mutex>
 #include <cmath>
 #include <span>

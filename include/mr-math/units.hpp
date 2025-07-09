@@ -155,6 +155,16 @@ inline namespace math {
     inline Vec3f z {0, 0, -1};
   }
 
+  namespace direction
+  {
+    inline const Vec3f up = axis::y;
+    inline const Vec3f down = -axis::y;
+    inline const Vec3f right = axis::x;
+    inline const Vec3f left = -axis::x;
+    inline const Vec3f forward = -axis::z;
+    inline const Vec3f backward = axis::z;
+  }
+
   namespace literals {
 
     namespace details {

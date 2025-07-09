@@ -52,24 +52,27 @@ inline namespace math {
         };
 
         constexpr Camera() = default;
-        constexpr Camera(VecT position) : _position(position) {}
-        constexpr Camera(VecT position, VecT direction, VecT up = {0, 1, 0}) :
-          _position(position),
-          _rotation(
-              direction.normalized_unchecked(),
-              up.normalized_unchecked(),
-              (direction.cross(up)).normalized_unchecked()) {}
+        constexpr Camera(const VecT &position) : _position(position) {}
+        
+        constexpr Camera(const VecT &position, const NormT &direction, const NormT &up = {0, 1, 0})
+          : _position(position)
+          , _rotation(direction, up, direction.cross(up)) {}
+
+        constexpr Camera(const VecT &position, const VecT &target, const NormT &up = {0, 1, 0})
+          : Camera(position, (target - position).normalized().value_or(NormT{1, 0, 0}), up) { }
+
 
         // copy semantics
-        constexpr Camera(const Camera &other) noexcept {
-          _position   = other._position;
-          _rotation   = other._rotation;
-          _projection = other._projection;
-
-          _perspective_calculated = false;
-        }
+        constexpr Camera(const Camera &other) noexcept 
+          : _position(other._position)
+          , _rotation(other._rotation)
+          , _projection(other._projection)
+          , _perspective_calculated(false) {}
 
         constexpr Camera &operator=(const Camera &other) noexcept {
+          if (this == &other)
+            return *this;
+
           _position   = other._position;
           _rotation   = other._rotation;
           _projection = other._projection;
@@ -79,15 +82,16 @@ inline namespace math {
         }
 
         // move semantics
-        constexpr Camera(Camera &&other) noexcept {
-          _position   = std::move(other._position);
-          _rotation   = std::move(other._rotation);
-          _projection = std::move(other._projection);
-
-          _perspective_calculated = false;
-        }
+        constexpr Camera(Camera &&other) noexcept 
+          : _position(std::move(other._position))
+          , _rotation(std::move(other._rotation))
+          , _projection(std::move(other._projection))
+          , _perspective_calculated(false) {}
 
         constexpr Camera &operator=(Camera &&other) noexcept {
+          if (this == &other)
+            return *this;
+
           _position   = std::move(other._position);
           _rotation   = std::move(other._rotation);
           _projection = std::move(other._projection);

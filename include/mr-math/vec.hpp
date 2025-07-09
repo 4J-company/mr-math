@@ -94,6 +94,8 @@ inline namespace math {
       [[nodiscard]] constexpr T w() const noexcept requires (N >= 4) { return _data[3]; }
       [[nodiscard]] constexpr T operator[](std::size_t i) const { return _data[i]; }
 
+      constexpr const RowT& as_row() const noexcept { return _data; }
+      constexpr       RowT& as_row()       noexcept { return _data; }
       // structured binding support
       template <size_t I> requires (I < N) constexpr T get() const { return _data[I]; }
 

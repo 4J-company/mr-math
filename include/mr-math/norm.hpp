@@ -37,6 +37,7 @@ inline namespace math {
     struct [[nodiscard]] Norm {
       using ValueT = T;
       using VecT = Vec<T, N>;
+      using RowT = Row<T, N>;
 
       // from elements constructor
       template <ArithmeticT... Args>
@@ -49,7 +50,10 @@ inline namespace math {
           assert(mr::equal(v.length(), 1, 0.1f));
         }
 
-      constexpr operator VecT() const noexcept { return _data; }
+      constexpr operator const VecT &() const noexcept { return as_vec(); }
+
+      constexpr const VecT &as_vec() const noexcept { return _data; }
+      constexpr const RowT& as_row() const noexcept { return as_vec().as_row(); }
 
       // getters
       [[nodiscard]] constexpr T x() const noexcept requires (N >= 1) { return _data[0]; }
@@ -63,8 +67,8 @@ inline namespace math {
 
       // cross product
       constexpr VecT cross(const VecT &other) const noexcept requires (N == 3) {
-        return RowT(_data._data.shifted(-1) * other._data._data.shifted(1)
-          - _data._data.shifted(1) * other._data._data.shifted(-1));
+        return RowT(as_row()._data.shifted(-1) * other.as_row()._data.shifted(1)
+          - as_row()._data.shifted(1) * other.as_row()._data.shifted(-1));
 #if 0
         std::array<T, 3> arr {
           _data[1] * other._data[2] - _data[2] * other._data[1],
@@ -78,8 +82,8 @@ inline namespace math {
 #endif
       }
 
-      constexpr VecT operator%(const VecT &other) const noexcept requires (N == 3) {
-        return cross(other);
+      constexpr Norm cross(const Norm& other) const noexcept requires (N == 3) {
+        return Norm{unchecked, cross(other.as_vec())};
       }
 
       // dot product

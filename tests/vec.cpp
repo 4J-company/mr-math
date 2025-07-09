@@ -29,6 +29,7 @@ TEST_F(Vector3D, Getters) {
   EXPECT_EQ(v1[0], 1.0);
   EXPECT_EQ(v1[1], 2.0);
   EXPECT_EQ(v1[2], 3.0);
+  EXPECT_EQ(v1.as_row(), mr::Vec3f::RowT(1, 2, 3));
 }
 
 TEST_F(Vector3D, Setters) {

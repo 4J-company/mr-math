@@ -11,6 +11,7 @@
 #include "camera.hpp"
 #include "bound_box.hpp"
 #include "color.hpp"
+#include "packing.hpp"
 
 #ifndef NDEBUG
   #include "debug.hpp"

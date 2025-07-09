@@ -7,12 +7,10 @@ set(MR_MATH_TESTS_NAME   mr-math-tests)
 
 project(
   ${MR_MATH_PROJECT_NAME}
-  VERSION 1.0.0
+  VERSION 1.1.0
   LANGUAGES CXX
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-project(mr-math VERSION 1.0.0)
 
 option(MR_MATH_ENABLE_BENCHMARK "Whether benchmarks are downloaded and built"    OFF)
 option(MR_MATH_ENABLE_TESTING   "Whether tests are downloaded and built"         OFF)
@@ -36,6 +34,7 @@ add_library(${MR_MATH_LIB_NAME} INTERFACE
   include/mr-math/bound_box.hpp
   include/mr-math/color.hpp
   include/mr-math/debug.hpp
+  include/mr-math/packing.hpp
 )
 
 target_include_directories(${MR_MATH_LIB_NAME} INTERFACE

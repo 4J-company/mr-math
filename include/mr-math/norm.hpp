@@ -47,7 +47,7 @@ inline namespace math {
         }
 
       constexpr Norm(UncheckedTag, const VecT &v) noexcept : _vec(v) {
-          assert(mr::equal(v.length(), 1, 0.1f));
+          assert(mr::equal(v.length(), 1.0, 0.1));
         }
 
       constexpr operator const VecT &() const noexcept { return as_vec(); }

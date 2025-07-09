@@ -111,12 +111,12 @@ inline namespace math {
         return (row.simd * row.simd).sum();
       }
 
-      [[nodiscard]] constexpr T length() const noexcept {
+      [[nodiscard]] constexpr double length() const noexcept {
         return std::sqrt(length2());
       }
 
       // use 1 / length() for higher precision
-      [[nodiscard]] constexpr T inversed_length() const {
+      [[nodiscard]] constexpr auto inversed_length() const {
         return fast_rsqrt(length2());
       }
 

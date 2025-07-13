@@ -165,14 +165,14 @@ inline namespace math {
     inline const Vec3f backward = axis::z;
   }
 
+
+  namespace details {
+    // internal aliases used by suffixes
+    using RadiansLiteral = Radians<float>;
+    using DegreesLiteral = Degrees<float>;
+  }
+
   namespace literals {
-
-    namespace details {
-      // internal aliases used by suffixes
-      using RadiansLiteral = Radians<float>;
-      using DegreesLiteral = Degrees<float>;
-    }
-
     constexpr details::RadiansLiteral operator""_rad(unsigned long long value) {
       return details::RadiansLiteral{static_cast<float>(value)};
     }

@@ -269,6 +269,9 @@ mr::axis::x = {1, 0, 0};
 mr::axis::y = {0, 1, 0};
 mr::axis::z = {0, 0, -1};
 
+// common direction vectors
+mr::direction::up, mr::direction::right, ...
+
 // literals
 using namespace mr::literals;
 1_rad == mr::Radiansf(1)

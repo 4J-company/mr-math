@@ -29,13 +29,13 @@ inline namespace math {
 
         // 3 vector constructor
         constexpr Rotation(
-            const VecT &direction,
-            const VecT &right,
-            const VecT &up) noexcept
+            const NormT &direction,
+            const NormT &right,
+            const NormT &up) noexcept
           : _data (
-                RowT(direction._data, 0), // direction
-                RowT(right._data, 0),     // right
-                RowT(up._data, 0),        // up
+                RowT(direction.as_row(), 0), // direction
+                RowT(right.as_row(), 0),     // right
+                RowT(up.as_row(), 0),        // up
                 RowT(0, 0, 0, 0)
             ) {}
 

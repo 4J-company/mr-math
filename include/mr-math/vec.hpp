@@ -52,68 +52,71 @@ inline namespace math {
       using SimdT = SimdImpl<T, N>;
       static constexpr size_t size = N;
 
-      RowT _data;
+      RowT row;
 
       constexpr Vec() noexcept = default;
 
       // from simd constructor
-      constexpr Vec(const RowT &row) noexcept : _data(row._data) {};
+      constexpr Vec(const RowT &row) noexcept : row(row.simd) {};
 
       // from elements constructor
       template <ArithmeticT... Args>
       requires (sizeof...(Args) >= 2) && (sizeof...(Args) <= N)
-        constexpr Vec(Args... args) : _data(args...) {}
+        constexpr Vec(Args... args) : row(args...) {}
 
       // from span constructor
       template <ArithmeticT U, size_t M>
         constexpr Vec(std::span<const U, M> span) noexcept {
           const size_t len = std::min(N, span.size());
           for (size_t i = 0; i < len; i++) {
-            _data._set_ind(i, span[i]);
+            row._set_ind(i, span[i]);
           }
         }
 
       // conversion constructor
       template <ArithmeticT R, std::size_t S>
-        constexpr Vec(const Vec<R, S> &v) noexcept : _data(v._data) {}
+        constexpr Vec(const Vec<R, S> &v) noexcept : row(v.row) {}
 
       template <ArithmeticT R, std::size_t S, ArithmeticT ... Args>
-        constexpr Vec(const Vec<R, S> &v, Args ... args) noexcept : _data(v._data, args...) {}
+        constexpr Vec(const Vec<R, S> &v, Args ... args) noexcept : row(v.row, args...) {}
 
       // setters
-      constexpr void set(size_t i, T value) noexcept { _data._set_ind(i, value); } // for some reason `T & RowT::operator[]` doesn't compile (maybe I'm just stupid)
+      constexpr void set(size_t i, T value) noexcept { row._set_ind(i, value); } // for some reason `T & RowT::operator[]` doesn't compile (maybe I'm just stupid)
       constexpr void x(T x) noexcept requires (N >= 1) { set(0, x); }
       constexpr void y(T y) noexcept requires (N >= 2) { set(1, y); }
       constexpr void z(T z) noexcept requires (N >= 3) { set(2, z); }
       constexpr void w(T w) noexcept requires (N >= 4) { set(3, w); }
 
       // getters
-      [[nodiscard]] constexpr T x() const noexcept requires (N >= 1) { return _data[0]; }
-      [[nodiscard]] constexpr T y() const noexcept requires (N >= 2) { return _data[1]; }
-      [[nodiscard]] constexpr T z() const noexcept requires (N >= 3) { return _data[2]; }
-      [[nodiscard]] constexpr T w() const noexcept requires (N >= 4) { return _data[3]; }
-      [[nodiscard]] constexpr T operator[](std::size_t i) const { return _data[i]; }
+      [[nodiscard]] constexpr T x() const noexcept requires (N >= 1) { return row[0]; }
+      [[nodiscard]] constexpr T y() const noexcept requires (N >= 2) { return row[1]; }
+      [[nodiscard]] constexpr T z() const noexcept requires (N >= 3) { return row[2]; }
+      [[nodiscard]] constexpr T w() const noexcept requires (N >= 4) { return row[3]; }
+      [[nodiscard]] constexpr T operator[](std::size_t i) const { return row[i]; }
+
+      constexpr const RowT& as_underlying() const noexcept { return row; }
+      constexpr       RowT& as_underlying()       noexcept { return row; }
 
       // structured binding support
-      template <size_t I> requires (I < N) constexpr T get() const { return _data[I]; }
+      template <size_t I> requires (I < N) constexpr T get() const { return row[I]; }
 
       // cross product
       constexpr Vec cross(const Vec &other) const noexcept requires (N == 3) {
-        return RowT(_data._data.rotated(1) * other._data._data.rotated(-1)
-          - _data._data.rotated(-1) * other._data._data.rotated(1));
+        return RowT(row.simd.rotated(1) * other.row.simd.rotated(-1)
+          - row.simd.rotated(-1) * other.row.simd.rotated(1));
       }
 
       // length methods
       [[nodiscard]] constexpr T length2() const noexcept {
-        return (_data._data * _data._data).sum();
+        return (row.simd * row.simd).sum();
       }
 
-      [[nodiscard]] constexpr T length() const noexcept {
+      [[nodiscard]] constexpr DefaultRealT<T> length() const noexcept {
         return std::sqrt(length2());
       }
 
       // use 1 / length() for higher precision
-      [[nodiscard]] constexpr T inversed_length() const {
+      [[nodiscard]] constexpr DefaultRealT<T> inversed_length() const {
         return fast_rsqrt(length2());
       }
 
@@ -172,14 +175,14 @@ inline namespace math {
 
       // dot product
       [[nodiscard]] constexpr T dot(const Vec &other) const noexcept {
-        return (_data._data * other._data._data).sum();
+        return (row.simd * other.row.simd).sum();
       }
 
       template<ArithmeticT R>
         constexpr Vec operator*(const Matr<R, N> &other) const noexcept {
           Vec res {};
           for (size_t i = 0; i < N; i++) {
-            res._data += (other._data[i] * _data[i])._data;
+            res.row += (other.rows[i] * row[i]).row;
           }
           return res;
         }
@@ -190,9 +193,9 @@ inline namespace math {
           Vec<T, N + 1> tmp {};
 
           for (size_t i = 0; i < N; i++) {
-            tmp._data += (other._data[i] * copy._data[i])._data;
+            tmp.row += (other.rows[i] * copy.row[i]).row;
           }
-          tmp._data += other._data[N]._data;
+          tmp.row += other.rows[N];
           return {tmp};
         }
 
@@ -200,7 +203,7 @@ inline namespace math {
         constexpr Vec & operator*=(const Matr<R, N> &other) noexcept {
           Vec tmp {};
           for (size_t i = 0; i < N; i++) {
-            tmp._data += (other._data[i] * _data[i])._data;
+            tmp.row += (other.rows[i] * row[i]).row;
           }
           *this = tmp;
           return *this;
@@ -211,9 +214,9 @@ inline namespace math {
           Vec<T, N + 1> copy = Vec<T, N + 1>(*this);
           Vec<T, N + 1> tmp {};
           for (size_t i = 0; i < N; i++) {
-            tmp._data += (other._data[i] * copy._data[i])._data;
+            tmp.row += (other.rows[i] * copy.row[i]).row;
           }
-          tmp._data += other._data[N]._data;
+          tmp.row += other.rows[N];
 
           *this = Vec<T, N>(tmp);
           return *this;
@@ -230,7 +233,7 @@ inline namespace math {
         }
 
         constexpr Vec absed() const noexcept {
-          return {stdx::abs(_data._data)};
+          return {stdx::abs(row.simd)};
         }
 
         constexpr Vec & abs() noexcept {
@@ -240,8 +243,8 @@ inline namespace math {
 
         constexpr Vec clamped(T low, T high) const noexcept {
           assert(low < high);
-          const auto &data = _data._data;
-          return {stdx::iif(data <= low, SimdT(low), stdx::iif(data >= high, SimdT(high), data))};
+          const auto &simd = row.simd;
+          return {stdx::iif(simd <= low, SimdT(low), stdx::iif(simd >= high, SimdT(high), simd))};
         }
 
         constexpr Vec & clamp(T low, T high) noexcept {
@@ -250,11 +253,11 @@ inline namespace math {
         }
 
         constexpr bool operator==(const Vec &other) const noexcept {
-          return _data == other._data;
+          return row == other.row;
         }
 
         constexpr bool equal(const Vec &other, ValueT eps = epsilon<ValueT>()) const noexcept {
-          return _data.equal(other._data, eps);
+          return row.equal(other.row, eps);
         }
 
       private:

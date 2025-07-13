@@ -67,8 +67,8 @@ inline namespace math {
 
       // cross product
       constexpr VecT cross(const VecT &other) const noexcept requires (N == 3) {
-        return RowT(as_row().simd.shifted(-1) * other.row.simd.shifted(1)
-          - as_row().simd.shifted(1) * other.row.simd.shifted(-1));
+        return RowT(as_row().simd.rotated(-1) * other.row.simd.rotated(1)
+          - as_row().simd.rotated(1) * other.row.simd.rotated(-1));
 #if 0
         std::array<T, 3> arr {
           _vec[1] * other._vec[2] - _vec[2] * other._vec[1],

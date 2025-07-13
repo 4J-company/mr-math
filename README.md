@@ -62,8 +62,8 @@ cmake --list-presets
 
 ## Configuration
 
-Use following macros to change library behaivour:
- - `MR_MATH_SINGLE_THREDED` (not defined by default): library is used in a single threded environment, so race-condition-preventing code can be omitted.
+Use the following macros to change library behaivour:
+ - `MR_MATH_SINGLE_THREADED` (not defined by default): the library is used in a single threaded environment, so race-condition-preventing code can be omitted.
 
 ## Benchmarking
 #### With Bash & Python:

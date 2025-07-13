@@ -10,7 +10,7 @@ namespace mr {
 inline namespace math {
 
 namespace details {
-#ifdef MR_MATH_SINGLE_THREDED
+#ifdef MR_MATH_SINGLE_THREADED
   using CacheFlag = bool;
 #else
   using CacheFlag = std::atomic_bool;
@@ -198,7 +198,7 @@ namespace details {
         }
 
         constexpr MatrT calculate_perspective() const noexcept {
-#ifndef MR_MATH_SINGLE_THREDED
+#ifndef MR_MATH_SINGLE_THREADED
           std::lock_guard lg(_perspective_mutex);
 #endif
           const auto direction = -_rotation.direction();
@@ -215,7 +215,7 @@ namespace details {
         }
 
         constexpr MatrT calculate_orthographic() const noexcept {
-#ifndef MR_MATH_SINGLE_THREDED
+#ifndef MR_MATH_SINGLE_THREADED
           std::lock_guard lg(_perspective_mutex);
 #endif
           const T l = -_projection.height / 2; // left
@@ -236,7 +236,7 @@ namespace details {
         }
 
         constexpr MatrT calculate_frustum() const noexcept {
-#ifndef MR_MATH_SINGLE_THREDED
+#ifndef MR_MATH_SINGLE_THREADED
           std::lock_guard lg(_perspective_mutex);
 #endif
 
@@ -262,7 +262,7 @@ namespace details {
         Rotation<T> _rotation;
         Projection _projection;
 
-#ifndef MR_MATH_SINGLE_THREDED
+#ifndef MR_MATH_SINGLE_THREADED
         mutable std::mutex _perspective_mutex;
 #endif
         mutable details::CacheFlag _perspective_calculated = false;

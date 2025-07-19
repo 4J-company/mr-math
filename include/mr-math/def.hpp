@@ -8,9 +8,11 @@
 #include <sstream>
 #include <numeric>
 #include <optional>
+#include <cstdint>
 #include <numbers>
 #include <ranges>
 #include <atomic>
+#include <array>
 #include <mutex>
 #include <cmath>
 #include <span>
@@ -30,6 +32,16 @@ inline namespace math {
 
   template <ArithmeticT T, std::size_t N>
     using SimdImpl = stdx::fixed_size_simd<T, N>;
+
+  template <ArithmeticT T>
+    struct DefaultReal : std::type_identity<float> {};
+
+  template <ArithmeticT T> requires (sizeof(T) > sizeof(float))
+    struct DefaultReal<T> : std::type_identity<double> {};
+
+  template <ArithmeticT T>
+    using DefaultRealT = DefaultReal<T>::type;
+
 
   template<ArithmeticT T>
     constexpr T epsilon() {

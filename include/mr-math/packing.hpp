@@ -1,6 +1,7 @@
 #ifndef __MR_PACKING_HPP_
 #define __MR_PACKING_HPP_
 
+#include "def.hpp"
 #include "norm.hpp"
 #include "vec.hpp"
 
@@ -91,7 +92,7 @@ namespace details {
   {
     const auto norm_trans = (norm * 0.5f + Vec2f{ 0.5 }) * max_value8;
     const auto norm_masked = static_cast<Vec2u>(norm_trans) & mask8;
-    return norm_masked.x() << 8 | norm_masked.y();
+    return static_cast<PackedNorm16>(norm_masked.x() << 8 | norm_masked.y());
   }
 
   inline Vec2f dequantize16(const PackedNorm16& norm)

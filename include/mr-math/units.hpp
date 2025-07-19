@@ -66,6 +66,9 @@ inline namespace math {
 
       constexpr T value() const noexcept { return _data; }
 
+      constexpr const T& as_underlying() const noexcept { return _data; }
+      constexpr       T& as_underlying()       noexcept { return _data; }
+      
       // comparison operator
       [[nodiscard]] friend constexpr auto operator<=>(Radians lhs, Radians rhs) = default;
 
@@ -95,6 +98,9 @@ inline namespace math {
       explicit constexpr operator T() const noexcept { return _data; };
 
       constexpr T value() const noexcept { return _data; }
+
+      constexpr const T& as_underlying() const noexcept { return _data; }
+      constexpr       T& as_underlying()       noexcept { return _data; }
 
       // comparison operator
       [[nodiscard]] friend constexpr auto operator<=>(Degrees lhs, Degrees rhs) = default;
@@ -149,14 +155,24 @@ inline namespace math {
     inline Vec3f z {0, 0, -1};
   }
 
+  namespace direction
+  {
+    inline const Vec3f up = axis::y;
+    inline const Vec3f down = -axis::y;
+    inline const Vec3f right = axis::x;
+    inline const Vec3f left = -axis::x;
+    inline const Vec3f forward = -axis::z;
+    inline const Vec3f backward = axis::z;
+  }
+
+
+  namespace details {
+    // internal aliases used by suffixes
+    using RadiansLiteral = Radians<float>;
+    using DegreesLiteral = Degrees<float>;
+  }
+
   namespace literals {
-
-    namespace details {
-      // internal aliases used by suffixes
-      using RadiansLiteral = Radians<float>;
-      using DegreesLiteral = Degrees<float>;
-    }
-
     constexpr details::RadiansLiteral operator""_rad(unsigned long long value) {
       return details::RadiansLiteral{static_cast<float>(value)};
     }

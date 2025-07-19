@@ -75,9 +75,9 @@ inline namespace math {
         return tmp1 + tmp2 + tmp3;
       }
 
-      [[nodiscard]] constexpr T length2()          const noexcept { return w() * w() + vec().length2(); }
-      [[nodiscard]] constexpr T length()           const noexcept { return std::sqrt(length2()); }
-      [[nodiscard]] constexpr T inversed_length()  const noexcept { return fast_rsqrt(length2()); }
+      [[nodiscard]] constexpr T               length2()          const noexcept { return w() * w() + vec().length2(); }
+      [[nodiscard]] constexpr DefaultRealT<T> length()           const noexcept { return std::sqrt(length2()); }
+      [[nodiscard]] constexpr DefaultRealT<T> inversed_length()  const noexcept { return fast_rsqrt(length2()); }
 
       // normalize methods
       constexpr Quat & normalize() noexcept {
@@ -175,11 +175,11 @@ inline namespace math {
     };
 
   template <ArithmeticT T>
-  [[nodiscard]] constexpr Quat<T> slerp(Quat<T> q1, Quat<T> q2, float t) noexcept {
-    float angle = std::acos(q1.w() * q2.w() + q1.vec().dot(q2.vec()));
-    float denom = std::sin(angle);
+  [[nodiscard]] constexpr Quat<T> slerp(Quat<T> q1, Quat<T> q2, DefaultRealT<T> t) noexcept {
+    const auto angle = std::acos(q1.w() * q2.w() + q1.vec().dot(q2.vec()));
+    const auto denom = std::sin(angle);
 
-    return (q1 * std::sin((1 - t) * angle) + q2 * std::sin(t * angle)) / denom;
+    return (q1 * (T)std::sin((1 - t) * angle) + q2 * (T)std::sin(t * angle)) / (T)denom;
   }
 }
 }

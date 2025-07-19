@@ -17,14 +17,14 @@ inline namespace math {
       using SimdT = SimdImpl<T, N>;
       static constexpr size_t size = N;
 
-      SimdT _data{};
+      SimdT simd{};
 
       constexpr Row() noexcept = default;
 
       // simd-like constructors
-      constexpr Row(const SimdT &rhs) noexcept : _data(rhs) {}
+      constexpr Row(const SimdT &rhs) noexcept : simd(rhs) {}
 
-      constexpr Row(const T data) : _data(data) {}
+      constexpr Row(const T data) : simd(data) {}
 
       // from elements constructor
       template <ArithmeticT... Args>
@@ -36,7 +36,7 @@ inline namespace math {
       // copy constructor from different row type
       template <ArithmeticT R, std::size_t S>
         constexpr Row(const Row<R, S> &rhs) noexcept {
-          _data = stdx::simd_cast<SimdT>(rhs._data);
+          simd = stdx::simd_cast<SimdT>(rhs.simd);
         }
 
       template <ArithmeticT R, std::size_t S, ArithmeticT ... Args>
@@ -51,21 +51,24 @@ inline namespace math {
           }(std::make_index_sequence<sizeof...(Args)>());
         }
 
+      constexpr const SimdT& as_underlying() const noexcept { return simd; }
+      constexpr       SimdT& as_underlying()       noexcept { return simd; }
+
       [[nodiscard]] constexpr T operator[](std::size_t i) const {
-        return _data[i];
+        return simd[i];
       }
 
       [[nodiscard]] constexpr T get(std::size_t i) const {
-        return _data[i];
+        return simd[i];
       }
 
       constexpr bool operator==(const Row &other) const noexcept {
-        return stdx::all_of(_data == other._data);
+        return stdx::all_of(simd == other.simd);
       }
 
       constexpr bool equal(const Row &other, ValueT eps = epsilon<ValueT>()) const noexcept {
         for (size_t i = 0; i < N; i++) {
-          if (!mr::equal(_data[i], other._data[i], eps))
+          if (!mr::equal(simd[i], other.simd[i], eps))
             return false;
         }
         return true;
@@ -75,12 +78,12 @@ inline namespace math {
       template <ArithmeticT... Args>
         requires (sizeof...(Args) >= 1) && (sizeof...(Args) <= N)
         constexpr void _set(Args... args) noexcept {
-          _data = {static_cast<T>(args)...};
+          simd = {static_cast<T>(args)...};
         }
 
     public:
       constexpr void _set_ind(std::size_t ind, T value) noexcept {
-        _data[ind] = value;
+        simd[ind] = value;
       }
     };
 } // namespace math

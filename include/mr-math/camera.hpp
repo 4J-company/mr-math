@@ -1,12 +1,21 @@
 #ifndef __MR_CAMERA_HPP_
 #define __MR_CAMERA_HPP_
 
+#include "def.hpp"
 #include "vec.hpp"
 #include "rot.hpp"
 #include "matr.hpp"
 
 namespace mr {
 inline namespace math {
+
+namespace details {
+#ifdef MR_MATH_SINGLE_THREADED
+  using CacheFlag = bool;
+#else
+  using CacheFlag = std::atomic_bool;
+#endif
+}
 
   using namespace mr::literals;
 
@@ -43,33 +52,36 @@ inline namespace math {
 
         private:
           // cached frustum matrix
-          mutable bool frustum_calculated = false;
+          mutable details::CacheFlag frustum_calculated = false;
           mutable MatrT frustum;
 
           // cached orthographics matrix
-          mutable bool orthographic_calculated = false;
+          mutable details::CacheFlag orthographic_calculated = false;
           mutable MatrT orthographic;
         };
 
         constexpr Camera() = default;
-        constexpr Camera(VecT position) : _position(position) {}
-        constexpr Camera(VecT position, VecT direction, VecT up = {0, 1, 0}) :
-          _position(position),
-          _rotation(
-              direction.normalized_unchecked(),
-              up.normalized_unchecked(),
-              (direction.cross(up)).normalized_unchecked()) {}
+        constexpr Camera(const VecT &position) : _position(position) {}
+        
+        constexpr Camera(const VecT &position, const NormT &direction, const NormT &up = {0, 1, 0})
+          : _position(position)
+          , _rotation(direction, up, direction.cross(up)) {}
+
+        constexpr Camera(const VecT &position, const VecT &target, const NormT &up = {0, 1, 0})
+          : Camera(position, (target - position).normalized().value_or(NormT{1, 0, 0}), up) { }
+
 
         // copy semantics
-        constexpr Camera(const Camera &other) noexcept {
-          _position   = other._position;
-          _rotation   = other._rotation;
-          _projection = other._projection;
-
-          _perspective_calculated = false;
-        }
+        constexpr Camera(const Camera &other) noexcept 
+          : _position(other._position)
+          , _rotation(other._rotation)
+          , _projection(other._projection)
+          , _perspective_calculated(false) {}
 
         constexpr Camera &operator=(const Camera &other) noexcept {
+          if (this == &other)
+            return *this;
+
           _position   = other._position;
           _rotation   = other._rotation;
           _projection = other._projection;
@@ -79,15 +91,16 @@ inline namespace math {
         }
 
         // move semantics
-        constexpr Camera(Camera &&other) noexcept {
-          _position   = std::move(other._position);
-          _rotation   = std::move(other._rotation);
-          _projection = std::move(other._projection);
-
-          _perspective_calculated = false;
-        }
+        constexpr Camera(Camera &&other) noexcept 
+          : _position(std::move(other._position))
+          , _rotation(std::move(other._rotation))
+          , _projection(std::move(other._projection))
+          , _perspective_calculated(false) {}
 
         constexpr Camera &operator=(Camera &&other) noexcept {
+          if (this == &other)
+            return *this;
+
           _position   = std::move(other._position);
           _rotation   = std::move(other._rotation);
           _projection = std::move(other._projection);
@@ -185,8 +198,9 @@ inline namespace math {
         }
 
         constexpr MatrT calculate_perspective() const noexcept {
+#ifndef MR_MATH_SINGLE_THREADED
           std::lock_guard lg(_perspective_mutex);
-
+#endif
           const auto direction = -_rotation.direction();
           const auto right = _rotation.right();
           const auto up = _rotation.up();
@@ -201,8 +215,9 @@ inline namespace math {
         }
 
         constexpr MatrT calculate_orthographic() const noexcept {
+#ifndef MR_MATH_SINGLE_THREADED
           std::lock_guard lg(_perspective_mutex);
-
+#endif
           const T l = -_projection.height / 2; // left
           const T r = _projection.height / 2;  // right
           const T b = -_projection.width / 2;  // bottom
@@ -221,7 +236,9 @@ inline namespace math {
         }
 
         constexpr MatrT calculate_frustum() const noexcept {
+#ifndef MR_MATH_SINGLE_THREADED
           std::lock_guard lg(_perspective_mutex);
+#endif
 
           const T l = -_projection.height / 2; // left
           const T r = _projection.height / 2;  // right
@@ -245,8 +262,10 @@ inline namespace math {
         Rotation<T> _rotation;
         Projection _projection;
 
+#ifndef MR_MATH_SINGLE_THREADED
         mutable std::mutex _perspective_mutex;
-        mutable std::atomic_bool _perspective_calculated = false;
+#endif
+        mutable details::CacheFlag _perspective_calculated = false;
         mutable MatrT _perspective;
     };
 }

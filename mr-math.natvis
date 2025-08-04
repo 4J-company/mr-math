@@ -2,7 +2,7 @@
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
   <!-- mr::Row2 -->
-  <Type Name="mr::Row&lt;*, 2&gt;">
+  <Type Name="mr::math::Row&lt;*, 2&gt;">
     <DisplayString>{{{get(0)}, {get(1)}}}</DisplayString>
     <Expand>
       <Item Name="[0]">get(0)</Item>
@@ -11,7 +11,7 @@
   </Type>
 
   <!-- mr::Row3 -->
-  <Type Name="mr::Row&lt;*, 3&gt;">
+  <Type Name="mr::math::Row&lt;*, 3&gt;">
     <DisplayString>{{{get(0)}, {get(1)}, {get(2)}}}</DisplayString>
     <Expand>
       <Item Name="[0]">get(0)</Item>
@@ -21,7 +21,7 @@
   </Type>
 
   <!-- mr::Row4 -->
-  <Type Name="mr::Row&lt;*, 4&gt;">
+  <Type Name="mr::math::Row&lt;*, 4&gt;">
     <DisplayString>{{{get(0)}, {get(1)}, {get(2)}, {get(3)}}}</DisplayString>
     <Expand>
       <Item Name="[0]">get(0)</Item>
@@ -32,7 +32,7 @@
   </Type>
 
   <!-- mr::Vec2 -->
-  <Type Name="mr::Vec&lt;*, 2&gt;">
+  <Type Name="mr::math::Vec&lt;*, 2&gt;">
     <DisplayString>{{{x()}, {y()}}}</DisplayString>
     <Expand>
       <Item Name="X">x()</Item>
@@ -42,7 +42,7 @@
   </Type>
 
   <!-- mr::Vec3 -->
-  <Type Name="mr::Vec&lt;*, 3&gt;">
+  <Type Name="mr::math::Vec&lt;*, 3&gt;">
     <DisplayString>{{{x()}, {y()}, {z()}}}</DisplayString>
     <Expand>
       <Item Name="X">x()</Item>
@@ -53,7 +53,7 @@
   </Type>
 
   <!-- mr::Vec4 -->
-  <Type Name="mr::Vec&lt;*, 4&gt;">
+  <Type Name="mr::math::Vec&lt;*, 4&gt;">
     <DisplayString>{{{x()}, {y()}, {z()}, {w()}}}</DisplayString>
     <Expand>
       <Item Name="X">x()</Item>
@@ -65,7 +65,7 @@
   </Type>
 
   <!-- mr::Norm2 -->
-  <Type Name="mr::Norm&lt;*, 2&gt;">
+  <Type Name="mr::math::Norm&lt;*, 2&gt;">
     <DisplayString>{{{x()}, {y()}}}</DisplayString>
     <Expand>
       <Item Name="X">x()</Item>
@@ -74,7 +74,7 @@
   </Type>
 
   <!-- mr::Norm3 -->
-  <Type Name="mr::Norm&lt;*, 3&gt;">
+  <Type Name="mr::math::Norm&lt;*, 3&gt;">
     <DisplayString>{{{x()}, {y()}, {z()}}}</DisplayString>
     <Expand>
       <Item Name="X">x()</Item>
@@ -84,7 +84,7 @@
   </Type>
 
   <!-- mr::Norm4 -->
-  <Type Name="mr::Norm&lt;*, 4&gt;">
+  <Type Name="mr::math::Norm&lt;*, 4&gt;">
     <DisplayString>{{{x()}, {y()}, {z()}, {w()}}}</DisplayString>
     <Expand>
       <Item Name="X">x()</Item>
@@ -95,17 +95,17 @@
   </Type>
 
   <!-- mr::Radians -->
-  <Type Name="mr::Radians&lt;*&gt;">
+  <Type Name="mr::math::Radians&lt;*&gt;">
     <DisplayString>{_data} rad</DisplayString>
   </Type>
 
   <!-- mr::Degrees -->
-  <Type Name="mr::Degrees&lt;*&gt;">
+  <Type Name="mr::math::Degrees&lt;*&gt;">
     <DisplayString>{_data} deg</DisplayString>
   </Type>
 
   <!-- mr::Color -->
-  <Type Name="mr::Color">
+  <Type Name="mr::math::Color">
     <DisplayString>R={r()}, G={g()}, B={b()}, A={a()}}</DisplayString>
     <Expand>
       <Item Name="R">r()</Item>
@@ -117,7 +117,7 @@
   </Type>
 
   <!-- mr::AABB -->
-  <Type Name="mr::AABB&lt;*&gt;">
+  <Type Name="mr::math::AABB&lt;*&gt;">
     <DisplayString>{min} : {max}</DisplayString>
     <Expand>
       <Item Name="Min">min</Item>
@@ -127,7 +127,7 @@
   </Type>
 
   <!-- mr::Matr -->
-  <Type Name="mr::Matr&lt;*, *&gt;">
+  <Type Name="mr::math::Matr&lt;*, *&gt;">
     <DisplayString>{_data[0]} ...</DisplayString>
     <Expand>
       <Item Name="Rows">_data</Item>

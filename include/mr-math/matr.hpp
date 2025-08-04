@@ -441,7 +441,7 @@ inline namespace math
             : _data(angle, (mr::Vec3<T>)axis) { }
 
           constexpr RotateMatr(mr::Vec3<T> axis, mr::Radians<T> angle) noexcept
-            : RotateMatr(angle, axis.normalized_unchecked()) {}
+            : RotateMatr(axis.normalized_unchecked(), angle) {}
 
           constexpr RotateMatr(mr::Yaw<T> angle) noexcept
             : RotateMatr(mr::Norm3<T>(mr::unchecked, mr::axis::y), angle.value) { }
@@ -483,8 +483,15 @@ inline namespace math
           friend constexpr Vec3<T> operator*(const Vec3<T> &lhs, const RotateMatr &rhs) noexcept {
             return lhs * rhs._data;
           }
-
           friend constexpr Vec3<T> & operator*=(Vec3<T> &lhs, const RotateMatr &rhs) noexcept {
+            lhs = lhs * rhs;
+            return lhs;
+          }
+
+          friend constexpr Norm3<T> operator*(const Norm3<T> &lhs, const RotateMatr &rhs) noexcept {
+            return lhs * rhs._data;
+          }
+          friend constexpr Norm3<T> & operator*=(Norm3<T> &lhs, const RotateMatr &rhs) noexcept {
             lhs = lhs * rhs;
             return lhs;
           }

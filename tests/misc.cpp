@@ -29,7 +29,185 @@ TEST(Transform, TransformVector) {
   EXPECT_TRUE(mr::equal(v * mr::scale(mr::Vec3f{2}) * mr::rotate(mr::Yaw(90_deg)) * mr::translate(mr::Vec3f{0, 0, 2}), expected, 0.001));
 }
 
-// TODO: camera tests
+TEST(Camera, DefaultConstructor) {
+  mr::Camera<float> cam;
+  EXPECT_EQ(cam.position(), mr::Vec3f(0, 0, 0));
+  EXPECT_TRUE(mr::equal(cam.direction(), mr::Norm3f(0, 0, -1)));
+  EXPECT_TRUE(mr::equal(cam.up(), mr::Norm3f(0, 1, 0)));
+  EXPECT_TRUE(mr::equal(cam.right(), mr::Norm3f(1, 0, 0)));
+}
+
+TEST(Camera, PositionConstructor) {
+  mr::Camera<float> cam(mr::Vec3f(1, 2, 3));
+  EXPECT_EQ(cam.position(), mr::Vec3f(1, 2, 3));
+  EXPECT_TRUE(mr::equal(cam.direction(), mr::Norm3f(0, 0, -1)));
+}
+
+TEST(Camera, FullConstructor) {
+  mr::Camera<float> cam(mr::Vec3f(1, 2, 3), mr::Vec3f(0, 0, -1), mr::Vec3f(0, 1, 0));
+  EXPECT_EQ(cam.position(), mr::Vec3f(1, 2, 3));
+  EXPECT_EQ(cam.direction(), mr::Norm3f(0, 0, -1));
+  EXPECT_EQ(cam.up(), mr::Norm3f(0, 1, 0));
+  EXPECT_EQ(cam.right(), mr::Norm3f(1, 0, 0));
+}
+
+TEST(Camera, CopySemantics) {
+  mr::Camera<float> cam1(mr::Vec3f(1, 2, 3));
+  mr::Camera<float> cam2(cam1);
+  EXPECT_EQ(cam2.position(), mr::Vec3f(1, 2, 3));
+
+  mr::Camera<float> cam3;
+  cam3 = cam1;
+  EXPECT_EQ(cam3.position(), mr::Vec3f(1, 2, 3));
+}
+
+TEST(Camera, MoveSemantics) {
+  mr::Camera<float> cam1(mr::Vec3f(1, 2, 3));
+  mr::Camera<float> cam2(std::move(cam1));
+  EXPECT_EQ(cam2.position(), mr::Vec3f(1, 2, 3));
+
+  mr::Camera<float> cam3;
+  cam3 = std::move(cam2);
+  EXPECT_EQ(cam3.position(), mr::Vec3f(1, 2, 3));
+}
+
+TEST(Camera, PositionMovement) {
+  mr::Camera<float> cam;
+  cam += mr::Vec3f(1, 2, 3);
+  EXPECT_EQ(cam.position(), mr::Vec3f(1, 2, 3));
+
+  cam.position(mr::Vec3f(4, 5, 6));
+  EXPECT_EQ(cam.position(), mr::Vec3f(4, 5, 6));
+}
+
+TEST(Camera, RotationAdjustments) {
+  mr::Camera<float> cam(mr::Vec3f(0), mr::Vec3f(0, 0, -1));
+
+  cam += mr::Yaw(90_deg);
+  EXPECT_EQ(cam.direction(), mr::Norm3f(1, 0, 0));
+  EXPECT_EQ(cam.right(), mr::Norm3f(0, 0, 1));
+  EXPECT_EQ(cam.up(), mr::Norm3f(0, 1, 0));
+
+  cam += mr::Pitch(90_deg);
+  EXPECT_EQ(cam.direction(), mr::Norm3f(0, 1, 0));
+  EXPECT_EQ(cam.right(), mr::Norm3f(0, 0, 1));
+  EXPECT_EQ(cam.up(), mr::Norm3f(-1, 0, 0));
+
+  cam += mr::Roll(90_deg);
+  EXPECT_EQ(cam.direction(), mr::Norm3f(0, 1, 0));
+  EXPECT_EQ(cam.right(), mr::Norm3f(1, 0, 0));
+  EXPECT_EQ(cam.up(), mr::Norm3f(0, 0, 1));
+}
+
+/* TODO: implement mr::Camera::direction setter
+TEST(Camera, SetDirection) {
+  mr::Camera<float> cam;
+  cam.direction(mr::Norm3f(0, 1, 0));
+  EXPECT_EQ(cam.direction(), mr::Norm3f(0, 1, 0));
+  EXPECT_EQ(cam.up(), mr::Norm3f(0, 0, -1)); // Orthogonal adjustment
+}
+*/
+
+TEST(Camera, ProjectionSettings) {
+  mr::Camera<float> cam;
+  auto& proj = cam.projection();
+
+  proj.distance = 0.1f;
+  proj.far = 1000.0f;
+  proj.width = 0.32f;
+  proj.height = 0.18f;
+
+  EXPECT_EQ(proj.distance, 0.1f);
+  EXPECT_EQ(proj.far, 1000.0f);
+
+  proj.resize(1.0f); // Square aspect
+  EXPECT_FLOAT_EQ(proj.height, 0.32f);
+}
+
+TEST(Camera, PerspectiveMatrix) {
+  mr::Camera<float> cam(mr::Vec3f(1, 2, 3));
+  mr::Matr4f view = cam.perspective();
+
+  // Should be inverse of camera transform
+  mr::Matr4f expected = {
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    -1, -2, -3, 1
+  };
+
+  EXPECT_TRUE(mr::equal(view, expected, 0.0001f));
+}
+
+TEST(Camera, OrthographicMatrix) {
+  mr::Camera<float> cam;
+  auto& proj = cam.projection();
+  proj.distance = 0.1f;
+  proj.far = 100.0f;
+  proj.width = 0.16f;
+  proj.height = 0.09f;
+
+  mr::Matr4f ortho = cam.orthographic();
+
+  // Calculated values
+  float l = -0.045f;
+  float r = 0.045f;
+  float b = -0.08f;
+  float t = 0.08f;
+  float n = 0.1f;
+  float f = 100.0f;
+
+  mr::Matr4f expected = {
+    2/(r-l),        0,          0,          0,
+    0,              2/(t-b),    0,          0,
+    0,              0,          2/(n-f),    0,
+    (r+l)/(l-r),    (t+b)/(b-t), (f+n)/(n-f), 1
+  };
+
+  EXPECT_TRUE(mr::equal(ortho, expected, 0.0001f));
+}
+
+TEST(Camera, FrustumMatrix) {
+  mr::Camera<float> cam;
+  auto& proj = cam.projection();
+  proj.distance = 0.1f;
+  proj.far = 100.0f;
+  proj.width = 0.16f;
+  proj.height = 0.09f;
+
+  mr::Matr4f frustum = cam.frustum();
+
+  // Calculated values
+  float l = -0.045f;
+  float r = 0.045f;
+  float b = -0.08f;
+  float t = 0.08f;
+  float n = 0.1f;
+  float f = 100.0f;
+
+  mr::Matr4f expected = {
+    2*n/(r-l), 0,           0,          0,
+    0,         2*n/(t-b),   0,          0,
+    (r+l)/(r-l), (t+b)/(t-b), (f+n)/(n-f), -1,
+    0,         0,           2*n*f/(n-f), 0
+  };
+
+  EXPECT_TRUE(mr::equal(frustum, expected, 0.0001f));
+}
+
+TEST(Camera, View) {
+  mr::Camera<float> cam(mr::Vec3f(0, 0, 5));
+  mr::Matr4f view = cam.perspective();
+
+  mr::Matr4f expected = {
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, -5, 1
+  };
+
+  EXPECT_EQ(view, expected);
+}
 
 TEST(Color, Constructors) {
   EXPECT_EQ(mr::Color(), mr::Color(0, 0, 0, 0));

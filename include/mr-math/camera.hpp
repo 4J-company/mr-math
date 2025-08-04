@@ -2,7 +2,6 @@
 #define __MR_CAMERA_HPP_
 
 #include "vec.hpp"
-#include "rot.hpp"
 #include "matr.hpp"
 
 namespace mr {
@@ -51,27 +50,29 @@ inline namespace math {
           mutable MatrT orthographic;
         };
 
-        constexpr Camera() = default;
-        constexpr Camera(VecT position) : _position(position) {}
-        constexpr Camera(VecT position, VecT direction, VecT up = {0, 1, 0}) :
-          _position(position),
-          _rotation(
-              direction.normalized_unchecked(),
-              up.normalized_unchecked(),
-              (direction.cross(up)).normalized_unchecked()) {}
+        constexpr Camera(VecT position = {0, 0, 0}, VecT direction = mr::axis::z, VecT up = mr::axis::y)
+          : _position(position)
+          , _direction(direction.normalized_unchecked())
+          , _right(direction.cross(up).normalized_unchecked())
+          , _up(up.normalized_unchecked())
+          {}
 
         // copy semantics
-        constexpr Camera(const Camera &other) noexcept {
-          _position   = other._position;
-          _rotation   = other._rotation;
-          _projection = other._projection;
-
+        constexpr Camera(const Camera &other) noexcept
+          : _position   {other._position}
+          , _direction  {other._direction}
+          , _up         {other._up}
+          , _right      {other._right}
+          , _projection {other._projection}
+        {
           _perspective_calculated = false;
         }
 
         constexpr Camera &operator=(const Camera &other) noexcept {
           _position   = other._position;
-          _rotation   = other._rotation;
+          _direction  = other._direction;
+          _up         = other._up;
+          _right      = other._right;
           _projection = other._projection;
 
           _perspective_calculated = false;
@@ -79,17 +80,21 @@ inline namespace math {
         }
 
         // move semantics
-        constexpr Camera(Camera &&other) noexcept {
-          _position   = std::move(other._position);
-          _rotation   = std::move(other._rotation);
-          _projection = std::move(other._projection);
-
+        constexpr Camera(Camera &&other) noexcept
+          : _position   {std::move(other._position)}
+          , _direction  {std::move(other._direction)}
+          , _up         {std::move(other._up)}
+          , _right      {std::move(other._right)}
+          , _projection{ std::move(other._projection) }
+        {
           _perspective_calculated = false;
         }
 
         constexpr Camera &operator=(Camera &&other) noexcept {
           _position   = std::move(other._position);
-          _rotation   = std::move(other._rotation);
+          _direction  = std::move(other._direction);
+          _up         = std::move(other._up);
+          _right      = std::move(other._right);
           _projection = std::move(other._projection);
 
           _perspective_calculated = false;
@@ -107,7 +112,10 @@ inline namespace math {
         // angle in radians
         constexpr Camera & operator+=(Pitch<T> angle_rad) noexcept {
           _perspective_calculated = false;
-          _rotation += angle_rad;
+
+          auto rot = mr::rotate(right(), angle_rad.value);
+          _direction *= rot;
+          _up *= rot;
 
           return *this;
         }
@@ -115,7 +123,10 @@ inline namespace math {
         // angle in radians
         constexpr Camera & operator+=(Yaw<T> angle_rad) noexcept {
           _perspective_calculated = false;
-          _rotation += angle_rad;
+
+          auto rot = mr::rotate(up(), -angle_rad.value);
+          _direction *= rot;
+          _right *= rot;
 
           return *this;
         }
@@ -123,7 +134,10 @@ inline namespace math {
         // angle in radians
         constexpr Camera & operator+=(Roll<T> angle_rad) noexcept {
           _perspective_calculated = false;
-          _rotation += angle_rad;
+
+          auto rot = mr::rotate(direction(), angle_rad.value);
+          _up *= rot;
+          _right *= rot;
 
           return *this;
         }
@@ -138,20 +152,22 @@ inline namespace math {
         }
 
         constexpr NormT direction() const noexcept {
-          return _rotation.direction();
+          return _direction;
         }
 
+        /*
         constexpr void direction(NormT dir) noexcept {
           _perspective_calculated = false;
           _rotation.direction(dir);
         }
+        */
 
         constexpr NormT right() const noexcept {
-          return _rotation.right();
+          return _right;
         }
 
         constexpr NormT up() const noexcept {
-          return _rotation.up();
+          return _up;
         }
 
         constexpr Projection & projection() noexcept {
@@ -187,9 +203,9 @@ inline namespace math {
         constexpr MatrT calculate_perspective() const noexcept {
           std::lock_guard lg(_perspective_mutex);
 
-          const auto direction = -_rotation.direction();
-          const auto right = _rotation.right();
-          const auto up = _rotation.up();
+          const auto direction = -_direction;
+          const auto right = _right;
+          const auto up = _up;
           _perspective = MatrT{
                           right.x(),               up.x(),               direction.x(), 0,
                           right.y(),               up.y(),               direction.y(), 0,
@@ -241,9 +257,12 @@ inline namespace math {
         }
 
       private:
-        VecT _position;
-        Rotation<T> _rotation;
         Projection _projection;
+
+        VecT _position;
+        NormT _direction;
+        NormT _up;
+        NormT _right;
 
         mutable std::mutex _perspective_mutex;
         mutable std::atomic_bool _perspective_calculated = false;

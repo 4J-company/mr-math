@@ -5,7 +5,6 @@
 #include "operators.hpp"
 #include "vec.hpp"
 #include "matr.hpp"
-#include "rot.hpp"
 
 namespace mr {
 inline namespace math {
@@ -49,30 +48,29 @@ inline namespace math {
       }
 
       operator Matr<T, 4>() const noexcept {
-        T rad = w();
-        mr::Norm n = vec().normalized_unchecked();
+          T w_ = w();
+          T x_ = x();
+          T y_ = y();
+          T z_ = z();
 
-        T co = std::cos(rad);
-        T si = std::sin(rad);
-        T nco = 1 - co;
-        Vec<T, 3> tmp0 {n * n * nco + Vec<T, 3>{co}};
+          T r00 = 1 - 2 * std::pow(y_, 2) - 2 * std::pow(z_, 2);
+          T r01 = 2 * x_ * y_ - 2 * z_ * w_;
+          T r02 = 2 * x_ * z_ + 2 * y_ * w_;
+        
+          T r10 = 2 * x_ * y_ + 2 * z_ * w_;
+          T r11 = 1 - 2 * std::pow(x_, 2) - 2 * std::pow(z_, 2);
+          T r12 = 2 * y_ * z_ - 2 * x_ * w_;
+        
+          T r20 = 2 * x_ * z_ - 2 * y_ * w_;
+          T r21 = 2 * y_ * z_ + 2 * x_ * w_;
+          T r22 = 1 - 2 * std::pow(x_, 2) - 2 * std::pow(y_, 2);
 
-        // TODO: implement using Vec4(Vec3, T) constructor
-        Matr4<T> tmp1 = ScaleMatr<T, 4>({tmp0.x(), tmp0.y(), tmp0.z(), 1});
-        Matr4<T> tmp2 = Matr4<T> {
-          0, n.x() * n.y() * nco, n.x() * n.z() * nco, 0,
-            n.x() * n.y() * nco,                   0, n.y() * n.z() * nco, 0,
-            n.x() * n.z() * nco, n.y() * n.z() * nco,                   0, 0,
-            0,                   0,                   0, 0
-        };
-        Matr4<T> tmp3 = Matr4<T> {
-          0, -n.z() * si,  n.y() * si, 0,
-            n.z() * si,           0, -n.x() * si, 0,
-            -n.y() * si,  n.x() * si,           0, 0,
-            0,           0,           0, 0
-        };
-
-        return tmp1 + tmp2 + tmp3;
+          return Matr<T, 4>(
+              Matr<T, 4>::RowT (r00, r10, r20, 0),
+              Matr<T, 4>::RowT (r01, r11, r21, 0),
+              Matr<T, 4>::RowT (r02, r12, r22, 0),
+              Matr<T, 4>::RowT (0, 0, 0, 1)
+          );
       }
 
       [[nodiscard]] constexpr T length2()          const noexcept { return w() * w() + vec().length2(); }
@@ -149,6 +147,16 @@ inline namespace math {
         return result.vec();
       }
       friend constexpr Vec<T, 3> & operator*=(Vec<T, 3> &lhs, const Quat &rhs) noexcept {
+        lhs = lhs * rhs;
+        return lhs;
+      }
+
+      [[nodiscard]] friend constexpr Norm3<T> operator*(const Norm3<T>& v, const Quat& q) noexcept {
+        const Quat pure(0, v.x(), v.y(), v.z());
+        const Quat result = q * pure * q.conjugate();
+        return result.vec().normalized_unchecked();
+      }
+      friend constexpr Norm<T, 3> & operator*=(Norm<T, 3> &lhs, const Quat &rhs) noexcept {
         lhs = lhs * rhs;
         return lhs;
       }

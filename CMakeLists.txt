@@ -7,7 +7,7 @@ set(MR_MATH_TESTS_NAME   mr-math-tests)
 
 project(
   ${MR_MATH_PROJECT_NAME}
-  VERSION 1.1.0
+  VERSION 1.1.1
   LANGUAGES CXX
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -25,7 +25,6 @@ add_library(${MR_MATH_LIB_NAME} INTERFACE
   include/mr-math/matr.hpp
   include/mr-math/norm.hpp
   include/mr-math/operators.hpp
-  include/mr-math/rot.hpp
   include/mr-math/row.hpp
   include/mr-math/units.hpp
   include/mr-math/vec.hpp

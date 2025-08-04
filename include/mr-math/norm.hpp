@@ -6,9 +6,6 @@
 
 namespace mr {
 inline namespace math {
-  template <std::floating_point T>
-    struct Rotation;
-
   // common aliases
   template <ArithmeticT T>
     using Norm2 = Norm<T, 2>;
@@ -35,8 +32,13 @@ inline namespace math {
 
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
     struct [[nodiscard]] Norm {
+      friend struct Vec<T, N>;
+
       using ValueT = T;
       using VecT = Vec<T, N>;
+      using RowT = Row<T, N>;
+
+      VecT _data;
 
       // from elements constructor
       template <ArithmeticT... Args>
@@ -45,6 +47,11 @@ inline namespace math {
           _data.normalize();
         }
 
+
+    private:
+      constexpr Norm(const VecT &v) noexcept : Norm(unchecked, v) {}
+
+    public:
       constexpr Norm(UncheckedTag, const VecT &v) noexcept : _data(v) {
           assert(mr::equal(v.length(), 1, 0.1f));
         }
@@ -63,19 +70,7 @@ inline namespace math {
 
       // cross product
       constexpr VecT cross(const VecT &other) const noexcept requires (N == 3) {
-        return RowT(_data._data.shifted(-1) * other._data._data.shifted(1)
-          - _data._data.shifted(1) * other._data._data.shifted(-1));
-#if 0
-        std::array<T, 3> arr {
-          _data[1] * other._data[2] - _data[2] * other._data[1],
-          _data[2] * other._data[0] - _data[0] * other._data[2],
-          _data[0] * other._data[1] - _data[1] * other._data[0]
-        };
-
-        SimdImpl<T, 3> ans;
-        ans.copy_from(arr.data(), stdx::element_aligned);
-        return {ans};
-#endif
+        return _data.cross(other);
       }
 
       constexpr VecT operator%(const VecT &other) const noexcept requires (N == 3) {
@@ -143,12 +138,6 @@ inline namespace math {
         constexpr bool equal(const VecT &other, ValueT eps = epsilon<ValueT>()) const noexcept {
           return _data.equal(other, eps);
         }
-
-      private:
-        friend struct Vec<T, N>;
-        constexpr Norm(const VecT &v) noexcept : Norm(unchecked, v) {}
-
-        VecT _data;
     };
 } // namespace math
 } // namespace mr

@@ -11,7 +11,7 @@ from conan.api.conan_api import ConanAPI
 
 class MrMath(ConanFile):
     name = "mr-math"
-    version = "1.1.1"
+    version = "1.1.2"
     license = "MIT"
 
     description = "Linear algebra library for computer graphics"

@@ -13,6 +13,10 @@ inline namespace math {
     using ValueT = float;
 
     Color() = default;
+    Color(const Color &) = default;
+    Color& operator=(const Color &) = default;
+    Color(Color &&) = default;
+    Color& operator=(Color &&) = default;
 
     template <std::floating_point T>
       Color(T r, T g, T b, T a = 1) noexcept

@@ -53,9 +53,15 @@ inline namespace math {
         constexpr Camera(VecT position = {0, 0, 0}, VecT direction = mr::axis::z, VecT up = mr::axis::y)
           : _position(position)
           , _direction(direction.normalized_unchecked())
-          , _right(direction.cross(up).normalized_unchecked())
           , _up(up.normalized_unchecked())
-          {}
+          , _right(direction.cross(up).normalized_unchecked())
+          {
+            // Orthonormalize basis to ensure consistency with lookAt
+            const NormT right_local = _direction.cross(_up).normalized_unchecked();
+            const NormT up_local = right_local.cross(_direction).normalized_unchecked();
+            _right = right_local;
+            _up = up_local;
+          }
 
         // copy semantics
         constexpr Camera(const Camera &other) noexcept
@@ -85,7 +91,7 @@ inline namespace math {
           , _direction  {std::move(other._direction)}
           , _up         {std::move(other._up)}
           , _right      {std::move(other._right)}
-          , _projection{ std::move(other._projection) }
+          , _projection {std::move(other._projection)}
         {
           _perspective_calculated = false;
         }
@@ -172,6 +178,8 @@ inline namespace math {
 
         constexpr Projection & projection() noexcept {
           _perspective_calculated = false;
+          _projection.frustum_calculated = false;
+          _projection.orthographic_calculated = false;
           return _projection;
         }
 

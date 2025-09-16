@@ -1,4 +1,5 @@
-#include <array>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "gtest/gtest.h"
 #include "mr-math/math.hpp"
@@ -195,6 +196,81 @@ TEST(Camera, FrustumMatrix) {
   EXPECT_TRUE(mr::equal(frustum, expected, 0.0001f));
 }
 
+TEST(Camera, FrustumMatrix_DefaultMatchesExpected) {
+  mr::Camera<float> cam;
+  auto &proj = cam.projection();
+  proj.distance = 0.1f;
+  proj.far = 100.0f;
+  proj.width = 0.16f;
+  proj.height = 0.09f;
+
+  mr::Matr4f fr = cam.frustum();
+
+  float l = -proj.height / 2;
+  float r =  proj.height / 2;
+  float b = -proj.width / 2;
+  float t =  proj.width / 2;
+  float n = proj.distance;
+  float f = proj.far;
+
+  glm::mat4 g = glm::frustum(l, r, b, t, n, f);
+  mr::Matr4f expected = {
+    g[0][0], g[0][1], g[0][2], g[0][3],
+    g[1][0], g[1][1], g[1][2], g[1][3],
+    g[2][0], g[2][1], g[2][2], g[2][3],
+    g[3][0], g[3][1], g[3][2], g[3][3]
+  };
+
+  EXPECT_TRUE(mr::equal(fr, expected, 0.0001f));
+}
+
+TEST(Camera, FrustumMatrix_AspectResize) {
+  mr::Camera<float> cam;
+  auto &proj = cam.projection();
+  proj.distance = 0.5f;
+  proj.far = 250.0f;
+  proj.width = 0.3f;
+  proj.height = 0.2f;
+
+  // Resize aspect (height = width * aspect)
+  proj.resize(2.0f);
+
+  mr::Matr4f fr = cam.frustum();
+
+  float l = -proj.height / 2;
+  float r =  proj.height / 2;
+  float b = -proj.width / 2;
+  float t =  proj.width / 2;
+  float n = proj.distance;
+  float f = proj.far;
+
+  glm::mat4 g = glm::frustum(l, r, b, t, n, f);
+  mr::Matr4f expected = {
+    g[0][0], g[0][1], g[0][2], g[0][3],
+    g[1][0], g[1][1], g[1][2], g[1][3],
+    g[2][0], g[2][1], g[2][2], g[2][3],
+    g[3][0], g[3][1], g[3][2], g[3][3]
+  };
+
+  EXPECT_TRUE(mr::equal(fr, expected, 0.0001f));
+}
+
+TEST(Camera, FrustumMatrix_TranslationInvariant) {
+  // Moving camera should not change projection (frustum) matrix
+  mr::Camera<float> cam(mr::Vec3f(1, 2, 3));
+  auto &proj = cam.projection();
+  proj.distance = 0.2f;
+  proj.far = 500.0f;
+  proj.width = 0.8f;
+  proj.height = 0.4f;
+
+  mr::Matr4f fr1 = cam.frustum();
+  cam += mr::Vec3f(10, -5, 2);
+  mr::Matr4f fr2 = cam.frustum();
+
+  EXPECT_TRUE(mr::equal(fr1, fr2, 0.0001f));
+}
+
 TEST(Camera, View) {
   mr::Camera<float> cam(mr::Vec3f(0, 0, 5));
   mr::Matr4f view = cam.perspective();
@@ -207,6 +283,121 @@ TEST(Camera, View) {
   };
 
   EXPECT_EQ(view, expected);
+}
+
+TEST(Camera, ViewMatrixOrigin) {
+  // Camera at origin looking down negative Z
+  mr::Camera<float> cam(mr::Vec3f(0, 0, 0), mr::Vec3f(0, 0, -1), mr::Vec3f(0, 1, 0));
+  mr::Matr4f view = cam.perspective();
+
+  glm::mat4 g = glm::lookAtRH(glm::vec3(0,0,0), glm::vec3(0,0,-1), glm::vec3(0,1,0));
+  mr::Matr4f expected = {
+    g[0][0], g[0][1], g[0][2], g[0][3],
+    g[1][0], g[1][1], g[1][2], g[1][3],
+    g[2][0], g[2][1], g[2][2], g[2][3],
+    g[3][0], g[3][1], g[3][2], g[3][3]
+  };
+
+  if (!mr::equal(view, expected, 0.0001f)) {
+    std::cout << "Complex view actual=" << view << "\n";
+    std::cout << "Complex view expected=" << expected << "\n";
+    std::cout << "cam basis R=" << cam.right() << ", U=" << cam.up() << ", D=" << cam.direction() << "\n";
+  }
+
+  EXPECT_TRUE(mr::equal(view, expected, 0.0001f));
+}
+
+TEST(Camera, ViewMatrixTranslated) {
+  // Camera at (1, 2, 3) looking down negative Z
+  mr::Camera<float> cam(mr::Vec3f(1, 2, 3), mr::Vec3f(0, 0, -1), mr::Vec3f(0, 1, 0));
+  mr::Matr4f view = cam.perspective();
+
+  glm::mat4 g = glm::lookAtRH(glm::vec3(1,2,3), glm::vec3(1,2,2), glm::vec3(0,1,0));
+  mr::Matr4f expected = {
+    g[0][0], g[0][1], g[0][2], g[0][3],
+    g[1][0], g[1][1], g[1][2], g[1][3],
+    g[2][0], g[2][1], g[2][2], g[2][3],
+    g[3][0], g[3][1], g[3][2], g[3][3]
+  };
+
+  EXPECT_TRUE(mr::equal(view, expected, 0.0001f));
+}
+
+TEST(Camera, ViewMatrixYaw90) {
+  // Camera at origin, yawed 90 degrees (looking down negative X)
+  mr::Camera<float> cam(mr::Vec3f(0, 0, 0), mr::Vec3f(-1, 0, 0), mr::Vec3f(0, 1, 0));
+  mr::Matr4f view = cam.perspective();
+
+  glm::mat4 g = glm::lookAtRH(glm::vec3(0,0,0), glm::vec3(-1,0,0), glm::vec3(0,1,0));
+  mr::Matr4f expected = {
+    g[0][0], g[0][1], g[0][2], g[0][3],
+    g[1][0], g[1][1], g[1][2], g[1][3],
+    g[2][0], g[2][1], g[2][2], g[2][3],
+    g[3][0], g[3][1], g[3][2], g[3][3]
+  };
+
+  EXPECT_TRUE(mr::equal(view, expected, 0.0001f));
+}
+
+TEST(Camera, ViewMatrixPitch90) {
+  // Camera at origin, pitched 90 degrees (looking down negative Y)
+  mr::Camera<float> cam(mr::Vec3f(0, 0, 0), mr::Vec3f(0, -1, 0), mr::Vec3f(0, 0, 1));
+  mr::Matr4f view = cam.perspective();
+
+  glm::mat4 g = glm::lookAtRH(glm::vec3(0,0,0), glm::vec3(0,-1,0), glm::vec3(0,0,1));
+  mr::Matr4f expected = {
+    g[0][0], g[0][1], g[0][2], g[0][3],
+    g[1][0], g[1][1], g[1][2], g[1][3],
+    g[2][0], g[2][1], g[2][2], g[2][3],
+    g[3][0], g[3][1], g[3][2], g[3][3]
+  };
+
+  EXPECT_TRUE(mr::equal(view, expected, 0.0001f));
+}
+
+TEST(Camera, ViewMatrixComplexPose) {
+  // Camera at (5, 10, 15) looking at (0, 0, 0) with up vector (0, 1, 0)
+  mr::Vec3f pos(5, 10, 15);
+  mr::Vec3f target(0, 0, 0);
+  mr::Vec3f up(0, 1, 0);
+  mr::Norm3f direction = (target - pos).normalized().value();
+  
+  mr::Camera<float> cam(pos, direction, up);
+  mr::Matr4f view = cam.perspective();
+
+  glm::mat4 g = glm::lookAtRH(glm::vec3(pos.x(), pos.y(), pos.z()), glm::vec3(target.x(), target.y(), target.z()), glm::vec3(up.x(), up.y(), up.z()));
+  mr::Matr4f expected = {
+    g[0][0], g[0][1], g[0][2], g[0][3],
+    g[1][0], g[1][1], g[1][2], g[1][3],
+    g[2][0], g[2][1], g[2][2], g[2][3],
+    g[3][0], g[3][1], g[3][2], g[3][3]
+  };
+
+  EXPECT_TRUE(mr::equal(view, expected, 0.0001f));
+}
+
+TEST(Camera, ViewMatrixArbitraryRotation) {
+  // Camera at origin with arbitrary rotation
+  mr::Camera<float> cam(mr::Vec3f(0, 0, 0));
+  cam += mr::Yaw(45_deg);
+  cam += mr::Pitch(30_deg);
+  
+  mr::Matr4f view = cam.perspective();
+
+  // Get the camera's basis vectors
+  mr::Vec3f right = cam.right();
+  mr::Vec3f up = cam.up();
+  mr::Vec3f forward = -cam.direction();  // Forward is negative of look direction
+
+  // Expected view matrix using camera's basis vectors
+  mr::Matr4f expected = {
+    right.x(), up.x(), forward.x(), 0,
+    right.y(), up.y(), forward.y(), 0,
+    right.z(), up.z(), forward.z(), 0,
+    0, 0, 0, 1
+  };
+
+  EXPECT_TRUE(mr::equal(view, expected, 0.0001f));
 }
 
 TEST(Color, Constructors) {

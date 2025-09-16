@@ -9,7 +9,7 @@ include(${CMAKE_CURRENT_BINARY_DIR}/cmake/CPM.cmake)
 CPMFindPackage(
   NAME Vc
   GITHUB_REPOSITORY 4J-company/Vc
-  GIT_TAG 1.4.1
+  GIT_TAG 1.4
 )
 
 if (MR_MATH_ENABLE_TESTING)
@@ -17,6 +17,12 @@ if (MR_MATH_ENABLE_TESTING)
     NAME GTest
     GITHUB_REPOSITORY google/googletest
     GIT_TAG 1.14.1
+  )
+
+  CPMFindPackage(
+    NAME glm
+    GITHUB_REPOSITORY g-truc/glm
+    GIT_TAG 1.0.1
   )
 endif()
 

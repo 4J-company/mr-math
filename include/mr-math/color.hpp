@@ -8,7 +8,7 @@ namespace mr {
 inline namespace math {
 
   // color in RGBA float format
-  struct [[nodiscard]] Color {
+  struct alignas(float) [[nodiscard]] Color {
   public:
     using ValueT = float;
 

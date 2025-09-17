@@ -9,7 +9,7 @@ inline namespace math {
     struct Quat;
 
   template <ArithmeticT T, std::size_t N>
-    struct Row : RowOperators<Row<T, N>> {
+    struct alignas(T) Row : RowOperators<Row<T, N>> {
       friend struct Quat<T>;
 
     public:

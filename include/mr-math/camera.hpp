@@ -10,7 +10,7 @@ inline namespace math {
   using namespace mr::literals;
 
   template <std::floating_point T = float>
-    struct [[nodiscard]] Camera {
+    struct alignas(T) [[nodiscard]] Camera {
       public:
         using ValueT = T;
         using VecT = Vec3<T>;

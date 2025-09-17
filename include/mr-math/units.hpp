@@ -46,7 +46,7 @@ inline namespace math {
 
 
   template <std::floating_point T>
-    struct [[nodiscard]] Radians : UnitOperators<Radians<T>> {
+    struct alignas(T) [[nodiscard]] Radians : UnitOperators<Radians<T>> {
     public:
       using ValueT = T;
 
@@ -76,7 +76,7 @@ inline namespace math {
     };
 
   template <std::floating_point T>
-    struct [[nodiscard]] Degrees : UnitOperators<Degrees<T>> {
+    struct alignas(T) [[nodiscard]] Degrees : UnitOperators<Degrees<T>> {
     public:
       using ValueT = T;
 

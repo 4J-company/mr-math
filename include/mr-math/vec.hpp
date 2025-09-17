@@ -42,7 +42,7 @@ inline namespace math {
 
   // base vector (use aliases for full functional)
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
-    struct [[nodiscard]] Vec : public RowOperators<Vec<T, N>> {
+    struct alignas(T) [[nodiscard]] Vec : public RowOperators<Vec<T, N>> {
       friend struct Quat<T>;
 
     public:

@@ -31,7 +31,7 @@ inline namespace math {
   using Norm4d = Norm4<double>;
 
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
-    struct [[nodiscard]] Norm {
+    struct alignas(T) [[nodiscard]] Norm {
       friend struct Vec<T, N>;
 
       using ValueT = T;

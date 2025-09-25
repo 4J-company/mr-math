@@ -210,30 +210,30 @@ mr::Vec3f rotated_point = point * q1;
 ### Color
 Initialization
 ```cpp
-mr::Color c1; // same as Vec4f(0, 0, 0, 0)
-mr::Color c2 = mr::Color(0.3, 0.47, 0.8); // == (0.3, 0.47, 0.8, 1.0)
-mr::Color c3 = mr::Color(76, 119, 204, 255); // == (0.2980392156862745, 0.4666666666666667, 0.8, 1.0)
-mr::Color c4 = mr::Color(0x4C'77'CC'FF); // == (0.2980392156862745, 0.4666666666666667, 0.8, 1.0)
-mr::Color c5 = 0x4C'77'CC'FF_rgba; // == (0.2980392156862745, 0.4666666666666667, 0.8, 1.0)
+mr::RGBAColor c1; // same as Vec4f(0, 0, 0, 0)
+mr::RGBAColor c2 = mr::Color(0.3, 0.47, 0.8); // == (0.3, 0.47, 0.8, 1.0)
+mr::RGBAColor c3 = mr::Color(76, 119, 204, 255); // == (0.2980392156862745, 0.4666666666666667, 0.8, 1.0)
+mr::RGBAColor c4 = mr::Color(0x4C'77'CC'FF); // == (0.2980392156862745, 0.4666666666666667, 0.8, 1.0)
+mr::RGBAColor c5 = 0x4C'77'CC'FF_rgba; // == (0.2980392156862745, 0.4666666666666667, 0.8, 1.0)
 ```
 Formats
 ```cpp
-mr::Color c6 = 0x4C'77'CC'FF_rgba;
-mr::Color c7 = color.argb(); // == 0xFF'4C'77'CC_rgba
-mr::Color c8 = color.bgra(); // == 0xCC'77'4c'FF_rgba
-mr::Color c9 = color.abgr(); // == 0xFF'CC'77'4c_rgba
+mr::RGBAColor c6 = 0x4C'77'CC'FF_rgba;
+mr::RGBAColor c7 = color.argb(); // == 0xFF'4C'77'CC_rgba
+mr::RGBAColor c8 = color.bgra(); // == 0xCC'77'4c'FF_rgba
+mr::RGBAColor c9 = color.abgr(); // == 0xFF'CC'77'4c_rgba
 ```
 Operations
 - comparison
 ```cpp
-mr::Color c10 = 0x4C'77'CC'FF_rgba;
-mr::Color copy = c10;
+mr::RGBAColor c10 = 0x4C'77'CC'FF_rgba;
+mr::RGBAColor copy = c10;
 
 bool is_equal = c10 == copy; // == true
 ```
 - sum
 ```cpp
-mr::Color c11 = mr::Color(1.0, 0.0, 0.5, 1.0) + mr::Color(0.0, 1.0, 0.5, 1.0); // == mr::Color(1.0, 1.0, 1.0, 2.0));
+mr::RGBAColor c11 = mr::Color(1.0, 0.0, 0.5, 1.0) + mr::Color(0.0, 1.0, 0.5, 1.0); // == mr::Color(1.0, 1.0, 1.0, 2.0));
 ```
 
 ### Useful stuff

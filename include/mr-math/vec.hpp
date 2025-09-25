@@ -24,9 +24,9 @@ inline namespace math {
   template <ArithmeticT T>
     using Vec4 = Vec<T, 4>;
 
-  using Vec2i = Vec2<int>;
-  using Vec3i = Vec3<int>;
-  using Vec4i = Vec4<int>;
+  using Vec2i = Vec2<int32_t>;
+  using Vec3i = Vec3<int32_t>;
+  using Vec4i = Vec4<int32_t>;
 
   using Vec2u = Vec2<uint32_t>;
   using Vec3u = Vec3<uint32_t>;
@@ -39,6 +39,16 @@ inline namespace math {
   using Vec2d = Vec2<double>;
   using Vec3d = Vec3<double>;
   using Vec4d = Vec4<double>;
+
+  template <ArithmeticT T>
+    struct alignas(T) [[nodiscard]] PackedVec3 {
+      T x, y, z;
+    };
+
+  using PackedVec3i = PackedVec3<int32_t>;
+  using PackedVec3u = PackedVec3<uint32_t>;
+  using PackedVec3f = PackedVec3<float>;
+  using PackedVec3d = PackedVec3<double>;
 
   // base vector (use aliases for full functional)
   template <ArithmeticT T, std::size_t N> requires (N >= 2)

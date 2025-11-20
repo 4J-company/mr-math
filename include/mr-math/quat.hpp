@@ -87,6 +87,7 @@ namespace mr {
           auto t = vq % lhs;
           auto u = std::sin(rhs.w() / 2) * t + vq % t;
 
+<<<<<<< Updated upstream
           return {lhs + u + u};
         }
       template <std::size_t N>
@@ -94,6 +95,38 @@ namespace mr {
           lhs = lhs * rhs;
           return lhs;
         }
+=======
+      [[nodiscard]] friend constexpr Vec3<T> operator*(const Vec3<T>& v, const Quat& q) noexcept {
+        const Quat pure(0, v.x(), v.y(), v.z());
+        const Quat result = q * pure * q.conjugate();
+        std::cout << q << " * " << pure << " * " << q.conjugate() << " = " << result << std::endl;
+        return result.vec();
+      }
+      friend constexpr Vec<T, 3> & operator*=(Vec<T, 3> &lhs, const Quat &rhs) noexcept {
+        lhs = lhs * rhs;
+        return lhs;
+      }
+
+      [[nodiscard]] friend constexpr Quat operator/(const Quat &lhs, T rhs) noexcept {
+        return {
+          lhs.w() / rhs,
+          lhs.vec() / rhs,
+        };
+      }
+      friend constexpr Quat & operator/=(Quat &lhs, T rhs) noexcept {
+        lhs = lhs / rhs;
+        return lhs;
+      }
+
+      [[nodiscard]] constexpr Quat conjugate() const noexcept {
+        return Quat(w(), -vec());
+      }
+
+      friend std::ostream & operator<<(std::ostream &os, const Quat &q) noexcept {
+        os << '(' << q.w() << ", " << q.vec() << ')';
+        return os;
+      }
+>>>>>>> Stashed changes
     };
 }
 

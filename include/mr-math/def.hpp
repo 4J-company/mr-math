@@ -34,6 +34,7 @@ namespace mr {
     // using SimdImpl = stdx::fixed_size_simd<T, N>;
     requires(sizeof(T) == 4)
     using SimdImpl = typename stdx::make_sized_batch<T, 4>::type;
+    // using SimdImpl = stdx::batch<T, stdx::avx2>;
     // using SimdImpl = typename stdx::make_sized_batch<T, N>::type;
 
   template<ArithmeticT T>

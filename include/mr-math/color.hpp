@@ -107,7 +107,7 @@ namespace mr {
       return s;
     }
 
-  private:
+  //private:
     Vec4f _data;
   };
 

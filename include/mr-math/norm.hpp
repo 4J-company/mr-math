@@ -46,8 +46,8 @@ namespace mr {
 
 
       constexpr Norm(UncheckedTag, const VecT &v) noexcept : _data(v) {
-          assert(mr::equal(v.length(), 1, 0.1f));
-        }
+        assert(mr::equal(v.length(), 1, 0.1f));
+      }
 
       constexpr operator VecT() const noexcept { return _data; }
 

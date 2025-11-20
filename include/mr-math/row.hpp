@@ -100,14 +100,24 @@ namespace mr {
 
       constexpr void swizzle(const std::array<std::size_t, N> &mask) {
         using IntSimdT = SimdImpl<uint32_t, N>;
+        // using IntSimdT = stdx::batch<uint32_t, xsimd::sse2>;
         std::array<uint32_t, IntSimdT::size> buf;
         for (std::size_t i = 0; i < N; i++) {
           buf[i] = mask[i];
         }
         for (std::size_t i = N; i < buf.size(); i++) {
-          buf[i] = i;
+          buf[i] = static_cast<uint32_t>(i);
         }
+        // IntSimdT sm;
+        // sm = sm.load_unaligned(buf.data());
         auto simd_mask = stdx::load_unaligned(buf.data());
+<<<<<<< Updated upstream
+=======
+        // std::cout << typeid(_data).name() << std::endl;
+        // std::cout << typeid(sm).name() << std::endl;
+
+        // TODO(dk6): this code isnt compile in benchmark
+>>>>>>> Stashed changes
         _data = stdx::swizzle(_data, simd_mask);
       }
 

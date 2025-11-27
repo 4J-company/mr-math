@@ -66,10 +66,10 @@ inline namespace math {
           T r22 = 1 - 2 * std::pow(x_, 2) - 2 * std::pow(y_, 2);
 
           return Matr<T, 4>(
-              Matr<T, 4>::RowT (r00, r10, r20, 0),
-              Matr<T, 4>::RowT (r01, r11, r21, 0),
-              Matr<T, 4>::RowT (r02, r12, r22, 0),
-              Matr<T, 4>::RowT (0, 0, 0, 1)
+              typename Matr<T, 4>::RowT (r00, r10, r20, 0),
+              typename Matr<T, 4>::RowT (r01, r11, r21, 0),
+              typename Matr<T, 4>::RowT (r02, r12, r22, 0),
+              typename Matr<T, 4>::RowT (0, 0, 0, 1)
           );
       }
 

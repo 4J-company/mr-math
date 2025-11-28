@@ -400,16 +400,16 @@ TEST(Camera, ViewMatrixArbitraryRotation) {
   EXPECT_TRUE(mr::equal(view, expected, 0.0001f));
 }
 
-TEST(Color, Constructors) {
-  EXPECT_EQ(mr::Color(), mr::Color(0, 0, 0, 0));
+TEST(RGBAColor, Constructors) {
+  EXPECT_EQ(mr::RGBAColor(), mr::RGBAColor(0, 0, 0, 0));
 
-  const mr::Color expected1{0.3, 0.47, 0.8, 1.0};
-  EXPECT_EQ(mr::Color(0.3, 0.47, 0.8), expected1);
-  EXPECT_EQ(mr::Color(mr::Vec4f(0.3, 0.47, 0.8, 1)), expected1);
+  const mr::RGBAColor expected1{0.3, 0.47, 0.8, 1.0};
+  EXPECT_EQ(mr::RGBAColor(0.3, 0.47, 0.8), expected1);
+  EXPECT_EQ(mr::RGBAColor(mr::Vec4f(0.3, 0.47, 0.8, 1)), expected1);
 
-  const mr::Color expected2{0.2980392156862745, 0.4666666666666667, 0.8, 1.0};
-  EXPECT_EQ(mr::Color(76, 119, 204, 255), expected2);
-  EXPECT_EQ(mr::Color(0x4C'77'CC'FF), expected2);
+  const mr::RGBAColor expected2{0.2980392156862745, 0.4666666666666667, 0.8, 1.0};
+  EXPECT_EQ(mr::RGBAColor(76, 119, 204, 255), expected2);
+  EXPECT_EQ(mr::RGBAColor(0x4C'77'CC'FF), expected2);
   EXPECT_EQ(0x4C'77'CC'FF_rgba, expected2);
 }
 
@@ -443,7 +443,7 @@ TEST(Color, Setters) {
   auto color = 0x4C'77'CC'FF_rgba;
   color.r(1.0);
   color.set(1, 0.5);
-  EXPECT_EQ(color, mr::Color(1.0, 0.5, 0.8, 1.0));
+  EXPECT_EQ(color, mr::RGBAColor(1.0, 0.5, 0.8, 1.0));
 }
 
 TEST(Color, Equality) {
@@ -460,8 +460,8 @@ TEST(Color, Equality) {
 }
 
 TEST(Color, Addition) {
-  // Values can exeed 1.0 (should they?)
-  EXPECT_EQ(mr::Color(1.0, 0.0, 0.5, 1.0) + mr::Color(0.0, 1.0, 0.5, 1.0), mr::Color(1.0, 1.0, 1.0, 2.0));
+  // Values can exceed 1.0 (should they?)
+  EXPECT_EQ(mr::RGBAColor(1.0, 0.0, 0.5, 1.0) + mr::RGBAColor(0.0, 1.0, 0.5, 1.0), mr::RGBAColor(1.0, 1.0, 1.0, 2.0));
 }
 
 TEST(Utility, Within) {

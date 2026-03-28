@@ -27,9 +27,12 @@ inline namespace math {
           T height = 0.09;
 
           inline constexpr Projection(mr::Radiansf fov = mr::Radiansf(90_deg),
+                                      T near_distance = 0.1, T far_distance = 1000.0,
                                       float aspect_ratio = 16.f / 9.f) noexcept
-              : width(2 * distance * std::tan(fov._data / 2))
-              , height(width * aspect_ratio) { }
+            : distance(near_distance >= epsilon<T>() ? near_distance : 0.1)
+            , far(far_distance >= distance + epsilon<T>() ? far_distance : (distance * 2) + 1)
+            , width(2 * distance * std::tan(fov._data / 2))
+            , height(width * aspect_ratio) {}
 
           inline constexpr Projection(Projection &&) noexcept = default;
           inline constexpr Projection & operator=(Projection &&) noexcept = default;
@@ -50,18 +53,53 @@ inline namespace math {
           mutable MatrT orthographic;
         };
 
-        constexpr Camera(VecT position = {0, 0, 0}, VecT direction = mr::axis::z, VecT up = mr::axis::y)
-          : _position(position)
-          , _direction(direction.normalized_unchecked())
-          , _up(up.normalized_unchecked())
-          , _right(direction.cross(up).normalized_unchecked())
-          {
-            // Orthonormalize basis to ensure consistency with lookAt
-            const NormT right_local = _direction.cross(_up).normalized_unchecked();
-            const NormT up_local = right_local.cross(_direction).normalized_unchecked();
-            _right = right_local;
-            _up = up_local;
+        constexpr Camera(VecT position = {0, 0, 0},
+                         NormT direction = mr::Norm3<T>(mr::unchecked, mr::axis::z),
+                         NormT up = mr::Norm3<T>(mr::unchecked, mr::axis::y))
+        {
+          set(position, direction, up);
+        }
+
+        constexpr Camera(VecT position, // has not default value - Camera constructors become ambiguous for default
+                         VecT at = {0, 0, 0},
+                         NormT up = mr::Norm3<T>(mr::unchecked, mr::axis::y))
+        {
+          set(position, at, up);
+        }
+
+        constexpr Camera & set(VecT position = {0, 0, 0},
+                               NormT direction = mr::Norm3<T>(mr::unchecked, mr::axis::z),
+                               NormT up = mr::Norm3<T>(mr::unchecked, mr::axis::y)) noexcept
+        {
+          auto right_opt = direction.cross(up).normalized();
+          if (!right_opt) {
+            return *this;
           }
+
+          _right = *right_opt;
+          _position = position;
+          _direction = direction;
+          _up = up;
+
+          // Orthonormalize basis to ensure consistency with lookAt
+          const NormT up_local = _right.cross(_direction).normalized_unchecked();
+          _up = up_local;
+
+          _perspective_calculated = false;
+
+          return *this;
+        }
+
+        constexpr Camera & set(VecT position = {0, 0, 0},
+                               VecT at = {0, 0, 1},
+                               NormT up = mr::Norm3<T>(mr::unchecked, mr::axis::y)) noexcept
+        {
+          auto dir = (at - position).normalized();
+          if (dir) {
+            set(position, dir.value(), up);
+          }
+          return *this;
+        }
 
         // copy semantics
         constexpr Camera(const Camera &other) noexcept
@@ -267,10 +305,10 @@ inline namespace math {
       private:
         Projection _projection;
 
-        VecT _position;
-        NormT _direction;
-        NormT _up;
-        NormT _right;
+        VecT _position {};
+        NormT _direction {mr::unchecked, -axis::z};
+        NormT _up {mr::unchecked, axis::y};
+        NormT _right {mr::unchecked, axis::x};
 
         mutable std::mutex _perspective_mutex;
         mutable std::atomic_bool _perspective_calculated = false;

@@ -48,6 +48,7 @@ if (MR_MATH_ENABLE_BENCHMARK)
 endif()
 
 if (MR_MATH_ENABLE_TESTING)
+  enable_testing()
   add_subdirectory(tests)
 endif()
 

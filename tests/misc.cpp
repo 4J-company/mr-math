@@ -39,13 +39,14 @@ TEST(Camera, DefaultConstructor) {
 }
 
 TEST(Camera, PositionConstructor) {
-  mr::Camera<float> cam(mr::Vec3f(1, 2, 3));
+  // Explicit basis avoids ambiguity between (position, Norm, Norm) and (position, at, Norm).
+  mr::Camera<float> cam(mr::Vec3f(1, 2, 3), mr::Norm3f(0, 0, -1), mr::Norm3f(0, 1, 0));
   EXPECT_EQ(cam.position(), mr::Vec3f(1, 2, 3));
   EXPECT_TRUE(mr::equal(cam.direction(), mr::Norm3f(0, 0, -1)));
 }
 
 TEST(Camera, FullConstructor) {
-  mr::Camera<float> cam(mr::Vec3f(1, 2, 3), mr::Vec3f(0, 0, -1), mr::Vec3f(0, 1, 0));
+  mr::Camera<float> cam(mr::Vec3f(1, 2, 3), mr::Norm3f(0, 0, -1), mr::Norm3f(0, 1, 0));
   EXPECT_EQ(cam.position(), mr::Vec3f(1, 2, 3));
   EXPECT_EQ(cam.direction(), mr::Norm3f(0, 0, -1));
   EXPECT_EQ(cam.up(), mr::Norm3f(0, 1, 0));
@@ -53,7 +54,7 @@ TEST(Camera, FullConstructor) {
 }
 
 TEST(Camera, CopySemantics) {
-  mr::Camera<float> cam1(mr::Vec3f(1, 2, 3));
+  mr::Camera<float> cam1(mr::Vec3f(1, 2, 3), mr::Norm3f(0, 0, -1), mr::Norm3f(0, 1, 0));
   mr::Camera<float> cam2(cam1);
   EXPECT_EQ(cam2.position(), mr::Vec3f(1, 2, 3));
 
@@ -63,7 +64,7 @@ TEST(Camera, CopySemantics) {
 }
 
 TEST(Camera, MoveSemantics) {
-  mr::Camera<float> cam1(mr::Vec3f(1, 2, 3));
+  mr::Camera<float> cam1(mr::Vec3f(1, 2, 3), mr::Norm3f(0, 0, -1), mr::Norm3f(0, 1, 0));
   mr::Camera<float> cam2(std::move(cam1));
   EXPECT_EQ(cam2.position(), mr::Vec3f(1, 2, 3));
 
@@ -126,7 +127,7 @@ TEST(Camera, ProjectionSettings) {
 }
 
 TEST(Camera, PerspectiveMatrix) {
-  mr::Camera<float> cam(mr::Vec3f(1, 2, 3));
+  mr::Camera<float> cam(mr::Vec3f(1, 2, 3), mr::Norm3f(0, 0, -1), mr::Norm3f(0, 1, 0));
   mr::Matr4f view = cam.perspective();
 
   // Should be inverse of camera transform
@@ -257,7 +258,7 @@ TEST(Camera, FrustumMatrix_AspectResize) {
 
 TEST(Camera, FrustumMatrix_TranslationInvariant) {
   // Moving camera should not change projection (frustum) matrix
-  mr::Camera<float> cam(mr::Vec3f(1, 2, 3));
+  mr::Camera<float> cam(mr::Vec3f(1, 2, 3), mr::Norm3f(0, 0, -1), mr::Norm3f(0, 1, 0));
   auto &proj = cam.projection();
   proj.distance = 0.2f;
   proj.far = 500.0f;
@@ -272,7 +273,7 @@ TEST(Camera, FrustumMatrix_TranslationInvariant) {
 }
 
 TEST(Camera, View) {
-  mr::Camera<float> cam(mr::Vec3f(0, 0, 5));
+  mr::Camera<float> cam(mr::Vec3f(0, 0, 5), mr::Norm3f(0, 0, -1), mr::Norm3f(0, 1, 0));
   mr::Matr4f view = cam.perspective();
 
   mr::Matr4f expected = {
@@ -287,7 +288,7 @@ TEST(Camera, View) {
 
 TEST(Camera, ViewMatrixOrigin) {
   // Camera at origin looking down negative Z
-  mr::Camera<float> cam(mr::Vec3f(0, 0, 0), mr::Vec3f(0, 0, -1), mr::Vec3f(0, 1, 0));
+  mr::Camera<float> cam(mr::Vec3f(0, 0, 0), mr::Norm3f(0, 0, -1), mr::Norm3f(0, 1, 0));
   mr::Matr4f view = cam.perspective();
 
   glm::mat4 g = glm::lookAtRH(glm::vec3(0,0,0), glm::vec3(0,0,-1), glm::vec3(0,1,0));
@@ -309,7 +310,7 @@ TEST(Camera, ViewMatrixOrigin) {
 
 TEST(Camera, ViewMatrixTranslated) {
   // Camera at (1, 2, 3) looking down negative Z
-  mr::Camera<float> cam(mr::Vec3f(1, 2, 3), mr::Vec3f(0, 0, -1), mr::Vec3f(0, 1, 0));
+  mr::Camera<float> cam(mr::Vec3f(1, 2, 3), mr::Norm3f(0, 0, -1), mr::Norm3f(0, 1, 0));
   mr::Matr4f view = cam.perspective();
 
   glm::mat4 g = glm::lookAtRH(glm::vec3(1,2,3), glm::vec3(1,2,2), glm::vec3(0,1,0));
@@ -325,7 +326,7 @@ TEST(Camera, ViewMatrixTranslated) {
 
 TEST(Camera, ViewMatrixYaw90) {
   // Camera at origin, yawed 90 degrees (looking down negative X)
-  mr::Camera<float> cam(mr::Vec3f(0, 0, 0), mr::Vec3f(-1, 0, 0), mr::Vec3f(0, 1, 0));
+  mr::Camera<float> cam(mr::Vec3f(0, 0, 0), mr::Norm3f(-1, 0, 0), mr::Norm3f(0, 1, 0));
   mr::Matr4f view = cam.perspective();
 
   glm::mat4 g = glm::lookAtRH(glm::vec3(0,0,0), glm::vec3(-1,0,0), glm::vec3(0,1,0));
@@ -341,7 +342,7 @@ TEST(Camera, ViewMatrixYaw90) {
 
 TEST(Camera, ViewMatrixPitch90) {
   // Camera at origin, pitched 90 degrees (looking down negative Y)
-  mr::Camera<float> cam(mr::Vec3f(0, 0, 0), mr::Vec3f(0, -1, 0), mr::Vec3f(0, 0, 1));
+  mr::Camera<float> cam(mr::Vec3f(0, 0, 0), mr::Norm3f(0, -1, 0), mr::Norm3f(0, 0, 1));
   mr::Matr4f view = cam.perspective();
 
   glm::mat4 g = glm::lookAtRH(glm::vec3(0,0,0), glm::vec3(0,-1,0), glm::vec3(0,0,1));
@@ -359,9 +360,9 @@ TEST(Camera, ViewMatrixComplexPose) {
   // Camera at (5, 10, 15) looking at (0, 0, 0) with up vector (0, 1, 0)
   mr::Vec3f pos(5, 10, 15);
   mr::Vec3f target(0, 0, 0);
-  mr::Vec3f up(0, 1, 0);
+  mr::Norm3f up(0, 1, 0);
   mr::Norm3f direction = (target - pos).normalized().value();
-  
+
   mr::Camera<float> cam(pos, direction, up);
   mr::Matr4f view = cam.perspective();
 
@@ -378,7 +379,7 @@ TEST(Camera, ViewMatrixComplexPose) {
 
 TEST(Camera, ViewMatrixArbitraryRotation) {
   // Camera at origin with arbitrary rotation
-  mr::Camera<float> cam(mr::Vec3f(0, 0, 0));
+  mr::Camera<float> cam(mr::Vec3f(0, 0, 0), mr::Norm3f(0, 0, -1), mr::Norm3f(0, 1, 0));
   cam += mr::Yaw(45_deg);
   cam += mr::Pitch(30_deg);
   

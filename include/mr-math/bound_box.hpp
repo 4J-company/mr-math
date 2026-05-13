@@ -16,7 +16,7 @@ inline namespace math {
   using AABBu = AABB<uint32_t>;
 
   template <ArithmeticT T>
-    struct alignas(T) AABB {
+    struct AABB {
     public:
       using VecT = Vec3<T>;
 

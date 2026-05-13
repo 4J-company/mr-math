@@ -41,7 +41,7 @@ inline namespace math {
   using Vec4d = Vec4<double>;
 
   template <ArithmeticT T>
-    struct alignas(T) [[nodiscard]] PackedVec3 {
+    struct [[nodiscard]] PackedVec3 {
       T x, y, z;
     };
 
@@ -52,7 +52,7 @@ inline namespace math {
 
   // base vector (use aliases for full functional)
   template <ArithmeticT T, std::size_t N> requires (N >= 2)
-    struct alignas(T) [[nodiscard]] Vec : public RowOperators<Vec<T, N>> {
+    struct [[nodiscard]] Vec : public RowOperators<Vec<T, N>> {
       friend struct Quat<T>;
 
     public:

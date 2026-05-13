@@ -16,7 +16,7 @@ inline namespace math {
   using Quatu = Quat<unsigned int>;
 
   template <ArithmeticT T>
-    struct alignas(T) Quat {
+    struct Quat {
     private:
       T _angle {};
       Vec3<T> _vec {};

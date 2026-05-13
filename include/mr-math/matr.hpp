@@ -71,7 +71,7 @@ inline namespace math
   using RotateMatr4u = RotateMatr<uint32_t>;
 
   template <ArithmeticT T, std::size_t N>
-    struct alignas(T) [[nodiscard]] Matr
+    struct [[nodiscard]] Matr
     {
     public:
       using ValueT = T;
